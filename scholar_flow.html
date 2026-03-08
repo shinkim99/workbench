@@ -568,6 +568,10 @@
         <label>N8N_WEBHOOK_URL (Zotero 저장용)</label>
         <input type="text" id="n8nWebhook" placeholder="https://your-n8n.cloud/webhook/..." />
       </div>
+      <div class="field-group">
+        <label>ZOTERO 컬렉션 이름 <span style="color:var(--muted); font-weight:300;">(비워두면 My Library에 저장)</span></label>
+        <input type="text" id="zoteroCollection" placeholder="예: CNT_배터리_2024, 리튬이온_전극..." />
+      </div>
     </div>
   </div>
 
@@ -991,6 +995,8 @@ CNT 배터리/전극 연구 맥락을 고려하세요.
     const selected = [...document.querySelectorAll('.paper-checkbox:checked')];
     if (selected.length === 0) { alert('저장할 논문을 선택하세요'); return; }
 
+    const collectionName = document.getElementById('zoteroCollection').value.trim();
+
     const btn = document.getElementById('zoteroBtn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>저장 중...';
@@ -1016,7 +1022,11 @@ CNT 배터리/전극 연구 맥락을 고려하세요.
       const res = await fetch(webhook, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ papers: toSave, timestamp: new Date().toISOString() })
+        body: JSON.stringify({
+          papers: toSave,
+          collectionName: collectionName || '',
+          timestamp: new Date().toISOString()
+        })
       });
 
       if (res.ok) {
