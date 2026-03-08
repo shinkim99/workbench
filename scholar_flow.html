@@ -717,13 +717,23 @@
           max_tokens: 1000,
           messages: [{
             role: 'user',
-            content: `당신은 학술 논문 검색 전문가입니다.
-주제: "${keyword}"
+            content: `You are a Semantic Scholar search expert.
 
-이 주제로 Semantic Scholar에서 검색할 영어 검색식 5개를 생성하세요.
-CNT 배터리/전극 연구 맥락을 고려하세요.
+Topic (may be Korean or English): "${keyword}"
 
-반드시 JSON 배열만 반환하세요. 다른 텍스트 없이:
+Generate exactly 5 English search queries for Semantic Scholar API.
+
+CRITICAL RULES:
+1. Each query MUST be 2-4 words only (Semantic Scholar works best with short queries)
+2. Use only English academic terms
+3. NO long phrases or sentences
+4. Mix broad and specific angles
+5. If the topic is in Korean, translate to precise English academic terms
+
+GOOD examples: "CNT electrode dispersion", "carbon nanotube binder", "MWCNT slurry rheology"
+BAD examples: "multi-walled carbon nanotube dispersant binder battery electrode composite" (too long, will return 0 results)
+
+Return ONLY a JSON array, no other text:
 ["query1", "query2", "query3", "query4", "query5"]`
           }]
         })
@@ -786,11 +796,15 @@ CNT 배터리/전극 연구 맥락을 고려하세요.
     for (const q of activeQueries) {
       log(`검색 중: "${q}"`, 'info');
       try {
-        const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(q)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url&sort=${sortBy === 'citationCount' ? 'citationCount' : sortBy === 'year' ? 'publicationDate' : 'relevance'}`;
+        // Semantic Scholar 검색 (연도 필터 포함)
+        const yearFilter = `&year=${minYear}-`;
+        const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(q)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url${yearFilter}&sort=${sortBy === 'citationCount' ? 'citationCount' : sortBy === 'year' ? 'publicationDate' : 'relevance'}`;
         const res = await fetch(url);
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
-        if (data.data) {
+        if (data.data && data.data.length > 0) {
           const filtered = data.data.filter(p =>
             (p.citationCount || 0) >= minCit &&
             (p.year || 0) >= minYear &&
@@ -798,10 +812,35 @@ CNT 배터리/전극 연구 맥락을 고려하세요.
           );
           papers.push(...filtered);
           log(`"${q}" → ${filtered.length}편 수집`, 'success');
+        } else {
+          // Fallback: 쿼리가 너무 길면 앞 3단어만으로 재시도
+          const words = q.split(/\s+/);
+          if (words.length > 3) {
+            const shortQ = words.slice(0, 3).join(' ');
+            log(`"${q}" 결과 없음 → "${shortQ}"로 재시도`, 'warn');
+            const retryUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(shortQ)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url${yearFilter}&sort=${sortBy === 'citationCount' ? 'citationCount' : sortBy === 'year' ? 'publicationDate' : 'relevance'}`;
+            const retryRes = await fetch(retryUrl);
+            if (retryRes.ok) {
+              const retryData = await retryRes.json();
+              if (retryData.data) {
+                const filtered = retryData.data.filter(p =>
+                  (p.citationCount || 0) >= minCit &&
+                  (p.year || 0) >= minYear &&
+                  p.abstract
+                );
+                papers.push(...filtered);
+                log(`"${shortQ}" → ${filtered.length}편 수집 (fallback)`, 'success');
+              }
+            }
+          } else {
+            log(`"${q}" 검색 결과: 0편`, 'warn');
+          }
         }
       } catch (e) {
         log(`"${q}" 검색 실패: ${e.message}`, 'error');
       }
+      // API rate limit 방지 (1초 간격)
+      await new Promise(r => setTimeout(r, 1000));
     }
 
     // 중복 제거
