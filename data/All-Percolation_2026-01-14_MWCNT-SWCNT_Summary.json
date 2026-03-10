@@ -1,0 +1,1646 @@
+{
+  "savedData": [
+    {
+      "id": 1763964902185,
+      "date": "2025-11-24",
+      "lotNo": "251124-3A-JEIO-1.2p-PVP-TA3vs1",
+      "cntType": "SWCNT-EIS",
+      "manufacturer": "JEIO",
+      "grade": "300A",
+      "memo": "",
+      "color": "#1F618D",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": null,
+      "finalViscosity": null,
+      "selected": false,
+      "eisData": [
+        {
+          "concentration": 0.002,
+          "resistance": 130000,
+          "conductivity": 0.0000385
+        },
+        {
+          "concentration": 0.005,
+          "resistance": 120000,
+          "conductivity": 0.0000417
+        },
+        {
+          "concentration": 0.01,
+          "resistance": 100000,
+          "conductivity": 0.00005
+        },
+        {
+          "concentration": 0.03,
+          "resistance": 90000,
+          "conductivity": 0.0000556
+        }
+      ],
+      "inPlaneData": [],
+      "throughPlaneData": []
+    },
+    {
+      "id": 1762399863791,
+      "date": "2025-11-05",
+      "lotNo": "251105-TUBALL-0d8wtP_Ref. w/oHPH",
+      "cntType": "SWCNT-EIS",
+      "manufacturer": "OCSiAl",
+      "grade": "TUBALL",
+      "color": "#666666",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "selected": false,
+      "eisData": [
+        {
+          "concentration": 0.002,
+          "resistance": 67136.4,
+          "conductivity": 0.0000745
+        },
+        {
+          "concentration": 0.005,
+          "resistance": 35852.3,
+          "conductivity": 0.000139
+        },
+        {
+          "concentration": 0.01,
+          "resistance": 21860.6,
+          "conductivity": 0.000229
+        },
+        {
+          "concentration": 0.03,
+          "resistance": 8528.43,
+          "conductivity": 0.000586
+        }
+      ],
+      "inPlaneData": [],
+      "throughPlaneData": []
+    },
+    {
+      "id": 1762399995343,
+      "date": "2025-11-05",
+      "lotNo": "251105-TUBALL-0d8wtP_Ref. HPH",
+      "cntType": "SWCNT-EIS",
+      "manufacturer": "OCSiAl",
+      "grade": "TUBALL",
+      "color": "#1F618D",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "selected": false,
+      "eisData": [
+        {
+          "concentration": 0.002,
+          "resistance": 22289.77,
+          "conductivity": 0.000224
+        },
+        {
+          "concentration": 0.005,
+          "resistance": 3803.28,
+          "conductivity": 0.00131
+        },
+        {
+          "concentration": 0.01,
+          "resistance": 677.9,
+          "conductivity": 0.00738
+        },
+        {
+          "concentration": 0.03,
+          "resistance": 167.331,
+          "conductivity": 0.0299
+        }
+      ],
+      "inPlaneData": [],
+      "throughPlaneData": []
+    },
+    {
+      "id": 1762400062320,
+      "date": "2025-11-05",
+      "lotNo": "251105-100A-1d2wtP_KII_w/oHPH",
+      "cntType": "SWCNT-EIS",
+      "manufacturer": "JEIO",
+      "grade": "100A",
+      "color": "#FF5733",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "selected": false,
+      "eisData": [
+        {
+          "concentration": 0.002,
+          "resistance": 32783.6,
+          "conductivity": 0.000153
+        },
+        {
+          "concentration": 0.005,
+          "resistance": 17692.5,
+          "conductivity": 0.000283
+        },
+        {
+          "concentration": 0.01,
+          "resistance": 10687.4,
+          "conductivity": 0.000468
+        },
+        {
+          "concentration": 0.03,
+          "resistance": 5085.57,
+          "conductivity": 0.000983
+        }
+      ],
+      "inPlaneData": [],
+      "throughPlaneData": []
+    },
+    {
+      "id": 1763421371310,
+      "date": "2025-11-12",
+      "lotNo": "251112-CNANO-Ref_KIST",
+      "cntType": "MWCNT",
+      "manufacturer": "C-NANO",
+      "grade": "",
+      "memo": "Ref.KIST",
+      "color": "#666666",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 1800,
+      "finalViscosity": 2000,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 22.25,
+          "sheetR_min": 374000,
+          "sheetR_max": 390000,
+          "sheetR_avg": 382000,
+          "deviation": 16000,
+          "conductivity": 0.00118,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 21,
+          "sheetR_min": 44990,
+          "sheetR_max": 46540,
+          "sheetR_avg": 45800,
+          "deviation": 1550,
+          "conductivity": 0.0104,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 21.5,
+          "sheetR_min": 6223,
+          "sheetR_max": 6801,
+          "sheetR_avg": 6510,
+          "deviation": 578,
+          "conductivity": 0.0714,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763422000334,
+      "date": "2025-10-20",
+      "lotNo": "251020-BT1001M-Z20p-54um",
+      "cntType": "MWCNT",
+      "manufacturer": "LGC",
+      "grade": "BT1001M",
+      "memo": "T41",
+      "color": "#FF6384",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 6098,
+      "finalViscosity": 14234,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 20,
+          "sheetR_min": 43300,
+          "sheetR_max": 45700,
+          "sheetR_avg": 44500,
+          "deviation": 2400,
+          "conductivity": 0.0112,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 17.3,
+          "sheetR_min": 2700,
+          "sheetR_max": 2920,
+          "sheetR_avg": 2810,
+          "deviation": 220,
+          "conductivity": 0.206,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 19,
+          "sheetR_min": 1200,
+          "sheetR_max": 1240,
+          "sheetR_avg": 1220,
+          "deviation": 40,
+          "conductivity": 0.431,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763422207484,
+      "date": "2025-10-23",
+      "lotNo": "251023-10B-ZD30p-33um",
+      "cntType": "MWCNT",
+      "manufacturer": "JEIO",
+      "grade": "10B",
+      "memo": "T22",
+      "color": "#2E86C1",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 2827,
+      "finalViscosity": 2460,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 19.5,
+          "sheetR_min": 35700,
+          "sheetR_max": 39500,
+          "sheetR_avg": 37600,
+          "deviation": 3800,
+          "conductivity": 0.0136,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 17.5,
+          "sheetR_min": 3010,
+          "sheetR_max": 3100,
+          "sheetR_avg": 3060,
+          "deviation": 90,
+          "conductivity": 0.187,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 19.3,
+          "sheetR_min": 1280,
+          "sheetR_max": 1320,
+          "sheetR_avg": 1300,
+          "deviation": 40,
+          "conductivity": 0.399,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763422250775,
+      "date": "2025-10-21",
+      "lotNo": "251021-10B-A20p-33um",
+      "cntType": "MWCNT",
+      "manufacturer": "JEIO",
+      "grade": "10B",
+      "memo": "T32",
+      "color": "#3498DB",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 2230,
+      "finalViscosity": 12096,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 16,
+          "sheetR_min": 67900,
+          "sheetR_max": 70800,
+          "sheetR_avg": 69400,
+          "deviation": 2900,
+          "conductivity": 0.00901,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 15,
+          "sheetR_min": 3770,
+          "sheetR_max": 3820,
+          "sheetR_avg": 3800,
+          "deviation": 50,
+          "conductivity": 0.176,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 17.5,
+          "sheetR_min": 1560,
+          "sheetR_max": 1580,
+          "sheetR_avg": 1570,
+          "deviation": 20,
+          "conductivity": 0.364,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763422314909,
+      "date": "2025-10-15",
+      "lotNo": "251015-10B-Z20p-33um",
+      "cntType": "MWCNT",
+      "manufacturer": "JEIO",
+      "grade": "10B",
+      "memo": "T42",
+      "color": "#36A2EB",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 1726,
+      "finalViscosity": 2452,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 21.3,
+          "sheetR_min": 47600,
+          "sheetR_max": 48300,
+          "sheetR_avg": 48000,
+          "deviation": 700,
+          "conductivity": 0.00979,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 16.5,
+          "sheetR_min": 4550,
+          "sheetR_max": 4830,
+          "sheetR_avg": 4690,
+          "deviation": 280,
+          "conductivity": 0.129,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 18,
+          "sheetR_min": 1760,
+          "sheetR_max": 1790,
+          "sheetR_avg": 1780,
+          "deviation": 30,
+          "conductivity": 0.313,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763422404431,
+      "date": "2025-09-24",
+      "lotNo": "250924-BT1001M-A20p-50um",
+      "cntType": "MWCNT",
+      "manufacturer": "LGC",
+      "grade": "BT1001M",
+      "memo": "T31",
+      "color": "#C0392B",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 7285,
+      "finalViscosity": 15552,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 17.7,
+          "sheetR_min": 17100,
+          "sheetR_max": 17700,
+          "sheetR_avg": 17400,
+          "deviation": 600,
+          "conductivity": 0.0325,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 20.1,
+          "sheetR_min": 3230,
+          "sheetR_max": 3330,
+          "sheetR_avg": 3280,
+          "deviation": 100,
+          "conductivity": 0.152,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 18.5,
+          "sheetR_min": 1360,
+          "sheetR_max": 1410,
+          "sheetR_avg": 1390,
+          "deviation": 50,
+          "conductivity": 0.39,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763422534153,
+      "date": "2025-10-01",
+      "lotNo": "251001-300T-F100-22um-OLD",
+      "cntType": "MWCNT",
+      "manufacturer": "KUMHO",
+      "grade": "300T-F100",
+      "memo": "T13-OLD",
+      "color": "#5B2C6F",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 1670,
+      "finalViscosity": 2164,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 19.3,
+          "sheetR_min": 21100,
+          "sheetR_max": 24200,
+          "sheetR_avg": 22700,
+          "deviation": 3100,
+          "conductivity": 0.0229,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 19,
+          "sheetR_min": 4080,
+          "sheetR_max": 4430,
+          "sheetR_avg": 4260,
+          "deviation": 350,
+          "conductivity": 0.124,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 15.3,
+          "sheetR_min": 2080,
+          "sheetR_max": 2230,
+          "sheetR_avg": 2160,
+          "deviation": 150,
+          "conductivity": 0.303,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763422594657,
+      "date": "2025-10-23",
+      "lotNo": "251023-300T-F100-Z20p-22um-OLD",
+      "cntType": "MWCNT",
+      "manufacturer": "KUMHO",
+      "grade": "300T-F100",
+      "memo": "T43-OLD",
+      "color": "#7D3C98",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 4655,
+      "finalViscosity": 6706,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 18,
+          "sheetR_min": 41600,
+          "sheetR_max": 43000,
+          "sheetR_avg": 42300,
+          "deviation": 1400,
+          "conductivity": 0.0131,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 16,
+          "sheetR_min": 4170,
+          "sheetR_max": 4390,
+          "sheetR_avg": 4280,
+          "deviation": 220,
+          "conductivity": 0.146,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 19,
+          "sheetR_min": 1670,
+          "sheetR_max": 1770,
+          "sheetR_avg": 1720,
+          "deviation": 100,
+          "conductivity": 0.306,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763422702464,
+      "date": "2025-09-23",
+      "lotNo": "250923-BT1001M-A30p-40um",
+      "cntType": "MWCNT",
+      "manufacturer": "LGC",
+      "grade": "BT1001M",
+      "memo": "T11-SHORT",
+      "color": "#D32F2F",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 2991,
+      "finalViscosity": 4319,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 18.1,
+          "sheetR_min": 32100,
+          "sheetR_max": 33500,
+          "sheetR_avg": 32800,
+          "deviation": 1400,
+          "conductivity": 0.0168,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 19.5,
+          "sheetR_min": 4700,
+          "sheetR_max": 5070,
+          "sheetR_avg": 4890,
+          "deviation": 370,
+          "conductivity": 0.105,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 15.3,
+          "sheetR_min": 1730,
+          "sheetR_max": 1770,
+          "sheetR_avg": 1750,
+          "deviation": 40,
+          "conductivity": 0.373,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763422735608,
+      "date": "2025-09-23",
+      "lotNo": "250923-BT1001M-A30p-57um",
+      "cntType": "MWCNT",
+      "manufacturer": "LGC",
+      "grade": "BT1001M",
+      "memo": "T11-LONG",
+      "color": "#DC143C",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 5556,
+      "finalViscosity": 7548,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 19.8,
+          "sheetR_min": 14300,
+          "sheetR_max": 14500,
+          "sheetR_avg": 14400,
+          "deviation": 200,
+          "conductivity": 0.0351,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 19,
+          "sheetR_min": 2690,
+          "sheetR_max": 2890,
+          "sheetR_avg": 2790,
+          "deviation": 200,
+          "conductivity": 0.189,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 21.5,
+          "sheetR_min": 1000,
+          "sheetR_max": 1060,
+          "sheetR_avg": 1030,
+          "deviation": 60,
+          "conductivity": 0.452,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763423746885,
+      "date": "2025-11-17",
+      "lotNo": "251117-NC606-Ref.2",
+      "cntType": "MWCNT",
+      "manufacturer": "DAZHAN",
+      "grade": "NC606",
+      "memo": "Ref.2",
+      "color": "#34495E",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 1800,
+      "finalViscosity": 2000,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 22,
+          "sheetR_min": 253800,
+          "sheetR_max": 275700,
+          "sheetR_avg": 265000,
+          "deviation": 21900,
+          "conductivity": 0.00172,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 21,
+          "sheetR_min": 25030,
+          "sheetR_max": 27600,
+          "sheetR_avg": 26300,
+          "deviation": 2570,
+          "conductivity": 0.0181,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 24,
+          "sheetR_min": 3355,
+          "sheetR_max": 3750,
+          "sheetR_avg": 3550,
+          "deviation": 395,
+          "conductivity": 0.117,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763424110643,
+      "date": "2025-10-29",
+      "lotNo": "251029-300T-F100-Z30p-46um",
+      "cntType": "MWCNT",
+      "manufacturer": "KUMHO",
+      "grade": "300T-F100",
+      "memo": "T23",
+      "color": "#0B5345",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 9664,
+      "finalViscosity": 12583,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 21.75,
+          "sheetR_min": 30510,
+          "sheetR_max": 33600,
+          "sheetR_avg": 32100,
+          "deviation": 3090,
+          "conductivity": 0.0143,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 18.5,
+          "sheetR_min": 3905,
+          "sheetR_max": 4142,
+          "sheetR_avg": 4020,
+          "deviation": 237,
+          "conductivity": 0.134,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 21.75,
+          "sheetR_min": 969.2,
+          "sheetR_max": 1040,
+          "sheetR_avg": 1000,
+          "deviation": 70.79999999999995,
+          "conductivity": 0.458,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763424248419,
+      "date": "2025-10-28",
+      "lotNo": "251028-300T-F100-A30p-53um",
+      "cntType": "MWCNT",
+      "manufacturer": "KUMHO",
+      "grade": "300T-F100",
+      "memo": "T13",
+      "color": "#229954",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 14720,
+      "finalViscosity": 19321,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 20.25,
+          "sheetR_min": 25300,
+          "sheetR_max": 27070,
+          "sheetR_avg": 26200,
+          "deviation": 1770,
+          "conductivity": 0.0189,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 19.5,
+          "sheetR_min": 3711,
+          "sheetR_max": 3794,
+          "sheetR_avg": 3750,
+          "deviation": 83,
+          "conductivity": 0.137,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 21.5,
+          "sheetR_min": 1015,
+          "sheetR_max": 1075,
+          "sheetR_avg": 1050,
+          "deviation": 60,
+          "conductivity": 0.445,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763424348343,
+      "date": "2025-09-18",
+      "lotNo": "250918-10B-A30p-50um",
+      "cntType": "MWCNT",
+      "manufacturer": "JEIO",
+      "grade": "10B",
+      "memo": "T12",
+      "color": "#1F618D",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 2397,
+      "finalViscosity": 2578,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 22,
+          "sheetR_min": 42100,
+          "sheetR_max": 46400,
+          "sheetR_avg": 44300,
+          "deviation": 4300,
+          "conductivity": 0.0103,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 26.5,
+          "sheetR_min": 4280,
+          "sheetR_max": 4680,
+          "sheetR_avg": 4480,
+          "deviation": 400,
+          "conductivity": 0.0842,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 18,
+          "sheetR_min": 1330,
+          "sheetR_max": 1610,
+          "sheetR_avg": 1470,
+          "deviation": 280,
+          "conductivity": 0.378,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763424501774,
+      "date": "2025-10-01",
+      "lotNo": "251001-BT1001M-Z30p-50um",
+      "cntType": "MWCNT",
+      "manufacturer": "LGC",
+      "grade": "BT1001M",
+      "memo": "T21",
+      "color": "#FF5733",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 4109,
+      "finalViscosity": 7482,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 17,
+          "sheetR_min": 33000,
+          "sheetR_max": 34200,
+          "sheetR_avg": 33600,
+          "deviation": 1200,
+          "conductivity": 0.0175,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 19.3,
+          "sheetR_min": 3510,
+          "sheetR_max": 3810,
+          "sheetR_avg": 3660,
+          "deviation": 300,
+          "conductivity": 0.142,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 17,
+          "sheetR_min": 1560,
+          "sheetR_max": 1700,
+          "sheetR_avg": 1630,
+          "deviation": 140,
+          "conductivity": 0.361,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763424530010,
+      "date": "2025-09-24",
+      "lotNo": "250924-BT1001M-A30p-50um",
+      "cntType": "MWCNT",
+      "manufacturer": "LGC",
+      "grade": "BT1001M",
+      "memo": "T11",
+      "color": "#A93226",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 4445,
+      "finalViscosity": 7135,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 19.3,
+          "sheetR_min": 17700,
+          "sheetR_max": 18400,
+          "sheetR_avg": 18100,
+          "deviation": 700,
+          "conductivity": 0.0287,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 19.3,
+          "sheetR_min": 4250,
+          "sheetR_max": 4570,
+          "sheetR_avg": 4410,
+          "deviation": 320,
+          "conductivity": 0.117,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 17.5,
+          "sheetR_min": 1530,
+          "sheetR_max": 1600,
+          "sheetR_avg": 1570,
+          "deviation": 70,
+          "conductivity": 0.365,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763425465759,
+      "date": "2025-09-19",
+      "lotNo": "250919_SuperP_Ref.",
+      "cntType": "MWCNT",
+      "manufacturer": "기타",
+      "grade": "",
+      "memo": "CB-Ref.",
+      "color": "#000000",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": null,
+      "finalViscosity": null,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 3,
+          "thickness": 21.5,
+          "sheetR_min": 7200,
+          "sheetR_max": 8170,
+          "sheetR_avg": 7690,
+          "deviation": 970,
+          "conductivity": 0.0605,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763940571974,
+      "date": "2025-11-18",
+      "lotNo": "251118-300T-F100-T43-Z20p-34um",
+      "cntType": "MWCNT",
+      "manufacturer": "KUMHO",
+      "grade": "300T-F100",
+      "memo": "T43",
+      "color": "#3498DB",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 9637,
+      "finalViscosity": 12636,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 19.25,
+          "sheetR_min": 42270,
+          "sheetR_max": 44820,
+          "sheetR_avg": 43500,
+          "deviation": 2550,
+          "conductivity": 0.0119,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 19.5,
+          "sheetR_min": 4256,
+          "sheetR_max": 4758,
+          "sheetR_avg": 4510,
+          "deviation": 502,
+          "conductivity": 0.114,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 24,
+          "sheetR_min": 936.2,
+          "sheetR_max": 1027,
+          "sheetR_avg": 982,
+          "deviation": 90.79999999999995,
+          "conductivity": 0.424,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763940709400,
+      "date": "2025-11-20",
+      "lotNo": "251120-300T-F100-T33-A20p-37um",
+      "cntType": "MWCNT",
+      "manufacturer": "KUMHO",
+      "grade": "300T-F100",
+      "memo": "T33",
+      "color": "#2ECC71",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": 15397,
+      "finalViscosity": 16063,
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 22.25,
+          "sheetR_min": 26620,
+          "sheetR_max": 28700,
+          "sheetR_avg": 27700,
+          "deviation": 2080,
+          "conductivity": 0.0162,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 20,
+          "sheetR_min": 2472,
+          "sheetR_max": 2745,
+          "sheetR_avg": 2610,
+          "deviation": 273,
+          "conductivity": 0.192,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 22.25,
+          "sheetR_min": 1199,
+          "sheetR_max": 1326,
+          "sheetR_avg": 1260,
+          "deviation": 127,
+          "conductivity": 0.356,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "cathodeType": "NCM811",
+      "eisData": []
+    },
+    {
+      "id": 1763965025430,
+      "date": "2025-11-05",
+      "lotNo": "251105-3A-1d2wtP_KII_HPH",
+      "cntType": "SWCNT-EIS",
+      "manufacturer": "JEIO",
+      "grade": "",
+      "memo": "",
+      "color": "#A93226",
+      "colorCategory": "dark",
+      "colorIndex": 0,
+      "initialViscosity": null,
+      "finalViscosity": null,
+      "selected": false,
+      "eisData": [
+        {
+          "concentration": 0.002,
+          "resistance": 18305.05,
+          "conductivity": 0.000273
+        },
+        {
+          "concentration": 0.005,
+          "resistance": 3426.61,
+          "conductivity": 0.00146
+        },
+        {
+          "concentration": 0.01,
+          "resistance": 1436.92,
+          "conductivity": 0.00348
+        },
+        {
+          "concentration": 0.03,
+          "resistance": 311.22,
+          "conductivity": 0.0161
+        }
+      ],
+      "inPlaneData": [],
+      "throughPlaneData": []
+    },
+    {
+      "id": 1764576145281,
+      "date": "2025-11-17",
+      "cntType": "MWCNT",
+      "manufacturer": "DAZHAN",
+      "grade": "NC606",
+      "lotNo": "251117-NC606-Ref.2",
+      "memo": "Ref.2",
+      "initialViscosity": "2000",
+      "finalViscosity": "2000",
+      "selected": false,
+      "color": "#F39C12",
+      "cathodeType": "NCM811",
+      "inPlaneData": [
+        {
+          "concentration": 0.2,
+          "thickness": 22,
+          "sheetR_min": 253800,
+          "sheetR_max": 275700,
+          "sheetR_avg": 265000,
+          "deviation": 21900,
+          "conductivity": 0.0017,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 21,
+          "sheetR_min": 25030,
+          "sheetR_max": 27600,
+          "sheetR_avg": 26300,
+          "deviation": 2570,
+          "conductivity": 0.0181,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 1,
+          "thickness": 24,
+          "sheetR_min": 3355,
+          "sheetR_max": 3750,
+          "sheetR_avg": 3550,
+          "deviation": 395,
+          "conductivity": 0.117,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [
+        {
+          "concentration": 0.5,
+          "thickness": 25.5,
+          "area": 1.327,
+          "resistance": 36.96,
+          "conductivity": 0.0052,
+          "measurementType": "through-plane"
+        }
+      ],
+      "eisData": []
+    },
+    {
+      "id": 1765322146761.686,
+      "date": "2025-11-26",
+      "lotNo": "251126-TUBALL-anode-press",
+      "cntType": "SWCNT",
+      "manufacturer": "OCSiAl",
+      "grade": "TUBALL",
+      "cathodeType": "",
+      "siContent": "10%",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "memo": "CSV Import",
+      "color": "#FF6384",
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.1,
+          "thickness": 14.75,
+          "sheetR_min": 42,
+          "sheetR_max": 42,
+          "sheetR_avg": 42,
+          "deviation": 0,
+          "conductivity": 16.1,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "eisData": []
+    },
+    {
+      "id": 1765322146761.4382,
+      "date": "2025-11-26",
+      "lotNo": "251126-3A-anode-press",
+      "cntType": "SWCNT",
+      "manufacturer": "JEIO",
+      "grade": "3A",
+      "cathodeType": "",
+      "siContent": "10%",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "memo": "CSV Import",
+      "color": "#FF9F40",
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.1,
+          "thickness": 13.5,
+          "sheetR_min": 58.4,
+          "sheetR_max": 58.4,
+          "sheetR_avg": 58.4,
+          "deviation": 0,
+          "conductivity": 12.7,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "eisData": []
+    },
+    {
+      "id": 1765322146761.8997,
+      "date": "2025-11-26",
+      "lotNo": "251126-Super P-Ref. 2%",
+      "cntType": "SWCNT",
+      "manufacturer": "Ref.",
+      "grade": "Super P",
+      "cathodeType": "",
+      "siContent": "10%",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "memo": "CSV Import",
+      "color": "#3498DB",
+      "selected": true,
+      "inPlaneData": [
+        {
+          "concentration": 2,
+          "thickness": 17.5,
+          "sheetR_min": 276,
+          "sheetR_max": 276,
+          "sheetR_avg": 276,
+          "deviation": 0,
+          "conductivity": 2.07,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 2,
+          "thickness": 14,
+          "sheetR_min": 402,
+          "sheetR_max": 402,
+          "sheetR_avg": 402,
+          "deviation": 0,
+          "conductivity": 1.78,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "eisData": []
+    },
+    {
+      "id": 1765322146761.6855,
+      "date": "2025-12-09",
+      "lotNo": "251209-TUBALL-1.2p(C+V)",
+      "cntType": "SWCNT",
+      "manufacturer": "OCSiAl",
+      "grade": "TUBALL",
+      "cathodeType": "",
+      "siContent": "10%",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "memo": "CSV Import",
+      "color": "#3498DB",
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.05,
+          "thickness": 16,
+          "sheetR_min": 450.5,
+          "sheetR_max": 450.5,
+          "sheetR_avg": 450.5,
+          "deviation": 0,
+          "conductivity": 1.3873,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.1,
+          "thickness": 17.5,
+          "sheetR_min": 320.9,
+          "sheetR_max": 320.9,
+          "sheetR_avg": 320.9,
+          "deviation": 0,
+          "conductivity": 1.7807,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 21,
+          "sheetR_min": 234.9,
+          "sheetR_max": 234.9,
+          "sheetR_avg": 234.9,
+          "deviation": 0,
+          "conductivity": 2.0272,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "eisData": []
+    },
+    {
+      "id": 1765322146761.783,
+      "date": "2025-12-09",
+      "lotNo": "251209-TUBALL-1.2p(CMC)",
+      "cntType": "SWCNT",
+      "manufacturer": "OCSiAl",
+      "grade": "TUBALL",
+      "cathodeType": "",
+      "siContent": "10%",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "memo": "CSV Import",
+      "color": "#FF6B6B",
+      "selected": true,
+      "inPlaneData": [
+        {
+          "concentration": 0.05,
+          "thickness": 14.5,
+          "sheetR_min": 420.4,
+          "sheetR_max": 420.4,
+          "sheetR_avg": 420.4,
+          "deviation": 0,
+          "conductivity": 1.6405,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.1,
+          "thickness": 18.5,
+          "sheetR_min": 293.1,
+          "sheetR_max": 293.1,
+          "sheetR_avg": 293.1,
+          "deviation": 0,
+          "conductivity": 1.8442,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 17.5,
+          "sheetR_min": 152.9,
+          "sheetR_max": 152.9,
+          "sheetR_avg": 152.9,
+          "deviation": 0,
+          "conductivity": 3.7373,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "eisData": []
+    },
+    {
+      "id": 1765322146761.3667,
+      "date": "2025-11-26",
+      "lotNo": "251126-TUBALL-0.8p(Ref.)",
+      "cntType": "SWCNT",
+      "manufacturer": "OCSiAl",
+      "grade": "TUBALL",
+      "cathodeType": "",
+      "siContent": "10%",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "memo": "CSV Import",
+      "color": "#808080",
+      "selected": false,
+      "inPlaneData": [
+        {
+          "concentration": 0.05,
+          "thickness": 18,
+          "sheetR_min": 363,
+          "sheetR_max": 363,
+          "sheetR_avg": 363,
+          "deviation": 0,
+          "conductivity": 1.53,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.1,
+          "thickness": 19,
+          "sheetR_min": 196,
+          "sheetR_max": 196,
+          "sheetR_avg": 196,
+          "deviation": 0,
+          "conductivity": 2.69,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "eisData": []
+    },
+    {
+      "id": 1765322146761.222,
+      "date": "2025-11-26",
+      "lotNo": "251126-3A-1.2p(C+V)",
+      "cntType": "SWCNT",
+      "manufacturer": "JEIO",
+      "grade": "3A",
+      "cathodeType": "",
+      "siContent": "10%",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "memo": "CSV Import",
+      "color": "#0000FF",
+      "selected": true,
+      "inPlaneData": [
+        {
+          "concentration": 0.05,
+          "thickness": 19.25,
+          "sheetR_min": 309,
+          "sheetR_max": 309,
+          "sheetR_avg": 309,
+          "deviation": 0,
+          "conductivity": 1.68,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.1,
+          "thickness": 20.5,
+          "sheetR_min": 281,
+          "sheetR_max": 281,
+          "sheetR_avg": 281,
+          "deviation": 0,
+          "conductivity": 1.74,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": [],
+      "eisData": []
+    },
+    {
+      "id": 1768366749462,
+      "date": "2026-01-14",
+      "cntType": "SWCNT",
+      "manufacturer": "OCSiAl",
+      "grade": "TUBALL",
+      "lotNo": "260114-TUBALL-0.8% Ref.2",
+      "memo": "",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "selected": true,
+      "color": "#000000",
+      "siContent": "10%",
+      "inPlaneData": [
+        {
+          "concentration": 0.05,
+          "thickness": 17.5,
+          "sheetR_min": 343,
+          "sheetR_max": 351,
+          "sheetR_avg": 347,
+          "deviation": 8,
+          "conductivity": 1.6468,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.1,
+          "thickness": 19.5,
+          "sheetR_min": 230.4,
+          "sheetR_max": 248.8,
+          "sheetR_avg": 239.6,
+          "deviation": 18.400000000000006,
+          "conductivity": 2.1403,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 15,
+          "sheetR_min": 272.2,
+          "sheetR_max": 300.1,
+          "sheetR_avg": 286.1,
+          "deviation": 27.900000000000034,
+          "conductivity": 2.3302,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": []
+    },
+    {
+      "id": 1768367088369,
+      "date": "2026-01-14",
+      "cntType": "SWCNT",
+      "manufacturer": "JEIO",
+      "grade": "300A",
+      "lotNo": "260114-3A-0.8% KII",
+      "memo": "0.05% 캐스팅 불량",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "selected": true,
+      "color": "#228B22",
+      "siContent": "10%",
+      "inPlaneData": [
+        {
+          "concentration": 0.05,
+          "thickness": 21,
+          "sheetR_min": 492.6,
+          "sheetR_max": 515.2,
+          "sheetR_avg": 503.9,
+          "deviation": 22.600000000000023,
+          "conductivity": 0.945,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.1,
+          "thickness": 20.75,
+          "sheetR_min": 231.3,
+          "sheetR_max": 241.7,
+          "sheetR_avg": 236.5,
+          "deviation": 10.399999999999977,
+          "conductivity": 2.0377,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 19,
+          "sheetR_min": 114.8,
+          "sheetR_max": 137.5,
+          "sheetR_avg": 126.2,
+          "deviation": 22.700000000000003,
+          "conductivity": 4.1705,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": []
+    },
+    {
+      "id": 1768367130993,
+      "date": "2026-01-14",
+      "cntType": "SWCNT",
+      "manufacturer": "OCSiAl",
+      "grade": "TUBALL",
+      "lotNo": "260114-TUBALL-0.8% KII",
+      "memo": "0.5% 캐스팅불량, 두께 2배(기존 수치로 설정)",
+      "initialViscosity": "",
+      "finalViscosity": "",
+      "selected": true,
+      "color": "#FF0000",
+      "siContent": "10%",
+      "inPlaneData": [
+        {
+          "concentration": 0.05,
+          "thickness": 21.5,
+          "sheetR_min": 277.6,
+          "sheetR_max": 292.2,
+          "sheetR_avg": 284.9,
+          "deviation": 14.599999999999966,
+          "conductivity": 1.6326,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.1,
+          "thickness": 20,
+          "sheetR_min": 211.9,
+          "sheetR_max": 221.2,
+          "sheetR_avg": 216.6,
+          "deviation": 9.299999999999983,
+          "conductivity": 2.3084,
+          "measurementType": "in-plane"
+        },
+        {
+          "concentration": 0.5,
+          "thickness": 22,
+          "sheetR_min": 156.6,
+          "sheetR_max": 178.4,
+          "sheetR_avg": 167.5,
+          "deviation": 21.80000000000001,
+          "conductivity": 2.7137,
+          "measurementType": "in-plane"
+        }
+      ],
+      "throughPlaneData": []
+    }
+  ],
+  "mwcntConcentrations": [
+    0.2,
+    0.5,
+    1
+  ],
+  "swcntConcentrations": [
+    0.05,
+    0.1,
+    0.5
+  ],
+  "eisConcentrations": [
+    0.002,
+    0.005,
+    0.01,
+    0.03
+  ],
+  "manufacturers": {
+    "MWCNT": [
+      "LGC",
+      "JEIO",
+      "KUMHO",
+      "카본나노텍",
+      "기타",
+      "C-NANO",
+      "DAZHAN"
+    ],
+    "SWCNT": [
+      "OCSiAl",
+      "JEIO",
+      "MEIJO",
+      "카본플라이",
+      "산동카본",
+      "Ref."
+    ],
+    "SWCNT-EIS": [
+      "OCSiAl",
+      "JEIO",
+      "MEIJO",
+      "카본플라이",
+      "산동카본"
+    ]
+  },
+  "defaultColors": [
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#4BC0C0",
+    "#9966FF",
+    "#FF9F40",
+    "#E74C3C",
+    "#3498DB",
+    "#2ECC71",
+    "#F39C12"
+  ],
+  "currentDataFilter": "SWCNT"
+}

@@ -1,0 +1,472 @@
+{
+  "meta": {
+    "db_name": "CNT_Manual_Handbook_DB",
+    "owner": "Sevastian",
+    "language": "ko",
+    "timezone": "Asia/Seoul",
+    "updated_at": "2025-12-24",
+    "version": "0.6.0",
+    "source": "Jarvis CNT Lab + CDP Working Board / Prompt Orchestrator v0.5",
+    "notes": [
+      "Backward-compatible with Orchestrator v0.5 (research_themes/experiments/literature/materials 유지).",
+      "Core Policy(헌법) + Modules(확장) + References/Glossary(누적) 3-레이어 구조."
+    ]
+  },
+  "research_themes": [
+    {
+      "id": "THEME_MWCNT_CATHODE_NCM811",
+      "name": "MWCNT 기반 NCM811 양극(Al foil) 제조·평가 표준화",
+      "cnt_type": "MWCNT",
+      "tags": [
+        "battery_manufacturing",
+        "cathode",
+        "NCM811",
+        "PVDF",
+        "Al_foil",
+        "porosity",
+        "tortuosity",
+        "rate",
+        "cycle"
+      ],
+      "summary_ko": "MWCNT 적용 NCM811 양극에서 코팅(foil/PET), 건조(80→120°C), 캘린더링, 기공도·전도도·tortuosity(EIS 기반) 및 half-cell 성능(사이클/율특성) 표준 프로토콜."
+    },
+    {
+      "id": "THEME_SWCNT_ANODE_GRAPHITE_SI",
+      "name": "SWCNT 기반 Graphite(+Si계) 음극(Cu foil) 제조·평가 표준화",
+      "cnt_type": "SWCNT",
+      "tags": [
+        "battery_manufacturing",
+        "anode",
+        "graphite",
+        "SiC",
+        "CMC",
+        "SBR",
+        "Cu_foil",
+        "porosity",
+        "in_plane"
+      ],
+      "summary_ko": "SWCNT 적용 음극에서 PET 기반 in-plane 전도 네트워크(percolation) 분석과 foil 기반 전극 특성/셀 성능 평가(단, tortuosity는 원칙적으로 별도 계산하지 않음)."
+    },
+    {
+      "id": "THEME_LIQUID_EIS_SWCNT",
+      "name": "[SWCNT only] 분산액 단계 Liquid EIS Percolation(Platinum jig) 사전 검증",
+      "cnt_type": "SWCNT",
+      "tags": [
+        "dispersion",
+        "liquid_EIS",
+        "percolation",
+        "Biologic",
+        "fit"
+      ],
+      "summary_ko": "슬러리 혼합 전, SWCNT 분산액의 CNT 농도(예: 0.2/0.5/1.0/3.0 wt%)에 따른 액상 임피던스 기반 percolation 경향을 사전 확인."
+    },
+    {
+      "id": "THEME_PET_PERCOLATION_ALL",
+      "name": "[PET 기반] CNT 함량별 in-plane 전도 네트워크(percolation) 비교",
+      "cnt_type": "ALL",
+      "tags": [
+        "PET",
+        "bar_coater",
+        "sheet_resistance",
+        "in_plane_conductivity",
+        "percolation"
+      ],
+      "summary_ko": "MWCNT(양극) 및 SWCNT(음극) 모두 PET film 코팅 후 Rs/두께 측정으로 in-plane 전도도 및 percolation 경향 비교. through-plane은 본 워크플로에서 직접 측정하지 않음."
+    }
+  ],
+  "experiments": [
+    {
+      "id": "EXP_PET_CAST_RS",
+      "electrode_system": "PET film casting (MWCNT cathode slurry / SWCNT anode slurry)",
+      "cell_type": "N/A",
+      "coating_loading": "N/A (PET는 Rs/두께 기반)",
+      "key_outputs": [
+        "Rs(5-point)",
+        "thickness(PET, PET+slurry)",
+        "in-plane conductivity",
+        "percolation trend"
+      ]
+    },
+    {
+      "id": "EXP_FOIL_CATHODE_NCM811_MWCNT",
+      "electrode_system": "NCM811 Cathode + MWCNT + PVDF on Al foil",
+      "cell_type": "Half-cell (Li metal counter/reference)",
+      "coating_loading": "8–10 mg/cm² (100 µm wet), 15–20 mg/cm² (180 µm wet)",
+      "key_outputs": [
+        "porosity",
+        "in-plane conductivity",
+        "tortuosity(EIS-cell)",
+        "cycle",
+        "rate"
+      ]
+    },
+    {
+      "id": "EXP_FOIL_ANODE_GRAPHITE_SI_SWCNT",
+      "electrode_system": "Graphite(+SiC/Si계) Anode + SWCNT + CMC/SBR on Cu foil",
+      "cell_type": "Half-cell (Li metal counter/reference)",
+      "coating_loading": "프로젝트 조건에 따름(foiling 기준 관리)",
+      "key_outputs": [
+        "porosity",
+        "in-plane conductivity",
+        "cycle (rate는 기본 제외/필요 시 별도)"
+      ]
+    }
+  ],
+  "literature": [
+    {
+      "id": "LIT_TEMPLATE_001",
+      "title": "CNT conductive additive / percolation / electrode transport (curated list)",
+      "year": "TBD",
+      "type": "curation",
+      "grade": "A",
+      "status": "placeholder",
+      "notes": "정식 문헌은 references 섹션에서 관리(grade, DOI, URL, 메모)."
+    }
+  ],
+  "materials": [
+    {
+      "name": "NCM811",
+      "category": "active_material",
+      "electrode": "cathode"
+    },
+    {
+      "name": "Graphite",
+      "category": "active_material",
+      "electrode": "anode"
+    },
+    {
+      "name": "SiC / Si계 보조활물질",
+      "category": "active_material_additive",
+      "electrode": "anode"
+    },
+    {
+      "name": "MWCNT",
+      "category": "conductive_additive",
+      "electrode": "cathode"
+    },
+    {
+      "name": "SWCNT",
+      "category": "conductive_additive",
+      "electrode": "anode"
+    },
+    {
+      "name": "PVDF (Arkema, Mw ~1.1M)",
+      "category": "binder",
+      "electrode": "cathode"
+    },
+    {
+      "name": "CMC",
+      "category": "binder",
+      "electrode": "anode"
+    },
+    {
+      "name": "SBR",
+      "category": "binder",
+      "electrode": "anode"
+    },
+    {
+      "name": "NMP",
+      "category": "solvent",
+      "electrode": "cathode"
+    },
+    {
+      "name": "DIW",
+      "category": "solvent",
+      "electrode": "anode"
+    },
+    {
+      "name": "Celgard separator",
+      "category": "separator",
+      "electrode": "cell"
+    },
+    {
+      "name": "LiPF6-based electrolyte (σ≈10 mS/cm, Soulbrain EC/DEC + additives)",
+      "category": "electrolyte",
+      "electrode": "cell"
+    }
+  ],
+  "core_policy": {
+    "scope_boundary": [
+      "본 DB/매뉴얼의 출발점은 'CNT 분산액이 이미 확보된 상태'이다. (분산액 제조 SOP는 별도 문서로 분리)",
+      "PET film 평가는 in-plane 전도 네트워크(percolation) 확인 목적이며, tortuosity 산출을 위한 기반이 아니다.",
+      "tortuosity(τ) 평가는 전해액 함침 + EIS 기반(foil 코팅 전극)으로 수행하며, 적용 범위는 시스템별로 명시한다."
+    ],
+    "electrode_definition": {
+      "cathode": {
+        "chemistry": "NCM811 + MWCNT + PVDF",
+        "current_collector": "Al foil",
+        "drying_step2": "120°C (vacuum) 10 h",
+        "tortuosity_policy": "tortuosity 평가 대상(필요 시)"
+      },
+      "anode": {
+        "chemistry": "Graphite(+Si계) + SWCNT + CMC/SBR",
+        "current_collector": "Cu foil",
+        "drying_step2": "100°C (vacuum) 10 h",
+        "tortuosity_policy": "원칙적으로 별도 tortuosity 계산은 하지 않음(구조적/목적상 의미 제한)"
+      }
+    },
+    "measurement_policy": {
+      "percolation": "PET film 기반 in-plane 측정(Rs→σ_in-plane).",
+      "liquid_EIS_percolation": "SWCNT 분산액에 한해 슬러리 혼합 전 사전 검증(Platinum electrode jig, Biologic 데이터 피팅).",
+      "foil_properties": "porosity(foil), in-plane conductivity(foil/PET 목적별), cell performance(foil).",
+      "tortuosity": "foil 전극 + 전해액 함침 + EIS 셀 구성 후 R_ion 기반 산출."
+    },
+    "rate_protocol": {
+      "applies_to": "cathode (MWCNT/NCM811) 기본",
+      "charge": "0.33C 고정",
+      "discharge_sequence": [
+        "0.1C",
+        "0.33C",
+        "1.0C",
+        "2.0C",
+        "3.0C",
+        "4.0C",
+        "5.0C",
+        "0.33C"
+      ],
+      "repeat_each_step": 3,
+      "reporting_rule": "각 C-rate 스텝의 '마지막 cycle' 값을 대표로 사용"
+    },
+    "format_rules": {
+      "language": "ko",
+      "uncertainty_tag": "_추론_",
+      "reference_grading": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ]
+    }
+  },
+  "modules": [
+    {
+      "id": "SOP_PET_CASTING_RS",
+      "title": "PET film 코팅(Bar coater) 및 Rs 기반 in-plane 전도도 산출 SOP",
+      "version": "1.0.0",
+      "status": "active",
+      "tags": [
+        "SOP",
+        "PET",
+        "bar_coater",
+        "Rs",
+        "in-plane",
+        "percolation"
+      ],
+      "inputs": {
+        "pet_size": "100 mm (cut)",
+        "auto_applicator": {
+          "speed_mm_s": 10,
+          "stroke_mm": 130
+        },
+        "drying": [
+          "Dry oven 70°C 1 h",
+          "Vacuum dryer 80°C <1 mTorr 1 h",
+          "rest 30 min"
+        ],
+        "rs_measurement": "중앙 5점(상→하 방향 5 mm 간격)",
+        "punch": "14pi, PET 2장 + PET+Slurry 2장, micrometer 두께 측정"
+      },
+      "procedure": [
+        "PET film을 100 mm로 절단한다.",
+        "Auto applicator에 PET를 장착하고, 설정(10 mm/s, 130 mm) 조건으로 코팅한다.",
+        "코팅된 PET를 wiper에 부착 후 STS tray 위에 위치시킨다.",
+        "Dry oven 70°C에서 1 h 건조한다.",
+        "Vacuum dryer 80°C, <1 mTorr 조건에서 1 h 건조한다.",
+        "상온에서 30 min 안정화(rest) 후 Rs를 측정한다(중앙 5점, 5 mm 간격).",
+        "펀칭기로 14pi로 PET 2장과 PET+Slurry 2장을 펀칭한다.",
+        "Micrometer로 두께를 측정하여 실제 코팅층 두께를 산출한다.",
+        "Rs와 두께로 in-plane 전도도(σ_in-plane)를 계산하고 CNT 함량별 percolation 경향을 정리한다."
+      ],
+      "acceptance_checks": [
+        "코팅 스트릭/핀홀/에지 비드 여부 기록",
+        "Rs 5점의 변동(CV) 기록 및 outlier 원인(두께/결함) 확인"
+      ],
+      "key_equations_latex": [
+        "\\sigma_{\\mathrm{in\\text{-}plane}} = \\frac{1}{R_s\\, t}",
+        "R_s\\;(\\Omega/\\square),\\; t\\;(\\mathrm{m})"
+      ]
+    },
+    {
+      "id": "SOP_FOIL_COATING_DRYING",
+      "title": "Foil(Al/Cu) 코팅 및 진공 건조 SOP (80°C → 120/100°C)",
+      "version": "1.0.0",
+      "status": "active",
+      "tags": [
+        "SOP",
+        "foil",
+        "Al",
+        "Cu",
+        "vacuum_drying",
+        "loading_control"
+      ],
+      "inputs": {
+        "substrate": "Sodalime glass A4 + ethanol",
+        "collector_cut": ">= 10 x 20 mm",
+        "blade": [
+          "100 µm (target loading 8–10 mg/cm²)",
+          "180 µm (target loading 15–20 mg/cm²)"
+        ],
+        "slurry_amount": "1–2 g (권장)",
+        "vacuum_step1": "80°C, >2 h (vacuum; detailed level per lab standard)",
+        "vacuum_step2": {
+          "cathode": "120°C 10 h",
+          "anode": "100°C 10 h"
+        }
+      },
+      "procedure": [
+        "Sodalime glass(A4)에 ethanol을 도포하고 표면을 정리한다.",
+        "집전체(Al 또는 Cu foil)를 10×20 mm 이상으로 절단한다.",
+        "brush를 이용해 집전체를 glass에 부착하며 기포가 남지 않도록 고정한다.",
+        "슬러리 1–2 g을 집전체 상단에 배치한다.",
+        "Doctor blade로 100 µm 또는 180 µm 조건으로 코팅한다(목표 로딩 범위에 맞춰 선택).",
+        "진공 오븐 80°C에서 2 h 이상 1차 건조한다.",
+        "전극 시스템에 따라 2차 진공 건조를 수행한다: cathode 120°C 10 h / anode 100°C 10 h.",
+        "건조 후 전극 외관(균일도, 크랙/박리)을 기록하고 후속 공정(캘린더링, 펀칭)으로 이동한다."
+      ],
+      "rationale_notes": [
+        "80°C→고온(120/100°C) 단계 상승은 용매 제거를 단계화하여 급격한 공휘발/표면 스키닝에 따른 내부 잔류 용매 및 레이어링 위험을 줄이고, 밀도 차에 의한 성분 분리 경향을 완화하는 목적이다."
+      ]
+    },
+    {
+      "id": "SOP_CALENDERING_LOADING_POROSITY",
+      "title": "캘린더링(loading 우선) 및 기공도 관리 SOP",
+      "version": "1.0.0",
+      "status": "active",
+      "tags": [
+        "SOP",
+        "calendering",
+        "loading",
+        "porosity"
+      ],
+      "policy": [
+        "캘린더링 최우선 목표는 '로딩(면적당 활물질/전극 질량) 관리'이며, 그 다음으로 기공도/두께 목표를 만족시키는 방향으로 gap/횟수/압력을 조정한다.",
+        "과도한 압밀은 기공도 감소로 이온 수송 저하(특히 두꺼운 양극에서) 및 binder migration/크랙 유발 가능성이 있으므로, 목표 porosity window를 먼저 정의한다."
+      ],
+      "procedure": [
+        "전극 로딩(mg/cm²) 목표를 확정하고, 코팅 두께/고형분/건조 수축을 고려해 블레이드 조건을 선정한다.",
+        "1차 캘린더링: gap을 목표보다 크게 설정하여 균일화(예: <20 µm 조건, 3회) 후 두께/질량/면적을 측정한다.",
+        "로딩이 목표 범위에서 벗어나면(코팅량/두께 원인) 캘린더링으로 억지 보정하지 않고 코팅 조건을 재조정한다.",
+        "로딩이 만족될 때, porosity 목표를 기준으로 압력을 조정해 미세구조를 정렬한다.",
+        "캘린더링 전후 기공도/두께/시트저항(또는 전도도)을 비교하여 과압밀 여부를 판정한다."
+      ]
+    },
+    {
+      "id": "SOP_TORTUOSITY_EIS_CELL",
+      "title": "[MWCNT cathode 중심] Tortuosity 산출을 위한 EIS 셀 제작 및 계산 SOP",
+      "version": "1.0.0",
+      "status": "active",
+      "tags": [
+        "SOP",
+        "tortuosity",
+        "EIS",
+        "Rion",
+        "electrolyte_excess"
+      ],
+      "inputs": {
+        "stack_order": "15.8pi STS 위에 Al+전극(14pi) 배치 → 전해액 주입 → 13pi STS → crimp",
+        "electrolyte_sigma": "10 mS/cm",
+        "excess_coefficient": 2.5
+      },
+      "procedure": [
+        "foil 기반 전극을 준비한다(필요 시 캘린더링 완료).",
+        "EIS 셀 스택을 구성한다: 15.8pi STS 위에 Al+ 전극을 올린다.",
+        "프로그램의 기공도 기반 전해액 부피 계산식에 excess coefficient=2.5를 적용하여 주입량을 산출한다.",
+        "Micropipette로 산출된 전해액을 주입한다.",
+        "13pi STS를 상부에 배치하고, 설정 압력으로 crimp하여 셀을 완성한다.",
+        "EIS 측정으로 R_ion(이온 수송 지배 저항)을 획득하고, τ를 계산한다."
+      ],
+      "key_equations_latex": [
+        "\\tau = \\frac{R_{\\mathrm{ion}}\\,\\varepsilon\\,A}{L\\,\\kappa_{\\mathrm{bulk}}}",
+        "R_{\\mathrm{ion}}\\;(\\Omega),\\; \\varepsilon\\;(-),\\; A\\;(\\mathrm{m}^2),\\; L\\;(\\mathrm{m}),\\; \\kappa_{\\mathrm{bulk}}\\;(\\mathrm{S/m})"
+      ],
+      "notes": [
+        "본 워크플로에서 τ는 '전해액 함침 다공성 전극'에서 이온 경로의 굴곡/우회 효과를 반영하는 유효 파라미터로 정의한다.",
+        "excess coefficient=2.5는 기공 부피 대비 충분한 함침을 확보하여 부분 젖음에 의한 R_ion 과대평가를 줄이려는 실무적 계수이다."
+      ]
+    },
+    {
+      "id": "SOP_RATE_AND_CYCLE",
+      "title": "[MWCNT cathode 기본] Half-cell 사이클 및 율특성 평가 SOP",
+      "version": "1.0.0",
+      "status": "active",
+      "tags": [
+        "SOP",
+        "cycle",
+        "rate",
+        "half-cell",
+        "protocol"
+      ],
+      "procedure": [
+        "전극(14pi)을 펀칭하고, 조립 전 80°C 건조 후 glove box로 이동한다(상세는 Cell SOP 참조).",
+        "사이클 평가는 지정 전압창에서 formation/초기 안정화 이후 retention을 평가한다(조건은 프로젝트 표준에 따른다).",
+        "율특성(rate)은 charge 0.33C 고정, discharge를 0.1→0.33→1→2→3→4→5C 순으로 변경하고, 각 스텝을 3회 반복한다.",
+        "마지막으로 0.33C로 복귀하고, 각 스텝의 '마지막 cycle' 값을 대표 데이터로 기록한다."
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Rs",
+      "meaning": "Sheet resistance (Ω/□)"
+    },
+    {
+      "term": "σ_in-plane",
+      "meaning": "in-plane electronic conductivity (S/m)"
+    },
+    {
+      "term": "EIS",
+      "meaning": "Electrochemical Impedance Spectroscopy"
+    },
+    {
+      "term": "R_ion",
+      "meaning": "EIS에서 이온 수송 지배 영역에서 추정되는 유효 저항"
+    },
+    {
+      "term": "ε",
+      "meaning": "porosity (void fraction)"
+    },
+    {
+      "term": "τ",
+      "meaning": "tortuosity (dimensionless)"
+    },
+    {
+      "term": "κ_bulk",
+      "meaning": "전해액(벌크)의 이온전도도 (S/m)"
+    },
+    {
+      "term": "percolation",
+      "meaning": "전도 네트워크가 임계 농도에서 급격히 연결되는 현상"
+    }
+  ],
+  "references": [
+    {
+      "id": "REF_PLACEHOLDER",
+      "grade": "A",
+      "type": "to_be_filled",
+      "citation": "TBD (사용자가 실제 문헌으로 채움)",
+      "why_relevant": "CNT 전도 네트워크/percolation, 전극 수송(τ/ε), EIS 해석 근거"
+    }
+  ],
+  "render_templates": {
+    "answer_structure": [
+      "질문 요지 정리",
+      "적용 범위/경계(필수)",
+      "SOP(단계별)",
+      "이론적 근거(수식/물리적 의미 포함)",
+      "데이터 해석(지표 정의, 주의사항, outlier 처리)",
+      "Troubleshooting & Failure mode",
+      "참고문헌(등급 A–E) 및 Glossary"
+    ],
+    "word_style": {
+      "default_font": "맑은고딕",
+      "default_size_pt": 11,
+      "line_spacing": "고정 25pt",
+      "heading_levels": [
+        "제목 1=PART/Chapter",
+        "제목 2=1.1/2.1",
+        "제목 3=하위 항목"
+      ]
+    }
+  }
+}
