@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cathode Slurry Manufacturing Run Sheet</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #e8f5e8, #a8e6a3);
+            color: #2d4a2d;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1a5e1a;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #f7fef7, #ecfdf5);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #22c55e;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .card h3 {
+            color: #166534;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #22c55e;
+            padding-bottom: 8px;
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #166534;
+            font-size: 14px;
+        }
+        
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #d1fae5;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+        
+        .yellow-input {
+            background: #fef3c7 !important;
+            font-weight: bold;
+            border-color: #f59e0b !important;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .result-table th,
+        .result-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .result-table th {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .result-table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .result-table .bold {
+            font-weight: bold;
+        }
+        
+        .info-panel {
+            background: #f0fff4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .balance-check {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid;
+        }
+        
+        .balance-check.good {
+            border-color: #22c55e;
+            background: #f0fdf4;
+            color: #166534;
+        }
+        
+        .balance-check.bad {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        
+        .process-step {
+            background: #f0fdf4;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #22c55e;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #22c55e;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .info {
+            background: #f0fff4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .wide-card {
+            grid-column: 1 / -1;
+        }
+
+        .material-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .material-details .input-group {
+            margin-bottom: 0;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            font-weight: bold;
+        }
+
+        .settings-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .settings-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+
+        .settings-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #22c55e;
+            padding-bottom: 15px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .close-btn:hover {
+            color: #ef4444;
+        }
+
+        .settings-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #22c55e;
+            margin-bottom: 20px;
+        }
+
+        .settings-section h4 {
+            color: #166534;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 13px;
+        }
+
+        .setting-item input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .setting-item input:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+
+        .print-btn {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            margin-bottom: 10px;
+        }
+
+        @media print {
+            body { 
+                background: white; 
+                padding: 5px;
+                font-size: 10px;
+                zoom: 0.8;
+                margin: 0;
+            }
+            .container { 
+                box-shadow: none; 
+                background: white;
+                padding: 10px;
+                margin: 0;
+            }
+            .btn, .settings-btn { display: none; }
+            .print-page-break { page-break-before: always; }
+            .no-print { display: none !important; }
+            .detailed-breakdown-end {
+                page-break-after: always;
+            }
+            .card {
+                margin-bottom: 10px;
+                padding: 15px;
+            }
+            .process-step {
+                padding: 12px;
+                margin-bottom: 8px;
+            }
+            .info-panel {
+                padding: 8px;
+                margin-top: 8px;
+            }
+            .input-group {
+                margin-bottom: 8px;
+            }
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+            h3 {
+                font-size: 1.1em;
+                margin-bottom: 10px;
+            }
+        }
+    
+        /* Tab styles */
+        .tabs {
+            display: flex;
+            background: #f0fdf0;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 30px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background: #dcfce7;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Loading calculation specific styles */
+        .loading-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .loading-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid #d1fae5;
+        }
+
+        .loading-card.highlight {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .loading-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #166534;
+            margin-bottom: 8px;
+        }
+
+        .loading-label {
+            font-size: 0.9em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .tooltip {
+            font-size: 0.75em;
+            color: #9ca3af;
+            margin-top: 5px;
+            line-height: 1.3;
+        }
+
+        .capacity-panel {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #f59e0b;
+            margin: 20px 0;
+        }
+
+        .capacity-panel h4 {
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 10mm;
+                background: white;
+            }
+            
+            .header, .tabs, .btn, button {
+                display: none !important;
+            }
+            
+            /* Default: Hide both tabs (will be controlled by JS) */
+            #recipe-tab {
+                display: none !important;
+            }
+            
+            #loading-tab {
+                display: none !important;
+            }
+            
+            /* When printing recipe */
+            body.print-recipe #recipe-tab {
+                display: block !important;
+            }
+            
+            body.print-recipe #loading-tab {
+                display: none !important;
+            }
+            
+            /* When printing loading */
+            body.print-loading #recipe-tab {
+                display: none !important;
+            }
+            
+            body.print-loading #loading-tab {
+                display: block !important;
+                page-break-after: auto;
+            }
+            
+            .card, .wide-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+                margin-bottom: 8px;
+                padding: 8px;
+                font-size: 0.9em;
+            }
+            
+            .card h3 {
+                font-size: 1.1em;
+                margin: 0 0 8px 0;
+            }
+            
+            .loading-card {
+                background: #f0f9ff !important;
+                border: 1px solid #0ea5e9;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+                padding: 6px;
+            }
+            
+            .capacity-panel {
+                background: #fef3c7 !important;
+                border-left: 4px solid #f59e0b !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+                padding: 8px;
+                font-size: 0.85em;
+            }
+            
+            .info {
+                background: #f0f9ff !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+                font-size: 0.85em;
+            }
+            
+            .yellow-input {
+                background: #fef3c7 !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            h3 {
+                color: #166534 !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .input-group label {
+                font-size: 0.85em;
+            }
+            
+            input {
+                font-size: 0.85em;
+                padding: 2px 4px;
+            }
+            
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔋 Cathode Slurry Manufacturing Run Sheet</h1>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" data-tab="recipe">Recipe Calculation</div>
+        <div class="tab" data-tab="loading">Loading Calculation</div>
+    </div>
+
+        
+        <div style="position: absolute; top: 20px; right: 30px; background: rgba(255,255,255,0.9); padding: 8px 12px; border-radius: 8px; border: 1px solid #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="font-size: 11px; color: #6b7280; text-align: right; font-weight: 600;">Run Sheet v2.2 | Date: 2025.09.18</div>
+            <div style="font-size: 10px; color: #9ca3af; text-align: right; margin-top: 2px;">Modified for Coin Cell Manufacturing</div>
+        </div>
+        
+        
+    <!-- Recipe Tab Content -->
+    <div id="recipe-tab" class="tab-content active">
+
+    <div class="grid">
+            <div class="card">
+                <h3>🧪 Base Formulation Setup</h3>
+                
+                <div class="input-group">
+                    <label>Cathode Material:</label>
+                    <select id="cathode-type">
+                        <option value="NCM811">NCM811 (Ni8-Co1-Mn1)</option>
+                        <option value="LFP">LFP (Lithium Iron Phosphate)</option>
+                        <option value="NCM622">NCM622 (Ni6-Co2-Mn2)</option>
+                        <option value="NCA">NCA (Nickel-Cobalt-Aluminum)</option>
+                        <option value="LMO">LMO (Lithium Manganese Oxide)</option>
+                        <option value="LCO">LCO (Lithium Cobalt Oxide)</option>
+                    </select>
+                </div>
+
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Active Material (%):</label>
+                        <input type="number" id="active-content" value="96.0" min="90" max="98" step="0.1" class="yellow-input">
+                    </div>
+                    <div class="input-group">
+                        <label>MWCNT (%):</label>
+                        <input type="number" id="mwcnt-content" value="2.0" min="0.5" max="5" step="0.1" class="yellow-input">
+                    </div>
+                    <div class="input-group">
+                        <label>Binder (%):</label>
+                        <input type="number" id="binder-content" value="2.0" min="1" max="8" step="0.1" class="yellow-input">
+                    </div>
+                    <div class="input-group">
+                        <label>Binder Strategy:</label>
+                        <select id="binder-strategy">
+                            <option value="pvdf-fill">PVDF로 잔여 바인더 채우기</option>
+                            <option value="1:1">PVDF:H-NBR = 1:1</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>🟡 Total Slurry (g):</label>
+                        <input type="number" id="total-slurry" value="5.66" min="3" max="50" step="0.01" class="yellow-input">
+                    </div>
+                    <div class="input-group">
+                        <label>🟡 Target N.V. (%):</label>
+                        <input type="number" id="target-nv" value="53.0" min="40" max="70" step="0.1" class="yellow-input">
+                    </div>
+                </div>
+
+                <div id="balance-status" class="balance-check">
+                    Balance Check
+                </div>
+
+                <button class="btn" id="calc-btn">Calculate Recipe</button>
+                <button class="btn" onclick="downloadRunSheet()" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">📋 Download Run Sheet</button>
+                <button class="btn" onclick="printRunSheet()" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">🖨️ Print Run Sheet</button>
+            </div>
+
+            <div class="card">
+                <h3>📊 Calculated Recipe</h3>
+                
+                <table class="result-table" id="recipe-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Weight (g)</th>
+                            <th>Solid (g)</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Recipe results here -->
+                    </tbody>
+                </table>
+
+                <div class="info-panel">
+                    <strong>💡 Recipe Summary:</strong><br>
+                    <div id="recipe-summary">
+                        • Total Slurry: <span id="total-slurry-calc">5.66g</span><br>
+                        • Total Solid: <span id="total-solid-calc">3.00g</span><br>
+                        • Total NMP: <span id="total-nmp-calc">2.66g</span><br>
+                        • Zr Ball Required: <span id="zr-ball-calc">8.61g</span>
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-top: 10px;">
+                    <label>MWCNT Lot.:</label>
+                    <input type="text" id="mwcnt-lot" placeholder="MWCNT Lot 번호를 입력하세요" style="font-size: 12px; padding: 6px;">
+                </div>
+
+                <div class="input-group" style="margin-bottom: 5px;">
+                    <label>실험상세:</label>
+                    <input type="text" id="experiment-details" placeholder="실험 상세 내용을 입력하세요..." style="font-size: 12px; padding: 6px;">
+                </div>
+            </div>
+        </div>
+
+        <div class="card wide-card">
+            <h3>📄 Detailed Material Breakdown</h3>
+            
+            <table class="result-table" id="detailed-table">
+                <thead>
+                    <tr>
+                        <th>Material Source</th>
+                        <th>Required (g)</th>
+                        <th>Solid Contribution (g)</th>
+                        <th>NMP Content (g)</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Detailed breakdown here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="print-page-break"></div>
+
+        <div class="card wide-card">
+            <h3>📄 Thinky Mixer Process Steps</h3>
+            
+            <div class="process-step">
+                <span class="step-number">1</span>
+                <strong>1차: 건식 믹싱 + NMP 1차 투입</strong><br>
+                • 투입: Active Material + CNT Slurry + PVDF Solution + H-NBR Solution + NMP <span id="nmp-first-amount">0.00g</span> (추가 NMP의 34%)<br>
+                • 조건: <strong>1500 rpm × 10분</strong><br>
+                • Zr Ball: <span id="zr-ball-amount">8.61g</span> (활물질 대비 3:1 중량비)<br>
+                • 온도: 30±5°C
+            </div>
+
+            <div class="process-step">
+                <span class="step-number">2</span>
+                <strong>2차: NMP 2차 투입</strong><br>
+                • 투입: NMP <span id="nmp-second-amount">0.00g</span> (추가 NMP의 33%)<br>
+                • 조건: <strong>1200 rpm × 15분</strong><br>
+                • 목적: 초기 습윤 및 분산 진행<br>
+                • 온도: 32±5°C
+            </div>
+
+            <div class="process-step">
+                <span class="step-number">3</span>
+                <strong>3차: NMP 3차 투입</strong><br>
+                • 투입: NMP <span id="nmp-third-amount">0.00g</span> (추가 NMP의 33%)<br>
+                • 조건: <strong>1000 rpm × 10분</strong><br>
+                • 목적: 점도 조절 및 균질화<br>
+                • 온도: 35±5°C
+            </div>
+
+            <div class="process-step">
+                <span class="step-number">4</span>
+                <strong>4차: 최종 균질화</strong><br>
+                • 투입: 없음 (NMP 투입 완료)<br>
+                • 조건: <strong>800 rpm × 10분</strong><br>
+                • 목적: 최종 균질화 및 탈포<br>
+                • 온도: 37±5°C
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ 주의사항:</strong><br>
+                • 모든 재료는 사용 전 수분 제거 (Active: 120°C/4h, CNT: 80°C/2h)<br>
+                • NMP는 anhydrous grade 사용 (수분 ≤50ppm)<br>
+                • 작업 환경 습도 ≤40% 유지<br>
+                • Thinky Mixer 온도 모니터링 필수
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings 버튼 -->
+    <button class="settings-btn no-print" onclick="openSettings()" title="Solution Settings">⚙️</button>
+
+    <!-- Settings 모달 -->
+    <div id="settings-modal" class="settings-modal">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2 style="color: #166534; margin: 0;">⚙️ Solution Parameters</h2>
+                <button class="close-btn" onclick="closeSettings()">×</button>
+            </div>
+            
+            <div class="settings-section">
+                <h4>CNT Slurry Composition</h4>
+                <div class="setting-item">
+                    <label>MWCNT Content (wt%):</label>
+                    <input type="number" id="set-mwcnt-wt" value="5.0" step="0.1">
+                </div>
+                <div class="setting-item">
+                    <label>H-NBR Content (wt%):</label>
+                    <input type="number" id="set-hnbr-wt" value="1.0" step="0.1">
+                </div>
+                <div class="setting-item">
+                    <label>BYK-LP Content (wt%):</label>
+                    <input type="number" id="set-byk-wt" value="0.5" step="0.1">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>Solution Solid Contents</h4>
+                <div class="setting-item">
+                    <label>PVDF Solution Solid (%):</label>
+                    <input type="number" id="set-pvdf-solid" value="7" step="0.1">
+                </div>
+                <div class="setting-item">
+                    <label>H-NBR Solution Solid (%):</label>
+                    <input type="number" id="set-hnbr-solid" value="8" step="0.1">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>전해액 설정 (Electrolyte Parameters)</h4>
+                <div class="setting-item">
+                    <label>전해액 전도도 κ₀ (mS/cm):</label>
+                    <input type="number" id="set-electrolyte-cond" value="10" step="0.1" min="1" max="20">
+                    <small style="color: #6b7280;">* 일반적으로 8-12 mS/cm</small>
+                </div>
+                <div class="setting-item">
+                    <label>전해액 과잉 계수 α:</label>
+                    <input type="number" id="set-electrolyte-excess" value="2.5" step="0.1" min="1.0" max="5.0">
+                    <small style="color: #6b7280;">* 일반적으로 1.2-3.0</small>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>재료 밀도 설정 (Material Densities, g/cm³)</h4>
+                <div class="input-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="setting-item">
+                        <label>PVDF:</label>
+                        <input type="number" id="set-density-pvdf" value="1.78" step="0.01" min="1.0" max="3.0">
+                    </div>
+                    <div class="setting-item">
+                        <label>SBR:</label>
+                        <input type="number" id="set-density-sbr" value="1.0" step="0.01" min="0.8" max="1.5">
+                    </div>
+                    <div class="setting-item">
+                        <label>CMC:</label>
+                        <input type="number" id="set-density-cmc" value="1.6" step="0.01" min="1.0" max="2.0">
+                    </div>
+                    <div class="setting-item">
+                        <label>CNT:</label>
+                        <input type="number" id="set-density-cnt" value="2.0" step="0.01" min="1.5" max="2.5">
+                    </div>
+                    <div class="setting-item">
+                        <label>Super P:</label>
+                        <input type="number" id="set-density-superp" value="2.0" step="0.01" min="1.5" max="2.5">
+                    </div>
+                    <div class="setting-item">
+                        <label>Ketjen Black:</label>
+                        <input type="number" id="set-density-kb" value="2.0" step="0.01" min="1.5" max="2.5">
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn" onclick="saveSettings()">💾 Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Material database
+        var materials = {
+            "NCM811": { name: "NCM811", capacity: 200, practical: 190, voltage: 3.7, density: 4.8 },
+            "LFP": { name: "LiFePOâ‚„", capacity: 170, practical: 160, voltage: 3.2, density: 3.6 },
+            "NCM622": { name: "NCM622", capacity: 185, practical: 175, voltage: 3.7, density: 4.7 },
+            "NCA": { name: "NCA", capacity: 205, practical: 195, voltage: 3.7, density: 4.8 },
+            "LMO": { name: "LMO", capacity: 148, practical: 120, voltage: 4.0, density: 4.3 },
+            "LCO": { name: "LCO", capacity: 274, practical: 140, voltage: 3.9, density: 5.1 }
+        };
+
+        // Default solution parameters
+        var solutionParams = {
+            mwcnt_wt: 5.0,
+            hnbr_wt: 1.0,
+            byk_wt: 0.5,
+            pvdf_solid: 7.0,
+            hnbr_solid: 8.0,
+            electrolyte_cond: 10.0,  // mS/cm
+            electrolyte_excess: 2.5,  // α factor - changed to 2.5
+            // Material densities (g/cm³)
+            density_pvdf: 1.78,
+            density_sbr: 1.0,
+            density_cmc: 1.6,
+            density_cnt: 2.0,
+            density_superp: 2.0,
+            density_kb: 2.0
+        };
+
+        // Settings functions
+        function openSettings() {
+            document.getElementById('set-mwcnt-wt').value = solutionParams.mwcnt_wt;
+            document.getElementById('set-hnbr-wt').value = solutionParams.hnbr_wt;
+            document.getElementById('set-byk-wt').value = solutionParams.byk_wt;
+            document.getElementById('set-pvdf-solid').value = solutionParams.pvdf_solid;
+            document.getElementById('set-hnbr-solid').value = solutionParams.hnbr_solid;
+            document.getElementById('set-electrolyte-cond').value = solutionParams.electrolyte_cond;
+            document.getElementById('set-electrolyte-excess').value = solutionParams.electrolyte_excess;
+            // Load density settings
+            document.getElementById('set-density-pvdf').value = solutionParams.density_pvdf;
+            document.getElementById('set-density-sbr').value = solutionParams.density_sbr;
+            document.getElementById('set-density-cmc').value = solutionParams.density_cmc;
+            document.getElementById('set-density-cnt').value = solutionParams.density_cnt;
+            document.getElementById('set-density-superp').value = solutionParams.density_superp;
+            document.getElementById('set-density-kb').value = solutionParams.density_kb;
+            document.getElementById('settings-modal').style.display = 'block';
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+
+        function saveSettings() {
+            solutionParams.mwcnt_wt = parseFloat(document.getElementById('set-mwcnt-wt').value);
+            solutionParams.hnbr_wt = parseFloat(document.getElementById('set-hnbr-wt').value);
+            solutionParams.byk_wt = parseFloat(document.getElementById('set-byk-wt').value);
+            solutionParams.pvdf_solid = parseFloat(document.getElementById('set-pvdf-solid').value);
+            solutionParams.hnbr_solid = parseFloat(document.getElementById('set-hnbr-solid').value);
+            solutionParams.electrolyte_cond = parseFloat(document.getElementById('set-electrolyte-cond').value);
+            solutionParams.electrolyte_excess = parseFloat(document.getElementById('set-electrolyte-excess').value);
+            // Save density settings
+            solutionParams.density_pvdf = parseFloat(document.getElementById('set-density-pvdf').value);
+            solutionParams.density_sbr = parseFloat(document.getElementById('set-density-sbr').value);
+            solutionParams.density_cmc = parseFloat(document.getElementById('set-density-cmc').value);
+            solutionParams.density_cnt = parseFloat(document.getElementById('set-density-cnt').value);
+            solutionParams.density_superp = parseFloat(document.getElementById('set-density-superp').value);
+            solutionParams.density_kb = parseFloat(document.getElementById('set-density-kb').value);
+            
+            // Update componentDensities
+            componentDensities.PVDF = solutionParams.density_pvdf;
+            componentDensities.SBR = solutionParams.density_sbr;
+            componentDensities.CMC = solutionParams.density_cmc;
+            componentDensities.CNT = solutionParams.density_cnt;
+            componentDensities.SuperP = solutionParams.density_superp;
+            componentDensities.KB = solutionParams.density_kb;
+            
+            // Update electrolyte input fields in Loading Calculation tab
+            const condInput = document.getElementById('electrolyte-conductivity');
+            const excessInput = document.getElementById('electrolyte-excess');
+            if (condInput) condInput.value = solutionParams.electrolyte_cond;
+            if (excessInput) excessInput.value = solutionParams.electrolyte_excess;
+            
+            closeSettings();
+            calculateRecipe(); // Recalculate with new parameters
+            alert('✅ 설정이 저장되었습니다!');
+        }
+
+        // Modal close on outside click
+        window.onclick = function(event) {
+            var modal = document.getElementById('settings-modal');
+            if (event.target == modal) {
+                closeSettings();
+            }
+        }
+
+        // Update balance check
+        function updateBalance() {
+            var active = parseFloat(document.getElementById("active-content").value) || 0;
+            var mwcnt = parseFloat(document.getElementById("mwcnt-content").value) || 0;
+            var binder = parseFloat(document.getElementById("binder-content").value) || 0;
+            
+            var total = active + mwcnt + binder;
+            var status = document.getElementById("balance-status");
+            
+            if (Math.abs(total - 100) < 0.1) {
+                status.className = "balance-check good";
+                status.textContent = "✅ Perfect Balance (100.0%)";
+            } else {
+                status.className = "balance-check bad";
+                status.textContent = "❌ Imbalance (" + total.toFixed(1) + "%) - Adjust to 100%";
+            }
+        }
+
+        // Main calculation function with FIXED LOGIC
+        function calculateRecipe() {
+            // Read input parameters
+            var totalSlurry = parseFloat(document.getElementById("total-slurry").value) || 5.66;
+            var targetNV = parseFloat(document.getElementById("target-nv").value) || 53.0;
+            var activePercent = parseFloat(document.getElementById("active-content").value) || 96.0;
+            var mwcntPercent = parseFloat(document.getElementById("mwcnt-content").value) || 2.0;
+            var binderPercent = parseFloat(document.getElementById("binder-content").value) || 2.0;
+            var binderStrategy = document.getElementById("binder-strategy").value;
+            
+            // Calculate total solid mass
+            var totalSolid = totalSlurry * targetNV / 100;
+            var totalNMP = totalSlurry - totalSolid;
+            
+            // Calculate target solid masses for each component
+            var activeSolidTarget = totalSolid * activePercent / 100;
+            var mwcntSolidTarget = totalSolid * mwcntPercent / 100;
+            var binderSolidTarget = totalSolid * binderPercent / 100;
+            
+            // CNT Slurry calculation
+            // CNT Slurry solid content = MWCNT% + H-NBR% + BYK%
+            var cntSlurrySolidContent = solutionParams.mwcnt_wt + solutionParams.hnbr_wt + solutionParams.byk_wt;
+            
+            // Required CNT Slurry mass to get target MWCNT
+            var cntSlurryMass = mwcntSolidTarget / (solutionParams.mwcnt_wt / 100);
+            
+            // Solid contributions from CNT Slurry
+            var mwcntFromCNT = cntSlurryMass * solutionParams.mwcnt_wt / 100;
+            var hnbrFromCNT = cntSlurryMass * solutionParams.hnbr_wt / 100;
+            var bykFromCNT = cntSlurryMass * solutionParams.byk_wt / 100;
+            var nmpFromCNT = cntSlurryMass * (100 - cntSlurrySolidContent) / 100;
+            
+            // FIXED LOGIC: Calculate binder distribution
+            // CNT Slurry에서 제공되는 바인더 (H-NBR + BYK-LP를 모두 H-NBR로 취급)
+            var hnbrFromCNTSlurry = hnbrFromCNT + bykFromCNT;
+            
+            var pvdfSolid, additionalHNBRSolid, pvdfSolutionMass, hnbrSolutionMass, nmpFromPVDF, nmpFromHNBR;
+            
+            if (binderStrategy === "1:1") {
+                // PVDF:H-NBR = 1:1 전략
+                // 전체 바인더의 50%는 PVDF, 50%는 H-NBR
+                var targetPVDF = binderSolidTarget * 0.5;
+                var targetHNBR = binderSolidTarget * 0.5;
+                
+                // PVDF는 모두 별도 용액으로 투입
+                pvdfSolid = targetPVDF;
+                
+                // H-NBR은 CNT Slurry에서 이미 제공된 양을 제외하고 추가 투입
+                additionalHNBRSolid = Math.max(0, targetHNBR - hnbrFromCNTSlurry);
+            } else {
+                // PVDF로 잔여 바인더 채우기
+                // CNT Slurry에서 제공되지 않은 바인더를 모두 PVDF로 채움
+                pvdfSolid = binderSolidTarget - hnbrFromCNTSlurry;
+                additionalHNBRSolid = 0;
+            }
+            
+            // Calculate solution masses
+            pvdfSolutionMass = pvdfSolid / (solutionParams.pvdf_solid / 100);
+            hnbrSolutionMass = additionalHNBRSolid / (solutionParams.hnbr_solid / 100);
+            
+            // NMP from solutions
+            nmpFromPVDF = pvdfSolutionMass * (100 - solutionParams.pvdf_solid) / 100;
+            nmpFromHNBR = hnbrSolutionMass * (100 - solutionParams.hnbr_solid) / 100;
+            
+            // Additional NMP needed
+            var additionalNMP = totalNMP - nmpFromCNT - nmpFromPVDF - nmpFromHNBR;
+            
+            // NMP distribution for process steps (34%/33%/33%)
+            var nmp2ndStep = additionalNMP * 0.34;
+            var nmp3rdStep = additionalNMP * 0.33;
+            var nmp4thStep = additionalNMP * 0.33;
+            
+            // Zr Ball calculation (3:1 ratio to active material only)
+            var zrBallMass = activeSolidTarget * 3;
+            
+            // Update recipe table
+            var tableBody = document.querySelector("#recipe-table tbody");
+            var tableHTML = 
+                '<tr><td><strong>Active Material</strong></td><td class="bold">' + activeSolidTarget.toFixed(3) + '</td><td>' + activeSolidTarget.toFixed(3) + '</td><td>' + activePercent.toFixed(1) + '%</td></tr>' +
+                '<tr style="background: #e0f2fe;"><td><strong>CNT Slurry</strong></td><td class="bold">' + cntSlurryMass.toFixed(3) + '</td><td>' + (cntSlurryMass * cntSlurrySolidContent / 100).toFixed(3) + '</td><td>' + cntSlurrySolidContent.toFixed(1) + '%</td></tr>' +
+                '<tr style="background: #f3e5f5;"><td><strong>PVDF Solution</strong></td><td class="bold">' + pvdfSolutionMass.toFixed(3) + '</td><td>' + pvdfSolid.toFixed(3) + '</td><td>' + solutionParams.pvdf_solid + '%</td></tr>' +
+                '<tr style="background: #f3e5f5;"><td><strong>H-NBR Solution</strong></td><td class="bold">' + hnbrSolutionMass.toFixed(3) + '</td><td>' + additionalHNBRSolid.toFixed(3) + '</td><td>' + solutionParams.hnbr_solid + '%</td></tr>' +
+                '<tr class="highlight"><td><strong>Additional NMP</strong></td><td class="bold">' + additionalNMP.toFixed(3) + '</td><td>0.000</td><td>Solvent</td></tr>';
+            
+            tableBody.innerHTML = tableHTML;
+            
+            // Store composition masses globally for Loading Calculation
+            window.recipeComposition = {
+                activeMaterial: activeSolidTarget,  // g
+                conductive: mwcntSolidTarget,       // g (MWCNT)
+                pvdf: pvdfSolid + additionalHNBRSolid + hnbrFromCNTSlurry,  // g (total binder)
+                totalSolid: totalSolid              // g
+            };
+            
+            // Update detailed breakdown table with CORRECTED SOLID CONTRIBUTIONS
+            var detailedTableBody = document.querySelector("#detailed-table tbody");
+            var detailedHTML = 
+                '<tr><td>Active Material (NCM811)</td><td class="bold">' + activeSolidTarget.toFixed(3) + '</td><td>' + activeSolidTarget.toFixed(3) + '</td><td>0.000</td><td>Pre-dried 120°C/4h</td></tr>' +
+                '<tr style="background: #e0f2fe;"><td>CNT Slurry</td><td class="bold">' + cntSlurryMass.toFixed(3) + '</td><td>' + (mwcntFromCNT + hnbrFromCNT + bykFromCNT).toFixed(3) + '</td><td>' + nmpFromCNT.toFixed(3) + '</td><td>MWCNT(' + mwcntFromCNT.toFixed(3) + 'g) + H-NBR(' + hnbrFromCNT.toFixed(3) + 'g) + BYK(' + bykFromCNT.toFixed(3) + 'g)</td></tr>' +
+                '<tr style="background: #f3e5f5;"><td>PVDF Solution</td><td class="bold">' + pvdfSolutionMass.toFixed(3) + '</td><td>' + pvdfSolid.toFixed(3) + '</td><td>' + nmpFromPVDF.toFixed(3) + '</td><td>' + solutionParams.pvdf_solid + '% solid in NMP</td></tr>' +
+                '<tr style="background: #f3e5f5;"><td>H-NBR Solution</td><td class="bold">' + hnbrSolutionMass.toFixed(3) + '</td><td>' + additionalHNBRSolid.toFixed(3) + '</td><td>' + nmpFromHNBR.toFixed(3) + '</td><td>' + solutionParams.hnbr_solid + '% solid in NMP (Additional)</td></tr>' +
+                '<tr style="background: #fef3c7;"><td>NMP (2nd step)</td><td class="bold">' + nmp2ndStep.toFixed(3) + '</td><td>0.000</td><td>' + nmp2ndStep.toFixed(3) + '</td><td>34% of additional NMP</td></tr>' +
+                '<tr style="background: #fef3c7;"><td>NMP (3rd step)</td><td class="bold">' + nmp3rdStep.toFixed(3) + '</td><td>0.000</td><td>' + nmp3rdStep.toFixed(3) + '</td><td>33% of additional NMP</td></tr>' +
+                '<tr style="background: #fef3c7;"><td>NMP (4th step)</td><td class="bold">' + nmp4thStep.toFixed(3) + '</td><td>0.000</td><td>' + nmp4thStep.toFixed(3) + '</td><td>33% of additional NMP</td></tr>' +
+                '<tr style="background: #e5e7eb;"><td>Zr Ball</td><td class="bold">' + zrBallMass.toFixed(2) + '</td><td>-</td><td>-</td><td>3:1 ratio to active material</td></tr>';
+            
+            detailedTableBody.innerHTML = detailedHTML;
+            
+            // Update summary information with null checks
+            var elements = [
+                { id: "total-slurry-calc", value: totalSlurry.toFixed(2) + "g" },
+                { id: "total-solid-calc", value: totalSolid.toFixed(2) + "g" },
+                { id: "total-nmp-calc", value: totalNMP.toFixed(2) + "g" },
+                { id: "zr-ball-calc", value: zrBallMass.toFixed(2) + "g" },
+                { id: "zr-ball-amount", value: zrBallMass.toFixed(2) + "g" },
+                { id: "nmp-first-amount", value: nmp2ndStep.toFixed(3) + "g" },
+                { id: "nmp-second-amount", value: nmp3rdStep.toFixed(3) + "g" },
+                { id: "nmp-third-amount", value: nmp4thStep.toFixed(3) + "g" }
+            ];
+            
+            elements.forEach(function(element) {
+                var el = document.getElementById(element.id);
+                if (el) {
+                    el.textContent = element.value;
+                }
+            });
+        }
+
+        // Calculate expected performance for coin cell
+        function calculateExpectedPerformance() {
+            var cathodeType = document.getElementById("cathode-type").value;
+            var material = materials[cathodeType];
+            var totalSlurry = parseFloat(document.getElementById("total-slurry").value) || 5.66;
+            var targetNV = parseFloat(document.getElementById("target-nv").value) || 53.0;
+            var activePercent = parseFloat(document.getElementById("active-content").value) || 96.0;
+            
+            // Calculate for coin cell (16mm diameter, ~2.0 cm² area)
+            var totalSolid = totalSlurry * targetNV / 100;
+            var activeSolid = totalSolid * activePercent / 100;
+            
+            // Coin cell electrode area (~2.0 cm²)
+            var electrodeArea = 2.0;
+            var arealLoading = activeSolid / electrodeArea * 1000; // mg/cm²
+            
+            // Target electrode density range 3.25±0.25 g/cm³
+            var targetDensity = 3.25;
+            var densityRange = "3.00-3.50 g/cm³";
+            
+            // Capacity range for coin cell (1-4 mAh/cm²)
+            var enhancedCapacity = material.practical * 1.08; // 8% boost from MWCNT
+            var minCapacity = 1.0;
+            var maxCapacity = 4.0;
+            var arealCapacity = (arealLoading * enhancedCapacity / 1000);
+            
+            // Ensure capacity is within coin cell range
+            if (arealCapacity < minCapacity) arealCapacity = minCapacity;
+            if (arealCapacity > maxCapacity) arealCapacity = maxCapacity;
+            
+            var expectedThickness = (arealLoading / (targetDensity * 10)).toFixed(0); // μm
+            
+            document.getElementById("calc-areal-cap").textContent = arealCapacity.toFixed(2) + " mAh/cm²";
+            document.getElementById("calc-density").textContent = densityRange;
+            document.getElementById("calc-loading").textContent = arealLoading.toFixed(1) + " mg/cm²";
+            document.getElementById("calc-thickness").textContent = expectedThickness + " μm";
+        }
+
+        // Print function
+        function printRunSheet() {
+            // Recipe 탭 인쇄를 위한 클래스 추가
+            document.body.classList.add('print-recipe');
+            document.body.classList.remove('print-loading');
+            
+            window.print();
+            
+            // 인쇄 후 클래스 제거
+            setTimeout(function() {
+                document.body.classList.remove('print-recipe');
+            }, 100);
+        }
+
+        // Event listeners
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("🔋 Cathode Run Sheet v2.2 Ready for Coin Cell Manufacturing!");
+            
+            // Input events for balance check
+            var inputIds = ["active-content", "mwcnt-content", "binder-content"];
+            for (var i = 0; i < inputIds.length; i++) {
+                var element = document.getElementById(inputIds[i]);
+                if (element) {
+                    element.addEventListener("input", updateBalance);
+                }
+            }
+            
+            // Button events
+            var calcBtn = document.getElementById("calc-btn");
+            if (calcBtn) {
+                calcBtn.addEventListener("click", calculateRecipe);
+            }
+            
+            // Other parameter events
+            var otherInputs = ["total-slurry", "target-nv", "binder-strategy"];
+            for (var i = 0; i < otherInputs.length; i++) {
+                var element = document.getElementById(otherInputs[i]);
+                if (element) {
+                    element.addEventListener("input", calculateRecipe);
+                    element.addEventListener("change", calculateRecipe);
+                }
+            }
+            
+            // Initialize calculations
+            updateBalance();
+            calculateRecipe();
+            
+            console.log("✅ Coin cell manufacturing system ready!");
+        });
+
+        // Download function for run sheet
+        function downloadRunSheet() {
+            var currentDate = new Date().toISOString().split('T')[0];
+            var cathodeType = document.getElementById("cathode-type").value;
+            var totalSlurry = document.getElementById("total-slurry").value;
+            var mwcntLot = document.getElementById("mwcnt-lot").value || "Not specified";
+            var experimentDetails = document.getElementById("experiment-details").value || "No details provided";
+            
+            var htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cathode Slurry Run Sheet v2.2</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #2d5a27; text-align: center; border-bottom: 3px solid #22c55e; padding-bottom: 10px; }
+        h2 { color: #166534; background: #f0fdf4; padding: 8px; border-left: 4px solid #22c55e; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 25px; }
+        th { background: #22c55e; color: white; padding: 10px; text-align: center; font-weight: bold; }
+        td { padding: 8px; border: 1px solid #d1d5db; text-align: center; }
+        tr:nth-child(even) { background: #f9fafb; }
+        .header-info { text-align: center; margin-bottom: 20px; color: #6b7280; }
+        .section { margin-bottom: 30px; }
+        .highlight { background: #fef3c7 !important; font-weight: bold; }
+        .bold { font-weight: bold; }
+        .experiment-info { background: #f0fff4; padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid #bbf7d0; }
+    </style>
+</head>
+<body>
+    <h1>🔋 Cathode Slurry Manufacturing Run Sheet v2.2</h1>
+    <div class="header-info">
+        <p>Date: ${currentDate} | Material: ${cathodeType} | Total Slurry: ${totalSlurry}g</p>
+        <p>Modified for Coin Cell Manufacturing</p>
+    </div>
+
+    <div class="experiment-info">
+        <h3 style="color: #166534; margin-bottom: 10px;">📝 Experiment Information</h3>
+        <p><strong>MWCNT Lot:</strong> ${mwcntLot}</p>
+        <p><strong>실험상세:</strong> ${experimentDetails}</p>
+    </div>
+
+    <div class="section">
+        <h2>🔋 Base Formulation Setup</h2>
+        <table>
+            <tr><th>Parameter</th><th>Value</th></tr>
+            <tr><td>Active Material (%)</td><td>${document.getElementById("active-content").value}%</td></tr>
+            <tr><td>MWCNT (%)</td><td>${document.getElementById("mwcnt-content").value}%</td></tr>
+            <tr><td>Binder (%)</td><td>${document.getElementById("binder-content").value}%</td></tr>
+            <tr><td>Binder Strategy</td><td>${document.getElementById("binder-strategy").options[document.getElementById("binder-strategy").selectedIndex].text}</td></tr>
+            <tr><td>Total Slurry (g)</td><td>${totalSlurry}g</td></tr>
+            <tr><td>Target N.V. (%)</td><td>${document.getElementById("target-nv").value}%</td></tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📊 Calculated Recipe</h2>
+        <table>
+            <tr><th>Component</th><th>Required (g)</th><th>Solid (g)</th><th>%</th></tr>
+            <tr><td>Active Material</td><td class="bold">${document.querySelector("#recipe-table tbody tr:nth-child(1) td:nth-child(2)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(1) td:nth-child(3)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(1) td:nth-child(4)").textContent}</td></tr>
+            <tr><td>CNT Slurry</td><td class="bold">${document.querySelector("#recipe-table tbody tr:nth-child(2) td:nth-child(2)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(2) td:nth-child(3)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(2) td:nth-child(4)").textContent}</td></tr>
+            <tr><td>PVDF Solution</td><td class="bold">${document.querySelector("#recipe-table tbody tr:nth-child(3) td:nth-child(2)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(3) td:nth-child(3)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(3) td:nth-child(4)").textContent}</td></tr>
+            <tr><td>H-NBR Solution</td><td class="bold">${document.querySelector("#recipe-table tbody tr:nth-child(4) td:nth-child(2)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(4) td:nth-child(3)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(4) td:nth-child(4)").textContent}</td></tr>
+            <tr class="highlight"><td>Additional NMP</td><td class="bold">${document.querySelector("#recipe-table tbody tr:nth-child(5) td:nth-child(2)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(5) td:nth-child(3)").textContent}</td><td>${document.querySelector("#recipe-table tbody tr:nth-child(5) td:nth-child(4)").textContent}</td></tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📄 Detailed Material Breakdown</h2>
+        <table>
+            <tr><th>Material Source</th><th>Required (g)</th><th>Solid Contribution (g)</th><th>NMP Content (g)</th><th>Notes</th></tr>` + 
+            (function() {
+                var rows = document.querySelectorAll("#detailed-table tbody tr");
+                var html = "";
+                for (var i = 0; i < rows.length; i++) {
+                    var cells = rows[i].querySelectorAll("td");
+                    html += "<tr>";
+                    for (var j = 0; j < cells.length; j++) {
+                        html += "<td>" + cells[j].textContent + "</td>";
+                    }
+                    html += "</tr>";
+                }
+                return html;
+            })() + `
+        </table>
+    </div>
+
+</body>
+</html>`;
+
+            var blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'Cathode_Run_Sheet_v2.2_CoinCell_' + cathodeType + '_' + totalSlurry + 'g_' + currentDate + '.xls';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('📊 Coin Cell Run Sheet v2.2가 다운로드되었습니다!');
+        }
+
+        // ========== Tab Switching ==========
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                
+                // Remove active class from all tabs and contents
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                document.getElementById(tabName + '-tab').classList.add('active');
+            });
+        });
+
+        // ========== Calculate Area from Diameter ==========
+        function calculateAreaFromDiameter() {
+            const diameterInput = document.getElementById('loading-electrode-diameter');
+            const areaInput = document.getElementById('loading-electrode-area');
+            
+            if (diameterInput && areaInput) {
+                const diameter = parseFloat(diameterInput.value) || 0;
+                const area = Math.PI * Math.pow(diameter / 2, 2); // π * r²
+                areaInput.value = area.toFixed(4);
+            }
+        }
+
+        // ========== Material Capacity Database ==========
+        const materialCapacities = {
+            "LFP": { capacity: 161.40, voltage: 3.2, density: 3.6 },
+            "NCM111": { capacity: 160, voltage: 3.7, density: 4.7 },
+            "NCM523": { capacity: 170, voltage: 3.7, density: 4.7 },
+            "NCM622": { capacity: 180, voltage: 3.7, density: 4.7 },
+            "NCM811": { capacity: 220.41, voltage: 4.2, density: 4.8 },  // Updated capacity and voltage
+            "NCM90": { capacity: 210, voltage: 3.85, density: 4.8 },
+            "NCA": { capacity: 200, voltage: 3.8, density: 4.7 },
+            "LCO": { capacity: 140, voltage: 3.9, density: 5.1 },
+            "LMO": { capacity: 120, voltage: 4.0, density: 4.3 }
+        };
+
+        // Component densities (g/cm³)
+        const componentDensities = {
+            "PVDF": 1.78,    // PVDF binder density
+            "SBR": 1.0,      // SBR binder density
+            "CMC": 1.6,      // CMC binder density
+            "CNT": 2.0,      // Carbon nanotube density
+            "SuperP": 2.0,   // Super P carbon black
+            "KB": 2.0        // Ketjen Black
+        };
+
+        function updateMaterialCapacityInfo() {
+            const cathodeTypeElem = document.getElementById('cathode-type');
+            const infoElem = document.getElementById('loading-capacity-info');
+            
+            if (!cathodeTypeElem || !infoElem) return;
+            
+            const cathodeType = cathodeTypeElem.value;
+            const material = materialCapacities[cathodeType];
+            
+            if (material) {
+                const infoHtml = `
+                    <strong>활물질:</strong> ${cathodeType} <br>
+                    <strong>이론 용량:</strong> ${material.capacity} mAh/g<br>
+                    <strong>평균 전압:</strong> ${material.voltage} V<br>
+                    <strong>이론 밀도:</strong> ${material.density} g/cm³
+                `;
+                infoElem.innerHTML = infoHtml;
+            }
+        }
+
+        // Update capacity info when cathode type changes
+        const cathodeTypeSelect = document.getElementById('cathode-type');
+        if (cathodeTypeSelect) {
+            cathodeTypeSelect.addEventListener('change', updateMaterialCapacityInfo);
+        }
+
+        // ========== Loading Calculation ==========
+        function calculateLoading() {
+            // Check if recipe has been calculated
+            if (!window.recipeComposition) {
+                alert('Recipe 탭에서 먼저 조성을 계산해주세요!');
+                return;
+            }
+            
+            // Check if all required elements exist
+            const requiredIds = [
+                'loading-electrode-area', 'loading-thickness', 'loading-coating-mass',
+                'cathode-type', 'coating-loading-result', 'active-loading-result',
+                'calc-density-result', 'porosity-result', 'areal-capacity-result',
+                'energy-density-result'
+            ];
+            
+            const missingElements = requiredIds.filter(id => !document.getElementById(id));
+            if (missingElements.length > 0) {
+                console.error('Missing elements:', missingElements);
+                alert('필요한 입력 필드를 찾을 수 없습니다.');
+                return;
+            }
+            
+            // Get inputs
+            const area = parseFloat(document.getElementById('loading-electrode-area').value); // cm²
+            const thickness = parseFloat(document.getElementById('loading-thickness').value); // μm
+            const coatingMass = parseFloat(document.getElementById('loading-coating-mass').value); // mg (already dried, solid basis)
+            
+            // Get material info
+            const cathodeType = document.getElementById('cathode-type').value;
+            const material = materialCapacities[cathodeType];
+            
+            if (!material) {
+                alert('활물질을 먼저 선택해주세요 (Recipe 탭)');
+                return;
+            }
+            
+            // Get composition from recipe (in grams from window.recipeComposition)
+            const activeMaterial = window.recipeComposition.activeMaterial;
+            const conductive = window.recipeComposition.conductive;
+            const pvdf = window.recipeComposition.pvdf;
+            const totalSolid = window.recipeComposition.totalSolid;
+            
+            // Calculate weight fractions
+            const w_AM = activeMaterial / totalSolid;
+            const w_PVDF = pvdf / totalSolid;
+            const w_CNT = conductive / totalSolid;
+            
+            // Calculate theoretical solid density using mixing rule
+            // 1/ρ_solid = Σ(w_i / ρ_i)
+            const rho_AM = material.density;
+            const rho_PVDF = componentDensities.PVDF;
+            const rho_CNT = componentDensities.CNT;
+            
+            const rho_solid_inv = (w_AM / rho_AM) + (w_PVDF / rho_PVDF) + (w_CNT / rho_CNT);
+            const rho_solid = 1 / rho_solid_inv; // g/cm³
+            
+            // Calculate loading (코팅 질량은 이미 고체 기준)
+            const coatingLoading = coatingMass / area; // mg/cm²
+            const activeLoading = coatingLoading * w_AM; // mg/cm²
+            
+            // Calculate electrode bulk density: ρ_elec = m_elec / (A × L)
+            const thicknessCm = thickness / 10000; // μm -> cm
+            const coatingMassG = coatingMass / 1000; // mg -> g
+            const rho_elec = coatingMassG / (area * thicknessCm); // g/cm³
+            
+            // Calculate porosity: ε = 1 - (ρ_elec / ρ_solid)
+            const porosity = (1 - rho_elec / rho_solid) * 100; // %
+            
+            // Calculate areal capacity
+            const arealCapacity = activeLoading * material.capacity / 1000; // mAh/cm²
+            const energyDensity = arealCapacity * material.voltage; // mWh/cm²
+            
+            // Display results
+            document.getElementById('coating-loading-result').textContent = coatingLoading.toFixed(2);
+            document.getElementById('active-loading-result').textContent = activeLoading.toFixed(2);
+            document.getElementById('calc-density-result').textContent = rho_elec.toFixed(3);
+            document.getElementById('porosity-result').textContent = porosity.toFixed(1);
+            document.getElementById('areal-capacity-result').textContent = arealCapacity.toFixed(2);
+            document.getElementById('energy-density-result').textContent = energyDensity.toFixed(2);
+            
+            // Update capacity info with detailed breakdown
+            const infoElem = document.getElementById('loading-capacity-info');
+            if (infoElem) {
+                const infoHtml = `
+                    <strong>활물질:</strong> ${cathodeType} (${(w_AM*100).toFixed(1)}%)<br>
+                    <strong>이론 용량:</strong> ${material.capacity} mAh/g<br>
+                    <strong>평균 전압:</strong> ${material.voltage} V<br>
+                    <strong>이론 고체 밀도:</strong> ${rho_solid.toFixed(3)} g/cm³<br>
+                    <small style="color: #6b7280;">
+                    조성별 밀도: AM ${rho_AM} g/cm³ (${(w_AM*100).toFixed(1)}%), 
+                    Binder ${rho_PVDF} g/cm³ (${(w_PVDF*100).toFixed(1)}%), 
+                    CNT ${rho_CNT} g/cm³ (${(w_CNT*100).toFixed(1)}%)
+                    </small>
+                `;
+                infoElem.innerHTML = infoHtml;
+            }
+            
+            // Store values for electrolyte calculation
+            window.currentPorosity = porosity / 100; // Store as fraction
+            window.currentArea = area;
+            window.currentThickness = thicknessCm;
+            window.currentRhoSolid = rho_solid;
+            
+            console.log('Loading Calculation Results:', {
+                '조성 (wt%)': `AM ${(w_AM*100).toFixed(1)}%, Binder ${(w_PVDF*100).toFixed(1)}%, CNT ${(w_CNT*100).toFixed(1)}%`,
+                '이론 고체 밀도 (g/cm³)': rho_solid.toFixed(3),
+                '전극 벌크 밀도 (g/cm³)': rho_elec.toFixed(3),
+                '기공도 (%)': porosity.toFixed(1)
+            });
+        }
+
+        // ========== Electrolyte & Tortuosity Calculation ==========
+        function calculateElectrolyte() {
+            if (!window.currentPorosity) {
+                alert('기공도를 먼저 계산해주세요!');
+                return;
+            }
+            
+            // Check if all required elements exist
+            const requiredIds = [
+                'electrolyte-excess', 'electrolyte-conductivity',
+                'eis-resistance', 'electrolyte-volume',
+                'tortuosity-result', 'effective-conductivity-result', 'electrolyte-analysis'
+            ];
+            
+            const missingElements = requiredIds.filter(id => !document.getElementById(id));
+            if (missingElements.length > 0) {
+                console.error('Missing elements:', missingElements);
+                return;
+            }
+            
+            // Get inputs
+            const excessFactor = parseFloat(document.getElementById('electrolyte-excess').value);
+            const electrolyteCond = parseFloat(document.getElementById('electrolyte-conductivity').value); // mS/cm
+            const R_ion = parseFloat(document.getElementById('eis-resistance').value); // Ω (ionic resistance)
+            
+            // Calculate pore volume: V_pore = ε × A × L (cm³)
+            const poreVolume = window.currentArea * window.currentThickness * window.currentPorosity;
+            
+            // Calculate electrolyte volume: V_elyte = α × V_pore (μL)
+            const electrolyteVolume = poreVolume * excessFactor * 1000; // cm³ -> μL
+            
+            // Display electrolyte volume
+            document.getElementById('electrolyte-volume').value = electrolyteVolume.toFixed(2);
+            
+            // Calculate tortuosity if R data is provided
+            if (!isNaN(R_ion) && R_ion > 0) {
+                // Get minimum diameter for tortuosity calculation
+                const minDiameter = parseFloat(document.getElementById('eis-min-diameter').value) || 1.3;
+                const minArea = Math.PI * Math.pow(minDiameter / 2, 2); // cm²
+                
+                // Step 1: Calculate ionic conductivity σ_ion,⊥
+                // σ_ion,⊥ = L / (R × A)  [S/cm]
+                const sigma_ion = window.currentThickness / (R_ion * minArea); // S/cm - 최소지름의 면적 사용
+                
+                // Step 2: Calculate tortuosity τ
+                // From: σ_ion,⊥ = (ε/τ) × κ₀
+                // Therefore: τ = (ε × κ₀) / σ_ion,⊥
+                const kappa_0 = electrolyteCond / 1000; // mS/cm -> S/cm (bulk electrolyte conductivity)
+                const tortuosity = (window.currentPorosity * kappa_0) / sigma_ion;
+                
+                // Step 3: Calculate effective ionic conductivity
+                // σ_ion,eff = (ε/τ) × κ₀
+                const sigma_eff = (window.currentPorosity / tortuosity) * kappa_0; // S/cm
+                const sigma_eff_mS = sigma_eff * 1000; // Convert to mS/cm
+                
+                document.getElementById('tortuosity-result').value = tortuosity.toFixed(2); // 2 decimal places
+                document.getElementById('effective-conductivity-result').value = sigma_eff_mS.toExponential(3);
+                
+                // Analysis
+                let analysis = `<div style="background: #f0f9ff; padding: 12px; border-radius: 6px; margin-bottom: 10px;">`;
+                analysis += `<strong>📊 계산 상세 결과</strong><br>`;
+                analysis += `<div style="margin-top: 8px; font-size: 0.95em;">`;
+                analysis += `• 기공 부피 (V<sub>pore</sub>): ${(poreVolume * 1000).toFixed(2)} μL<br>`;
+                analysis += `• 전해액 투입량 (α=${excessFactor}): <strong>${electrolyteVolume.toFixed(2)} μL</strong><br>`;
+                analysis += `• 이온 저항 (R): ${R_ion.toFixed(3)} Ω<br>`;
+                analysis += `• 최소 지름: ${minDiameter.toFixed(2)} cm (면적: ${minArea.toFixed(3)} cm²)<br>`;
+                analysis += `• 기공도 (ε): ${(window.currentPorosity * 100).toFixed(1)}%<br>`;
+                analysis += `• 벌크 전도도 (κ₀): ${kappa_0.toFixed(3)} S/cm (${electrolyteCond} mS/cm)<br>`;
+                analysis += `• Through-plane 전도도 (σ<sub>ion,⊥</sub>): ${sigma_ion.toExponential(3)} S/cm<br>`;
+                analysis += `• <strong>Tortuosity (τ): ${tortuosity.toFixed(2)}</strong><br>`;
+                analysis += `• <strong>유효 이온 전도도 (σ<sub>ion,eff</sub>): ${sigma_eff_mS.toExponential(3)} mS/cm</strong>`;
+                analysis += `</div></div>`;
+                
+                analysis += `<div style="padding: 10px; border-left: 4px solid `;
+                
+                if (tortuosity < 5) {
+                    analysis += `#10b981;">🟢 <strong>우수한 이온 전도 경로</strong> (τ < 5)<br>`;
+                    analysis += `<small>다공성 구조가 잘 형성되어 전해액 침투가 원활합니다.</small>`;
+                } else if (tortuosity < 10) {
+                    analysis += `#f59e0b;">🟡 <strong>양호한 이온 전도 경로</strong> (5 ≤ τ < 10)<br>`;
+                    analysis += `<small>일반적인 전극 수준입니다.</small>`;
+                } else if (tortuosity < 20) {
+                    analysis += `#ef4444;">🟠 <strong>보통 수준</strong> (10 ≤ τ < 20)<br>`;
+                    analysis += `<small>기공 구조 최적화를 고려해볼 수 있습니다.</small>`;
+                } else {
+                    analysis += `#dc2626;">🔴 <strong>높은 Tortuosity</strong> (τ ≥ 20)<br>`;
+                    analysis += `<small>⚠️ 다음 사항을 확인하세요:<br>`;
+                    analysis += `1. 전해액 전도도 κ₀ 값 (일반적으로 8-12 mS/cm)<br>`;
+                    analysis += `2. EIS R이 순수 이온 저항인지 확인<br>`;
+                    analysis += `3. 전극 두께/면적 측정값의 정확도<br>`;
+                    analysis += `4. 캘린더링 압력이 과도하여 기공이 막혔는지 확인</small>`;
+                }
+                
+                analysis += `</div>`;
+                
+                document.getElementById('electrolyte-analysis').innerHTML = analysis;
+                
+                console.log('Tortuosity & Effective Conductivity Calculation:', {
+                    '이온 저항 R (Ω)': R_ion,
+                    'Through-plane 전도도 σ_ion (S/cm)': sigma_ion.toExponential(3),
+                    '벌크 전도도 κ₀ (S/cm)': kappa_0.toFixed(3),
+                    '기공도 ε': window.currentPorosity.toFixed(3),
+                    'Tortuosity τ': tortuosity.toFixed(2),
+                    '유효 이온 전도도 σ_eff (mS/cm)': sigma_eff_mS.toExponential(3)
+                });
+            } else {
+                document.getElementById('tortuosity-result').value = '';
+                document.getElementById('effective-conductivity-result').value = '';
+                document.getElementById('electrolyte-analysis').innerHTML = 
+                    `<div style="background: #f0f9ff; padding: 12px; border-radius: 6px;">` +
+                    `<strong>✅ 전해액 투입량</strong><br>` +
+                    `• 기공 부피: ${(poreVolume * 1000).toFixed(2)} μL<br>` +
+                    `• 권장 투입량 (α=${excessFactor}): <strong>${electrolyteVolume.toFixed(2)} μL</strong><br><br>` +
+                    `<small style="color: #6b7280;">` +
+                    `📌 EIS 이온 저항 R을 입력하면 Tortuosity와 유효 이온 전도도를 계산합니다.<br>` +
+                    `• R: Through-plane 이온 저항 (Ω)<br>` +
+                    `• κ₀: 벌크 전해액 전도도 (일반적으로 8-12 mS/cm)<br>` +
+                    `• σ<sub>ion,eff</sub> = (ε/τ) × κ₀` +
+                    `</small></div>`;
+            }
+        }
+
+        // ========== Settings Integration ==========
+        function applySettings() {
+            // Apply electrolyte settings - safely check if elements exist
+            const electroCondSetting = document.getElementById('set-electrolyte-conductivity');
+            const excessFactorSetting = document.getElementById('set-electrolyte-excess');
+            const electroCondInput = document.getElementById('electrolyte-conductivity');
+            const excessFactorInput = document.getElementById('electrolyte-excess');
+            
+            if (electroCondSetting && electroCondInput) {
+                electroCondInput.value = electroCondSetting.value;
+            }
+            
+            if (excessFactorSetting && excessFactorInput) {
+                excessFactorInput.value = excessFactorSetting.value;
+            }
+            
+            // Apply material capacities - safely
+            const capacitySettings = {
+                'LFP': document.getElementById('set-LFP-capacity'),
+                'NCM111': document.getElementById('set-NCM111-capacity'),
+                'NCM523': document.getElementById('set-NCM523-capacity'),
+                'NCM622': document.getElementById('set-NCM622-capacity'),
+                'NCM811': document.getElementById('set-NCM811-capacity'),
+                'NCM90': document.getElementById('set-NCM90-capacity'),
+                'NCA': document.getElementById('set-NCA-capacity'),
+                'LCO': document.getElementById('set-LCO-capacity'),
+                'LMO': document.getElementById('set-LMO-capacity')
+            };
+            
+            for (const [key, element] of Object.entries(capacitySettings)) {
+                if (element && materialCapacities[key]) {
+                    materialCapacities[key].capacity = parseFloat(element.value);
+                }
+            }
+            
+            // Call original applySettings if it exists
+            if (typeof originalApplySettings === 'function') {
+                originalApplySettings();
+            }
+            
+            alert('✅ Settings가 적용되었습니다!');
+        }
+
+        // Store original applySettings function if it exists
+        const originalApplySettings = window.applySettings;
+        
+        // ========== Export to CSV ==========
+        function exportToCSV() {
+            if (!window.recipeComposition || !window.currentPorosity) {
+                alert('먼저 계산을 완료해주세요!');
+                return;
+            }
+            
+            const cathodeType = document.getElementById('cathode-type').value;
+            const diameter = document.getElementById('loading-electrode-diameter').value;
+            const area = document.getElementById('loading-electrode-area').value;
+            const thickness = document.getElementById('loading-thickness').value;
+            const coatingMass = document.getElementById('loading-coating-mass').value;
+            
+            const coatingLoading = document.getElementById('coating-loading-result').textContent;
+            const activeLoading = document.getElementById('active-loading-result').textContent;
+            const calcDensity = document.getElementById('calc-density-result').textContent;
+            const porosity = document.getElementById('porosity-result').textContent;
+            const arealCapacity = document.getElementById('areal-capacity-result').textContent;
+            const energyDensity = document.getElementById('energy-density-result').textContent;
+            
+            const electrolyteVolume = document.getElementById('electrolyte-volume').value;
+            const resistance = document.getElementById('eis-resistance').value || '-';
+            const tortuosity = document.getElementById('tortuosity-result').value || '-';
+            const effConductivity = document.getElementById('effective-conductivity-result').value || '-';
+            
+            // Get MWCNT Lot from Recipe tab
+            const mwcntLot = document.getElementById('mwcnt-lot') ? document.getElementById('mwcnt-lot').value : '';
+            
+            // Get composition from Recipe tab
+            const activeContent = document.getElementById('active-content') ? parseFloat(document.getElementById('active-content').value).toFixed(1) : '-';
+            const mwcntContent = document.getElementById('mwcnt-content') ? parseFloat(document.getElementById('mwcnt-content').value).toFixed(1) : '-';
+            const binderContent = document.getElementById('binder-content') ? parseFloat(document.getElementById('binder-content').value).toFixed(1) : '-';
+            
+            // Convert effective conductivity from S/cm to mS/cm
+            let effCondMS = '-';
+            if (effConductivity !== '-' && effConductivity !== '') {
+                const effCondValue = parseFloat(effConductivity);
+                if (!isNaN(effCondValue)) {
+                    effCondMS = (effCondValue * 1000).toExponential(3);
+                }
+            }
+            
+            // Format tortuosity to 2 decimal places
+            let tortuosityFormatted = '-';
+            if (tortuosity !== '-' && tortuosity !== '') {
+                const tortuosityValue = parseFloat(tortuosity);
+                if (!isNaN(tortuosityValue)) {
+                    tortuosityFormatted = tortuosityValue.toFixed(2);
+                }
+            }
+            
+            const timestamp = new Date().toISOString().split('T')[0];
+            
+            // Column widths: A=24, B=11, C=11
+            let csv = 'Loading Calculation Results\n';
+            csv += `Date,${timestamp}\n`;
+            csv += `Cathode Type,${cathodeType}\n`;
+            csv += `Active Material,${activeContent},%\n`;
+            csv += `MWCNT,${mwcntContent},%\n`;
+            csv += `Binder,${binderContent},%\n`;
+            csv += '\n';
+            
+            csv += `Input Parameters,${mwcntLot}\n`;
+            csv += 'Parameter,Value,Unit\n';
+            csv += `Electrode Diameter,${diameter},cm\n`;
+            csv += `Electrode Area,${area},cm^2\n`;
+            csv += `Coating Thickness,${thickness},um\n`;
+            csv += `Coating Mass,${coatingMass},mg\n`;
+            csv += '\n';
+            
+            csv += 'Calculation Results\n';
+            csv += 'Parameter,Value,Unit\n';
+            csv += `Coating Loading,${coatingLoading},mg/cm^2\n`;
+            csv += `Active Loading,${activeLoading},mg/cm^2\n`;
+            csv += `Calculated Density,${calcDensity},g/cm^2\n`;
+            csv += `Porosity,${porosity},%\n`;
+            csv += `Areal Capacity,${arealCapacity},mAh/cm^2\n`;
+            csv += `Energy Density,${energyDensity},mWh/cm^2\n`;
+            csv += '\n';
+            
+            csv += 'Electrolyte & Tortuosity\n';
+            csv += 'Parameter,Value,Unit\n';
+            csv += `Electrolyte Volume,${electrolyteVolume},uL\n`;
+            csv += `EIS R,${resistance},ohm\n`;
+            csv += `Tortuosity ?,${tortuosityFormatted},-\n`;
+            csv += `Effective Conductivity,${effCondMS},mS/cm\n`;
+            
+            // Add UTF-8 BOM to ensure proper Korean character encoding
+            const BOM = '\uFEFF';
+            const csvWithBOM = BOM + csv;
+            
+            const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `Loading_Calculation_${cathodeType}_${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ========== Print Loading Calculation ==========
+        function printLoadingCalc() {
+            if (!window.recipeComposition || !window.currentPorosity) {
+                alert('먼저 계산을 완료해주세요!');
+                return;
+            }
+            
+            // Loading 탭 인쇄를 위한 클래스 추가
+            document.body.classList.add('print-loading');
+            document.body.classList.remove('print-recipe');
+            
+            window.print();
+            
+            // 인쇄 후 클래스 제거
+            setTimeout(function() {
+                document.body.classList.remove('print-loading');
+            }, 100);
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            // Calculate recipe first to initialize recipeComposition
+            calculateRecipe();
+            
+            // Calculate initial area from diameter
+            calculateAreaFromDiameter();
+            
+            // Initialize electrolyte settings from solutionParams
+            const electroCondInput = document.getElementById('electrolyte-conductivity');
+            const excessInput = document.getElementById('electrolyte-excess');
+            
+            if (electroCondInput) {
+                electroCondInput.value = solutionParams.electrolyte_cond;
+            }
+            if (excessInput) {
+                excessInput.value = solutionParams.electrolyte_excess;
+            }
+            
+            // Update material capacity info if cathode type is selected
+            const cathodeTypeElem = document.getElementById('cathode-type');
+            if (cathodeTypeElem) {
+                updateMaterialCapacityInfo();
+            }
+        });
+    </script>
+</body>
+</html
+    </div>
+    <!-- End Recipe Tab -->
+    
+
+    
+    <!-- Loading Calculation Tab -->
+    <div id="loading-tab" class="tab-content">
+        <div class="grid">
+            <!-- Input Card -->
+            <div class="card">
+                <h3>📐 측정 데이터 입력</h3>
+                
+                <div class="input-group">
+                    <label>전극 지름 (cm):</label>
+                    <input type="number" id="loading-electrode-diameter" value="1.4" min="0.5" max="10" step="0.01" oninput="calculateAreaFromDiameter()">
+                    <small style="color: #6b7280;">* 원형 전극 지름</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>전극 면적 (cm²):</label>
+                    <input type="number" id="loading-electrode-area" value="1.54" min="0.1" max="100" step="0.01" readonly class="yellow-input">
+                    <small style="color: #6b7280;">* 지름으로부터 자동 계산</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>코팅 두께 (μm):</label>
+                    <input type="number" id="loading-thickness" value="29" min="10" max="200" step="1">
+                    <small style="color: #6b7280;">* 캘린더링 후 측정 두께 (Al foil -15㎛)</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>코팅 질량 (mg):</label>
+                    <input type="number" id="loading-coating-mass" value="11.8" min="0.1" max="1000" step="0.1">
+                    <small style="color: #6b7280;">* 건조 후 측정 질량 (고체 기준, Al foil -6mg)</small>
+                </div>
+
+                <button class="btn" onclick="calculateLoading()">📊 계산하기</button>
+                
+                <!-- Capacity Display - moved below button -->
+                <div class="capacity-panel" style="margin-top: 15px;">
+                    <h4 style="margin: 0 0 10px 0;">🔋 활물질 용량 정보</h4>
+                    <div id="loading-capacity-info">
+                        계산을 시작하려면 Recipe 탭에서 활물질을 선택하세요.
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                    <button class="btn" onclick="exportToCSV()" style="background: #059669;">📥 CSV 다운로드</button>
+                    <button class="btn" onclick="printLoadingCalc()" style="background: #7c3aed;">🖨️ 인쇄하기</button>
+                </div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="card">
+                <h3>📈 계산 결과</h3>
+                
+                <div class="loading-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="loading-card highlight">
+                        <div class="loading-value" id="coating-loading-result">-</div>
+                        <div class="loading-label">코팅 로딩 (mg/cm²)</div>
+                        <div class="tooltip">코팅 질량 ÷ 면적</div>
+                    </div>
+                    
+                    <div class="loading-card">
+                        <div class="loading-value" id="active-loading-result">-</div>
+                        <div class="loading-label">활물질 로딩 (mg/cm²)</div>
+                        <div class="tooltip">코팅로딩 × 활물질비율</div>
+                    </div>
+                    
+                    <div class="loading-card">
+                        <div class="loading-value" id="calc-density-result">-</div>
+                        <div class="loading-label">계산밀도 (g/cm³)</div>
+                        <div class="tooltip">로딩 ÷ 두께</div>
+                    </div>
+                    
+                    <div class="loading-card highlight">
+                        <div class="loading-value" id="porosity-result">-</div>
+                        <div class="loading-label">기공도 (%)</div>
+                        <div class="tooltip">100 - (계산밀도/이론밀도×100)</div>
+                    </div>
+                </div>
+
+                <div class="loading-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="loading-card">
+                        <div class="loading-value" id="areal-capacity-result">-</div>
+                        <div class="loading-label">Areal Capacity (mAh/cm²)</div>
+                        <div class="tooltip">활물질 로딩 × 용량 ÷ 1000</div>
+                    </div>
+                    
+                    <div class="loading-card">
+                        <div class="loading-value" id="energy-density-result">-</div>
+                        <div class="loading-label">Energy Density (mWh/cm²)</div>
+                        <div class="tooltip">Areal Capacity × 전압</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Electrolyte & Tortuosity Card -->
+            <div class="card wide-card">
+                <h3>💧 전해액 투입 및 EIS 분석</h3>
+                
+                <div class="input-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="input-group">
+                        <label>전해액 과잉 계수:</label>
+                        <input type="number" id="electrolyte-excess" value="2.5" min="1.0" max="5.0" step="0.1">
+                        <small style="color: #6b7280;">* Settings에서 변경 가능</small>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>전해액 전도도 (mS/cm):</label>
+                        <input type="number" id="electrolyte-conductivity" value="10" min="1" max="20" step="0.1">
+                        <small style="color: #6b7280;">* Settings에서 변경 가능</small>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>계산된 투입량 (μL):</label>
+                        <input type="number" id="electrolyte-volume" readonly class="yellow-input">
+                    </div>
+                </div>
+
+                <div class="input-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 20px;">
+                    <div class="input-group">
+                        <label>이온 저항 R (Ω):</label>
+                        <input type="number" id="eis-resistance" min="0" step="0.1" placeholder="EIS 측정값">
+                        <small style="color: #6b7280;">* Through-plane 이온 저항</small>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>최소 지름 (cm):</label>
+                        <input type="number" id="eis-min-diameter" value="1.3" min="0.5" max="10" step="0.01">
+                        <small style="color: #6b7280;">* Tortuosity 계산용</small>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Tortuosity (τ):</label>
+                        <input type="number" id="tortuosity-result" readonly class="yellow-input">
+                    </div>
+                </div>
+
+                <div class="input-grid" style="grid-template-columns: 1fr; margin-top: 10px;">
+                    <div class="input-group">
+                        <label>유효 이온 전도도 σ<sub>ion,eff</sub> (mS/cm):</label>
+                        <input type="text" id="effective-conductivity-result" readonly class="yellow-input">
+                        <small style="color: #6b7280;">* σ<sub>ion,eff</sub> = ε/τ × κ₀</small>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calculateElectrolyte()">💧 전해액 및 Tortuosity 계산</button>
+
+                <div class="info" id="electrolyte-analysis" style="margin-top: 15px;">
+                    기공도를 먼저 계산한 후 전해액 투입량을 산정하세요.
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Loading Tab -->
+
+
+    >

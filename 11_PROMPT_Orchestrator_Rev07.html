@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 CNT Prompt Orchestrator v0.7</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', -apple-system, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1600px; margin: 0 auto; background: rgba(255,255,255,0.98); border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #0f3460 0%, #533483 50%, #e94560 100%); color: white; padding: 25px; text-align: center; }
+        .header h1 { font-size: 2em; margin-bottom: 8px; }
+        .version-badge { display: inline-block; margin: 3px; padding: 5px 12px; background: rgba(255,255,255,0.2); border-radius: 15px; font-size: 0.8em; }
+        .preset-indicator { display: inline-block; padding: 6px 16px; background: #e94560; border-radius: 20px; font-weight: bold; margin-top: 8px; font-size: 0.9em; }
+        
+        /* Unified DB Section */
+        .db-section { background: #f8f9fa; padding: 15px 20px; border-bottom: 3px solid #0f3460; }
+        .db-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .db-stats { display: flex; gap: 15px; flex-wrap: wrap; }
+        .db-stat { background: white; padding: 8px 15px; border-radius: 20px; font-size: 0.85em; border: 1px solid #dee2e6; }
+        .db-stat strong { color: #533483; }
+        .db-upload-btn { padding: 10px 20px; background: linear-gradient(135deg, #0f3460, #533483); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; }
+        .db-upload-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(83,52,131,0.3); }
+        
+        /* Category Pills */
+        .category-pills { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+        .category-pill { padding: 5px 12px; border-radius: 15px; font-size: 0.8em; font-weight: 600; }
+        .category-pill.sop { background: #d4edda; color: #155724; }
+        .category-pill.theory { background: #cce5ff; color: #004085; }
+        .category-pill.material { background: #fff3cd; color: #856404; }
+        .category-pill.deprecated { background: #f8d7da; color: #721c24; }
+
+        /* Preset Bar */
+        .preset-bar { background: linear-gradient(135deg, #533483, #0f3460); padding: 12px 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .preset-label { color: white; font-weight: 600; }
+        .preset-select { padding: 8px 15px; border: none; border-radius: 20px; min-width: 220px; }
+        .preset-info { color: rgba(255,255,255,0.8); font-size: 0.85em; flex: 1; }
+
+        .content { padding: 20px; }
+        
+        /* Stats */
+        .stats-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat-box { flex: 1; min-width: 100px; background: linear-gradient(135deg, #0f3460, #533483); color: white; padding: 12px; border-radius: 10px; text-align: center; }
+        .stat-num { font-size: 1.8em; font-weight: 700; }
+        .stat-lbl { font-size: 0.75em; opacity: 0.9; }
+
+        /* Section */
+        .section { background: #f8f9fa; padding: 18px; border-radius: 10px; margin-bottom: 18px; border: 2px solid #e9ecef; }
+        .section-title { font-size: 1.1em; font-weight: 700; color: #0f3460; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #0f3460; }
+        
+        /* Form */
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; color: #495057; font-size: 0.9em; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 10px; border: 2px solid #dee2e6; border-radius: 6px; font-size: 0.95em; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #533483; }
+
+        /* Modules Panel */
+        .modules-panel { background: #e8f4fd; border: 2px solid #4a90d9; border-radius: 10px; padding: 12px; margin: 15px 0; }
+        .modules-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .modules-header h4 { color: #0d47a1; font-size: 0.95em; }
+        .module-count { background: #0d47a1; color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.8em; }
+        .module-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+        .module-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: white; border: 1px solid #4a90d9; border-radius: 15px; font-size: 0.8em; }
+        .module-tag.excluded { background: #ffebee; border-color: #ef5350; text-decoration: line-through; opacity: 0.6; }
+        .module-tag input { width: auto; margin: 0; }
+        .module-tag .priority { font-size: 0.7em; background: #533483; color: white; padding: 1px 5px; border-radius: 8px; }
+        .module-tag .version { font-size: 0.65em; color: #666; }
+        .module-tag.deprecated { background: #fff3e0; border-color: #ff9800; }
+
+        /* System Sections */
+        .system-section { background: #fffde7; border: 2px solid #fbc02d; padding: 12px; border-radius: 10px; margin-bottom: 12px; display: none; }
+        .system-section.active { display: block; }
+        .system-title { font-weight: 700; color: #f57f17; margin-bottom: 10px; font-size: 0.95em; }
+        .system-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+        .sys-field { background: white; padding: 6px 8px; border-radius: 6px; }
+        .sys-field label { font-size: 0.75em; color: #f57f17; font-weight: 600; display: block; margin-bottom: 2px; }
+        .sys-field input, .sys-field select { width: 100%; padding: 5px; border: 1px solid #fdd835; border-radius: 4px; font-size: 0.85em; }
+        .sys-summary { background: #e8f5e9; padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 0.85em; display: none; border-left: 3px solid #4caf50; }
+
+        /* Buttons */
+        .btn-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        button { padding: 10px 20px; background: linear-gradient(135deg, #0f3460, #533483); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; flex: 1; min-width: 120px; font-size: 0.95em; }
+        button:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(83,52,131,0.3); }
+        .btn-secondary { background: #6c757d !important; }
+        .btn-warning { background: linear-gradient(135deg, #ffc107, #ff9800) !important; color: #333; }
+        .btn-success { background: #28a745 !important; }
+        .btn-danger { background: #dc3545 !important; }
+        .btn-sm { padding: 6px 12px; min-width: auto; flex: none; font-size: 0.85em; }
+
+        /* Output */
+        .output-section { margin-top: 20px; display: none; }
+        .output-box { background: #1a1a2e; color: #e0e0e0; padding: 15px; border-radius: 10px; font-family: 'Consolas', monospace; font-size: 0.85em; line-height: 1.5; white-space: pre-wrap; max-height: 500px; overflow-y: auto; }
+        .output-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 15px; padding: 20px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-title { font-size: 1.2em; font-weight: 700; color: #0f3460; margin-bottom: 15px; }
+        .modal-close { float: right; background: none; border: none; font-size: 1.5em; cursor: pointer; color: #999; padding: 0; min-width: auto; }
+        .merge-summary { background: #f8f9fa; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 0.9em; }
+        .merge-item { padding: 5px 0; border-bottom: 1px solid #eee; }
+        .merge-item:last-child { border-bottom: none; }
+        .merge-new { color: #28a745; }
+        .merge-update { color: #ffc107; }
+        .merge-skip { color: #6c757d; }
+
+        @media (max-width: 768px) { 
+            .stats-row { gap: 5px; } 
+            .stat-box { min-width: 80px; padding: 8px; }
+            .stat-num { font-size: 1.4em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 CNT Prompt Orchestrator</h1>
+            <div>
+                <span class="version-badge">v0.7</span>
+                <span class="version-badge">Auto-Classify</span>
+                <span class="version-badge">19 Modules</span>
+            </div>
+            <div class="preset-indicator" id="activePreset">📋 SOP_MODE</div>
+        </div>
+
+        <!-- DB Section -->
+        <div class="db-section">
+            <div class="db-header">
+                <div class="db-stats">
+                    <div class="db-stat">📦 Total: <strong id="dbTotal">19</strong></div>
+                    <div class="db-stat">✅ Active: <strong id="dbActive">15</strong></div>
+                    <div class="db-stat">🔄 Version: <strong id="dbVersion">1.1.0</strong></div>
+                </div>
+                <div>
+                    <button class="db-upload-btn" onclick="document.getElementById('jsonUpload').click()">
+                        📤 JSON 업로드 (자동 병합)
+                    </button>
+                    <input type="file" id="jsonUpload" accept=".json" style="display:none" onchange="handleJsonUpload(event)">
+                </div>
+            </div>
+            <div class="category-pills" id="categoryPills">
+                <span class="category-pill sop">SOP: <span id="catSOP">7</span></span>
+                <span class="category-pill theory">Theory: <span id="catTheory">5</span></span>
+                <span class="category-pill material">Material: <span id="catMaterial">2</span></span>
+                <span class="category-pill deprecated">Deprecated: <span id="catDeprecated">2</span></span>
+            </div>
+        </div>
+
+        <!-- Preset Bar -->
+        <div class="preset-bar">
+            <span class="preset-label">🎯 Mode:</span>
+            <select class="preset-select" id="presetSelect" onchange="changePreset()">
+                <option value="SOP_MODE">📋 SOP_MODE - 실험 절차</option>
+                <option value="THEORY_MODE">📚 THEORY_MODE - 이론 분석</option>
+            </select>
+            <span class="preset-info" id="presetInfo">Step-by-Step 절차, 파라미터, 품질 기준 중심</span>
+        </div>
+
+        <div class="content">
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-box"><div class="stat-num" id="statTotal">19</div><div class="stat-lbl">Total</div></div>
+                <div class="stat-box"><div class="stat-num" id="statActive">15</div><div class="stat-lbl">Active</div></div>
+                <div class="stat-box"><div class="stat-num" id="statSOP">7</div><div class="stat-lbl">SOP</div></div>
+                <div class="stat-box"><div class="stat-num" id="statTheory">5</div><div class="stat-lbl">Theory</div></div>
+                <div class="stat-box"><div class="stat-num" id="statSelected">0</div><div class="stat-lbl">Selected</div></div>
+                <div class="stat-box"><div class="stat-num" id="statMax">5</div><div class="stat-lbl">Max</div></div>
+            </div>
+
+            <!-- Question Section -->
+            <div class="section">
+                <div class="section-title">📝 연구 질문</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CNT 타입</label>
+                        <select id="cntType" onchange="updateUI()">
+                            <option value="ALL">전체</option>
+                            <option value="MWCNT">MWCNT</option>
+                            <option value="SWCNT">SWCNT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>전극</label>
+                        <select id="electrode" onchange="updateUI()">
+                            <option value="all">전체</option>
+                            <option value="cathode">양극</option>
+                            <option value="anode">음극</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>의도</label>
+                        <select id="intent">
+                            <option value="procedure">절차 확인</option>
+                            <option value="theory">이론 이해</option>
+                            <option value="troubleshooting">문제 해결</option>
+                            <option value="optimization">최적화</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>질문 (키워드 자동 분석)</label>
+                    <textarea id="question" placeholder="예: Tortuosity 측정할 때 분리막 넣어야 하나요? 80도에서 120도로 건조 온도 올리는 이유?" oninput="debounceAnalyze()"></textarea>
+                </div>
+                <button class="btn-warning btn-sm" onclick="analyzeQuestion()">🔍 모듈 분석</button>
+            </div>
+
+            <!-- Modules Panel -->
+            <div class="modules-panel" id="modulesPanel" style="display:none;">
+                <div class="modules-header">
+                    <h4>📦 매칭된 모듈</h4>
+                    <span class="module-count" id="moduleCount">0 / 5</span>
+                </div>
+                <div class="module-grid" id="moduleGrid"></div>
+                <div style="margin-top:8px;font-size:0.8em;color:#666;">
+                    <label><input type="checkbox" id="showDeprecated" onchange="analyzeQuestion()"> deprecated 포함</label>
+                </div>
+            </div>
+
+            <!-- Cathode Section -->
+            <div class="system-section" id="cathodeSection">
+                <div class="system-title">🔋 양극 정보</div>
+                <div class="system-grid">
+                    <div class="sys-field"><label>활물질</label><select id="cathodeType"><option>NCM811</option><option>NCM622</option><option>NCA</option><option>LFP</option></select></div>
+                    <div class="sys-field"><label>함량(%)</label><input type="number" id="cathodeContent" value="97"></div>
+                    <div class="sys-field"><label>바인더</label><select id="cathodeBinder"><option>PVDF</option><option>PVDF+HNBR</option></select></div>
+                    <div class="sys-field"><label>CNT(%)</label><input type="number" id="cathodeCNT" value="0.5" step="0.1"></div>
+                    <div class="sys-field"><label>로딩(mg/cm²)</label><input type="number" id="cathodeLoading" value="10"></div>
+                    <div class="sys-field"><label>전압(V)</label><input id="cathodeVoltage" value="2.8-4.3"></div>
+                </div>
+                <button class="btn-success btn-sm" onclick="applyCathode()" style="margin-top:8px;">✅ 적용</button>
+                <div class="sys-summary" id="cathodeSummary"></div>
+            </div>
+
+            <!-- Anode Section -->
+            <div class="system-section" id="anodeSection">
+                <div class="system-title">⚫ 음극 정보</div>
+                <div class="system-grid">
+                    <div class="sys-field"><label>활물질</label><select id="anodeType"><option>Graphite</option><option>Gr+SiC</option><option>SiOx</option></select></div>
+                    <div class="sys-field"><label>Si(%)</label><input type="number" id="anodeSi" value="10"></div>
+                    <div class="sys-field"><label>바인더</label><select id="anodeBinder"><option>SBR/CMC</option><option>PAA</option></select></div>
+                    <div class="sys-field"><label>CNT(%)</label><input type="number" id="anodeCNT" value="0.1" step="0.01"></div>
+                    <div class="sys-field"><label>로딩(mg/cm²)</label><input type="number" id="anodeLoading" value="7"></div>
+                    <div class="sys-field"><label>전압(V)</label><input id="anodeVoltage" value="0.01-2.0"></div>
+                </div>
+                <button class="btn-success btn-sm" onclick="applyAnode()" style="margin-top:8px;">✅ 적용</button>
+                <div class="sys-summary" id="anodeSummary"></div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-row">
+                <button onclick="generatePrompt()">🚀 프롬프트 생성</button>
+                <button class="btn-secondary" onclick="clearAll()">🗑️ 초기화</button>
+                <button class="btn-warning" onclick="exportDB()">📤 DB 내보내기</button>
+            </div>
+
+            <!-- Output -->
+            <div class="output-section" id="outputSection">
+                <div class="section-title">📋 생성된 프롬프트</div>
+                <div class="output-box" id="outputBox"></div>
+                <div class="output-actions">
+                    <button class="btn-success btn-sm" onclick="copyOutput()">📋 복사</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Merge Modal -->
+    <div class="modal-overlay" id="mergeModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeMergeModal()">×</button>
+            <div class="modal-title">📦 JSON 병합 결과</div>
+            <div class="merge-summary" id="mergeSummary"></div>
+            <div class="btn-row">
+                <button class="btn-success" onclick="confirmMerge()">✅ 적용</button>
+                <button class="btn-secondary" onclick="closeMergeModal()">취소</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ============================================================
+// EMBEDDED DATABASE v1.1.0 (19 modules)
+// ============================================================
+const MODULES_DB = {
+    meta: { version: "1.1.0", last_updated: "2025-01-15" },
+    modules: [
+        // === SOP MODULES ===
+        { id: "sop_module_001", version: "1.0.0", status: "active", priority: 10, name: "PET 면저항(Rs) 측정 SOP", category: "SOP",
+          tags: ["SOP", "measurement", "Rs", "PET", "sheet_resistance"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["MWCNT", "SWCNT", "DWCNT"] },
+          keywords: ["Rs", "면저항", "PET", "4-probe", "sheet resistance", "코팅"],
+          content: { description: "CNT 분산액의 품질 평가를 위한 PET 필름 코팅 후 면저항 측정", procedure: ["PET 필름 세척 (IPA → 건조)", "CNT 분산액 bar coating (wet 50μm)", "건조 80°C 10min", "4-point probe 측정 (5점 이상)"], key_parameters: { wet_thickness: "50±5 μm", drying_temp: "80°C" } }
+        },
+        { id: "sop_module_002", version: "1.1.0", status: "active", priority: 9, name: "전극 건조 온도 프로토콜", category: "SOP",
+          tags: ["SOP", "drying", "temperature", "NMP"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["건조", "drying", "온도", "80", "120", "NMP", "crack", "migration"],
+          content: { description: "전극 코팅 후 건조 단계별 온도 프로파일", temperature_profile: { stage_1: { temp: "80°C", time: "30 min", purpose: "표면 용매 증발, crack 방지" }, stage_2: { temp: "120°C", time: "2 hr", purpose: "잔류 NMP 완전 제거" } }, rationale: { why_80_first: "급격한 증발 시 crack 발생 및 바인더 migration 최소화", why_120_final: "NMP bp(202°C) 이하에서 충분한 증발속도, 바인더 열화 방지" } }
+        },
+        { id: "sop_module_003", version: "1.0.0", status: "active", priority: 8, name: "슬러리 코팅 SOP", category: "SOP",
+          tags: ["SOP", "coating", "doctor_blade", "slot_die"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["코팅", "coating", "닥터블레이드", "슬롯다이", "wet thickness"],
+          content: { description: "전극 슬러리 코팅 절차" }
+        },
+        { id: "sop_module_005", version: "1.0.0", status: "active", priority: 10, name: "EIS 측정 프로토콜", category: "SOP",
+          tags: ["SOP", "EIS", "measurement", "impedance"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["EIS", "임피던스", "Nyquist", "Rs", "Rct", "주파수"],
+          content: { description: "EIS 표준 측정 절차", parameters: { frequency_range: "1 MHz - 10 mHz", amplitude: "5-10 mV" }, analysis: { Rs: "고주파 Z' 절편", Rct: "semicircle diameter" } }
+        },
+        { id: "sop_module_006", version: "1.0.0", status: "active", priority: 8, name: "Rate Capability 테스트", category: "SOP",
+          tags: ["SOP", "rate", "C-rate", "protocol"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["rate", "C-rate", "율특성", "충방전", "cycle"],
+          content: { description: "율특성 평가 표준 프로토콜", protocol: { formation: "0.1C × 3 cycles", rate_sequence: ["0.1C", "0.2C", "0.5C", "1C", "2C", "3C", "5C"] } }
+        },
+        { id: "sop_module_007", version: "1.0.0", status: "active", priority: 7, name: "점도 측정 프로토콜", category: "SOP",
+          tags: ["SOP", "viscosity", "rheology"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["점도", "viscosity", "rheology", "shear"],
+          content: { description: "CNT 슬러리 점도 측정 절차" }
+        },
+        { id: "sop_module_008", version: "1.0.0", status: "active", priority: 8, name: "Percolation Curve 측정", category: "SOP",
+          tags: ["SOP", "percolation", "conductivity"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["MWCNT", "SWCNT"] },
+          keywords: ["percolation", "전도도", "threshold", "φc"],
+          content: { description: "CNT 함량별 전도도 곡선 측정" }
+        },
+        { id: "sop_module_009", version: "1.0.0", status: "deprecated", priority: 9, name: "Tortuosity 측정 (Non-separator) [구버전]", category: "SOP",
+          tags: ["SOP", "tortuosity", "EIS", "symmetric_cell"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["tortuosity", "굴곡도", "대칭셀"],
+          content: { description: "[DEPRECATED] 분리막 없이 STS 직접 접촉 방식 - v2.0.0 사용 권장", deprecation_reason: "계면 저항 변동성, 단락 위험, 정밀도 부족" }
+        },
+        { id: "sop_module_009", version: "2.0.0", status: "active", priority: 10, name: "Tortuosity 측정 SOP (Separator 방식)", category: "SOP",
+          tags: ["SOP", "tortuosity", "EIS", "symmetric_cell", "separator", "MacMullin"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["tortuosity", "굴곡도", "τ", "대칭셀", "분리막", "separator", "MacMullin", "R_ion", "blocking"],
+          content: { 
+            description: "분리막 삽입 대칭 셀을 이용한 Tortuosity 정밀 측정 (v1.0 대비 15%↑ 정밀도)", 
+            version_note: "Non-separator 방식 대비 정밀도 15% 향상",
+            materials: { separator: "Celgard 2325 (25μm)", electrolyte_amount: "40-60 μL" },
+            procedure: ["1. 분리막 단독 셀로 R_separator 측정 (1-3Ω)", "2. 전극 펀칭 (Φ14mm)", "3. Electrode|Separator|STS 구조 조립", "4. 전해액 40-60μL 정량 주입", "5. 일정 토크 체결", "6. 25°C 항온 24hr 에이징", "7. EIS 측정 (1MHz-10mHz)", "8. R_ion 계산 및 τ 산출"],
+            key_equations_latex: ["R_{ion} = 3 \\times (R_{intercept} - R_{bulk} - R_{separator})", "\\tau = \\frac{R_{ion} \\cdot A \\cdot \\kappa_{bulk} \\cdot \\epsilon}{L}"],
+            key_parameters: { R_separator: "1-3 Ω", R_ion_expected: "10-50 Ω", aging: "25°C, 24hr" },
+            comparison: { old: "Non-separator", improvements: ["정밀도 15%↑", "재현성↑", "단락위험 제거"] }
+          }
+        },
+        // === THEORY MODULES ===
+        { id: "theory_module_001", version: "1.0.0", status: "active", priority: 10, name: "Percolation Theory 기초", category: "Theory",
+          tags: ["theory", "percolation", "threshold", "conductivity"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["MWCNT", "SWCNT"] },
+          keywords: ["percolation", "threshold", "φc", "critical", "전도 네트워크", "aspect ratio"],
+          content: { description: "CNT 전도 네트워크 형성의 percolation 이론", key_equations_latex: ["\\sigma = \\sigma_0 (\\phi - \\phi_c)^t"], practical: ["SWCNT: φc ≈ 0.01-0.05 vol%", "MWCNT: φc ≈ 0.1-1 vol%"] }
+        },
+        { id: "theory_module_002", version: "2.0.0", status: "active", priority: 10, name: "EIS 기반 Tortuosity 분석", category: "Theory",
+          tags: ["theory", "EIS", "tortuosity", "MacMullin", "τ"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["tortuosity", "τ", "time constant", "MacMullin", "이온전도", "Transmission Line"],
+          content: { description: "Transmission Line Model 기반 tortuosity 분석", key_equations_latex: ["R_{measured} = R_{ohm} + \\frac{1}{3}R_{ion}", "\\tau = \\frac{R_{ion} \\cdot A \\cdot \\kappa_{bulk} \\cdot \\epsilon}{L}"], typical_values: { NCM811_97pct: "τ ≈ 3-6", Graphite: "τ ≈ 2-4" } }
+        },
+        { id: "theory_module_002", version: "1.0.0", status: "deprecated", priority: 10, name: "EIS Tortuosity [구버전]", category: "Theory",
+          tags: ["theory", "EIS", "tortuosity"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["tortuosity"],
+          content: { description: "[DEPRECATED] v2.0.0으로 대체됨" }
+        },
+        { id: "theory_module_003", version: "1.0.0", status: "active", priority: 9, name: "Li+ 확산 이론", category: "Theory",
+          tags: ["theory", "diffusion", "Warburg", "GITT"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["diffusion", "확산", "Warburg", "GITT", "Li+"],
+          content: { description: "리튬 이온 확산 메커니즘 및 측정법" }
+        },
+        { id: "theory_module_005", version: "1.0.0", status: "active", priority: 8, name: "CNT 분산 안정화 메커니즘", category: "Theory",
+          tags: ["theory", "dispersion", "stabilization"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["MWCNT", "SWCNT"] },
+          keywords: ["분산", "dispersion", "zeta potential", "안정화"],
+          content: { description: "CNT 분산 안정화 원리" }
+        },
+        { id: "theory_module_006", version: "1.0.0", status: "active", priority: 9, name: "Rate Capability 제한 인자", category: "Theory",
+          tags: ["theory", "rate_capability", "limiting_factor"],
+          applies_to: { electrode_systems: ["cathode", "anode"], cnt_types: ["all"] },
+          keywords: ["rate", "율특성", "limiting factor", "제한 인자", "IR drop"],
+          content: { description: "고율 방전 시 성능 제한 인자 분석", limiting_factors: { electronic: "높은 IR drop", ionic: "고 C-rate 용량 급감", charge_transfer: "큰 EIS semicircle" } }
+        },
+        // === MATERIAL MODULES ===
+        { id: "material_module_001", version: "1.0.0", status: "active", priority: 6, name: "NCM811 물성", category: "Material",
+          tags: ["material", "NCM811", "cathode"],
+          applies_to: { electrode_systems: ["cathode"], cnt_types: ["MWCNT"] },
+          keywords: ["NCM811", "양극", "고니켈"],
+          content: { material: "NCM811", capacity: "180-195 mAh/g", voltage: "2.8-4.3V", tortuosity_ref: "τ ≈ 3-6 (97%)" }
+        },
+        { id: "material_module_002", version: "1.0.0", status: "active", priority: 6, name: "SWCNT 분산액 물성", category: "Material",
+          tags: ["material", "SWCNT", "dispersion"],
+          applies_to: { electrode_systems: ["anode"], cnt_types: ["SWCNT"] },
+          keywords: ["SWCNT", "분산액"],
+          content: { solid_content: "0.4-1.0 wt%", tube_diameter: "1.2-1.8 nm" }
+        }
+    ]
+};
+
+const PRESETS = {
+    SOP_MODE: {
+        name: "SOP Mode",
+        prefer_tags: ["SOP", "protocol", "measurement", "procedure"],
+        suppress_tags: ["theory_deep", "derivation"],
+        max_modules: 5,
+        include_equations: false,
+        sections: ["📌 목적", "🧪 준비물", "📋 절차 (Step-by-Step)", "⚙️ 핵심 파라미터", "✅ 품질 기준", "⚠️ 문제 해결", "🛡️ 안전"]
+    },
+    THEORY_MODE: {
+        name: "Theory Mode",
+        prefer_tags: ["theory", "mechanism", "modeling"],
+        suppress_tags: ["SOP", "quick_guide"],
+        max_modules: 8,
+        include_equations: true,
+        sections: ["📋 요지 정리", "📚 이론적 배경", "📐 핵심 수식", "🔬 심층 분석", "💡 실무 시사점", "📖 참고문헌", "🎯 결론"]
+    }
+};
+
+const CORE_POLICY = {
+    role: "CNT 및 2차전지 연구 전문가 (Jarvis CNT Lab)",
+    output_principles: ["질문 요지 정리", "근거 기반 답변", "문헌 등급화 [A][B][C]", "핵심 결론 요약"],
+    style: { tone: "전문적이지만 명확하고 실행 가능하게", precision: "구체적 수치 필수" },
+    inference_marker: "<inference>"
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+    modules: [...MODULES_DB.modules],
+    selectedModules: [],
+    excludedIds: new Set(),
+    preset: 'SOP_MODE',
+    cathode: null,
+    anode: null,
+    pendingMerge: null
+};
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+    updateStats();
+    updateUI();
+}
+
+// ============================================================
+// JSON UPLOAD & AUTO-MERGE
+// ============================================================
+function handleJsonUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        try {
+            const data = JSON.parse(evt.target.result);
+            analyzeAndMerge(data, file.name);
+        } catch (err) {
+            alert('❌ JSON 파싱 실패: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+}
+
+function analyzeAndMerge(data, filename) {
+    // Auto-detect JSON type
+    let newModules = [];
+    
+    if (data.modules && Array.isArray(data.modules)) {
+        // Modules DB format
+        newModules = data.modules;
+    } else if (data.content || data.procedure) {
+        // Single module format
+        newModules = [data];
+    } else if (Array.isArray(data)) {
+        // Array of modules
+        newModules = data;
+    } else {
+        alert('❌ 인식할 수 없는 JSON 형식입니다.');
+        return;
+    }
+
+    // Classify and prepare merge
+    const mergeResult = { new: [], update: [], skip: [], modules: newModules };
+    
+    newModules.forEach(m => {
+        // Auto-classify category if missing
+        if (!m.category) {
+            if (m.tags?.some(t => t.toLowerCase() === 'sop' || t.toLowerCase() === 'protocol')) {
+                m.category = 'SOP';
+            } else if (m.tags?.some(t => t.toLowerCase() === 'theory' || t.toLowerCase() === 'mechanism')) {
+                m.category = 'Theory';
+            } else if (m.tags?.some(t => t.toLowerCase() === 'material')) {
+                m.category = 'Material';
+            } else {
+                m.category = 'SOP'; // default
+            }
+        }
+        
+        // Check existing
+        const existing = state.modules.find(x => x.id === m.id && x.version === m.version);
+        const existingOlder = state.modules.find(x => x.id === m.id && x.version !== m.version);
+        
+        if (existing) {
+            mergeResult.skip.push({ module: m, reason: '동일 버전 존재' });
+        } else if (existingOlder) {
+            mergeResult.update.push({ module: m, oldVersion: existingOlder.version });
+        } else {
+            mergeResult.new.push({ module: m });
+        }
+    });
+
+    state.pendingMerge = mergeResult;
+    showMergeModal(mergeResult, filename);
+}
+
+function showMergeModal(result, filename) {
+    let html = `<div style="margin-bottom:10px;"><strong>📄 ${filename}</strong></div>`;
+    
+    if (result.new.length > 0) {
+        html += `<div class="merge-item merge-new">✅ 새 모듈 ${result.new.length}개</div>`;
+        result.new.forEach(r => {
+            html += `<div style="padding-left:15px;font-size:0.85em;">+ ${r.module.name} (${r.module.category})</div>`;
+        });
+    }
+    
+    if (result.update.length > 0) {
+        html += `<div class="merge-item merge-update">🔄 업데이트 ${result.update.length}개</div>`;
+        result.update.forEach(r => {
+            html += `<div style="padding-left:15px;font-size:0.85em;">↑ ${r.module.name}: v${r.oldVersion} → v${r.module.version}</div>`;
+        });
+    }
+    
+    if (result.skip.length > 0) {
+        html += `<div class="merge-item merge-skip">⏭️ 스킵 ${result.skip.length}개 (이미 존재)</div>`;
+    }
+
+    document.getElementById('mergeSummary').innerHTML = html;
+    document.getElementById('mergeModal').classList.add('active');
+}
+
+function confirmMerge() {
+    if (!state.pendingMerge) return;
+    
+    const result = state.pendingMerge;
+    
+    // Add new modules
+    result.new.forEach(r => {
+        state.modules.push(r.module);
+    });
+    
+    // Update existing (deprecate old, add new)
+    result.update.forEach(r => {
+        const oldIdx = state.modules.findIndex(x => x.id === r.module.id && x.version === r.oldVersion);
+        if (oldIdx >= 0) {
+            state.modules[oldIdx].status = 'deprecated';
+        }
+        state.modules.push(r.module);
+    });
+
+    closeMergeModal();
+    updateStats();
+    analyzeQuestion();
+    alert(`✅ 병합 완료: 새 ${result.new.length}개, 업데이트 ${result.update.length}개`);
+}
+
+function closeMergeModal() {
+    document.getElementById('mergeModal').classList.remove('active');
+    state.pendingMerge = null;
+}
+
+// ============================================================
+// STATS & UI
+// ============================================================
+function updateStats() {
+    const all = state.modules;
+    const active = all.filter(m => m.status === 'active');
+    const sop = all.filter(m => m.category === 'SOP' && m.status === 'active');
+    const theory = all.filter(m => m.category === 'Theory' && m.status === 'active');
+    const material = all.filter(m => m.category === 'Material' && m.status === 'active');
+    const deprecated = all.filter(m => m.status === 'deprecated');
+
+    document.getElementById('dbTotal').textContent = all.length;
+    document.getElementById('dbActive').textContent = active.length;
+    document.getElementById('statTotal').textContent = all.length;
+    document.getElementById('statActive').textContent = active.length;
+    document.getElementById('statSOP').textContent = sop.length;
+    document.getElementById('statTheory').textContent = theory.length;
+    document.getElementById('catSOP').textContent = sop.length;
+    document.getElementById('catTheory').textContent = theory.length;
+    document.getElementById('catMaterial').textContent = material.length;
+    document.getElementById('catDeprecated').textContent = deprecated.length;
+    document.getElementById('statMax').textContent = PRESETS[state.preset].max_modules;
+}
+
+function updateUI() {
+    // System sections visibility
+    const cnt = document.getElementById('cntType').value;
+    const elec = document.getElementById('electrode').value;
+    const cathode = document.getElementById('cathodeSection');
+    const anode = document.getElementById('anodeSection');
+    
+    cathode.classList.remove('active');
+    anode.classList.remove('active');
+    
+    if (elec === 'all' || elec === 'cathode') {
+        if (cnt === 'ALL' || cnt === 'MWCNT') cathode.classList.add('active');
+    }
+    if (elec === 'all' || elec === 'anode') {
+        if (cnt === 'ALL' || cnt === 'SWCNT') anode.classList.add('active');
+    }
+    
+    analyzeQuestion();
+}
+
+function changePreset() {
+    state.preset = document.getElementById('presetSelect').value === 'SOP_MODE' ? 'SOP_MODE' : 'THEORY_MODE';
+    const p = PRESETS[state.preset];
+    document.getElementById('activePreset').textContent = state.preset === 'SOP_MODE' ? '📋 SOP_MODE' : '📚 THEORY_MODE';
+    document.getElementById('presetInfo').textContent = state.preset === 'SOP_MODE' 
+        ? 'Step-by-Step 절차, 파라미터, 품질 기준 중심'
+        : '이론적 배경, 핵심 수식, 심층 분석 중심';
+    document.getElementById('statMax').textContent = p.max_modules;
+    analyzeQuestion();
+}
+
+// ============================================================
+// QUESTION ANALYSIS
+// ============================================================
+let debounceTimer = null;
+function debounceAnalyze() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(analyzeQuestion, 400);
+}
+
+function analyzeQuestion() {
+    const q = document.getElementById('question').value.trim().toLowerCase();
+    if (!q) {
+        document.getElementById('modulesPanel').style.display = 'none';
+        state.selectedModules = [];
+        document.getElementById('statSelected').textContent = '0';
+        return;
+    }
+
+    const cnt = document.getElementById('cntType').value;
+    const elec = document.getElementById('electrode').value;
+    const showDep = document.getElementById('showDeprecated').checked;
+    const preset = PRESETS[state.preset];
+
+    // Filter candidates
+    let candidates = state.modules.filter(m => {
+        if (m.status === 'deprecated' && !showDep) return false;
+        const sys = m.applies_to?.electrode_systems || ['all'];
+        const types = m.applies_to?.cnt_types || ['all'];
+        if (elec !== 'all' && !sys.includes('all') && !sys.includes(elec)) return false;
+        if (cnt !== 'ALL' && !types.includes('all') && !types.includes(cnt)) return false;
+        return true;
+    });
+
+    // Score
+    const scored = candidates.map(m => {
+        let score = 0;
+        
+        // Keyword matching
+        const kws = m.keywords || [];
+        kws.forEach(kw => {
+            if (q.includes(kw.toLowerCase())) score += 10;
+        });
+        
+        // Tag preference
+        (m.tags || []).forEach(t => {
+            if (preset.prefer_tags.includes(t)) score += 5;
+            if (preset.suppress_tags.includes(t)) score -= 8;
+        });
+        
+        // Priority & status bonus
+        score += (m.priority || 0) * 0.5;
+        if (m.status === 'active') score += 3;
+        
+        return { ...m, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    state.selectedModules = scored.filter(m => m.score > 0).slice(0, preset.max_modules);
+    
+    renderModules();
+}
+
+function renderModules() {
+    const panel = document.getElementById('modulesPanel');
+    const grid = document.getElementById('moduleGrid');
+    
+    if (state.selectedModules.length === 0) {
+        panel.style.display = 'none';
+        document.getElementById('statSelected').textContent = '0';
+        return;
+    }
+
+    panel.style.display = 'block';
+    const max = PRESETS[state.preset].max_modules;
+    const active = state.selectedModules.filter(m => !state.excludedIds.has(m.id + m.version));
+    document.getElementById('moduleCount').textContent = `${active.length} / ${max}`;
+    document.getElementById('statSelected').textContent = active.length;
+
+    grid.innerHTML = state.selectedModules.map(m => {
+        const key = m.id + m.version;
+        const excluded = state.excludedIds.has(key);
+        const depClass = m.status === 'deprecated' ? ' deprecated' : '';
+        return `<div class="module-tag${excluded ? ' excluded' : ''}${depClass}">
+            <input type="checkbox" ${excluded ? '' : 'checked'} onchange="toggleModule('${key}')">
+            <span>${m.name}</span>
+            <span class="version">v${m.version}</span>
+            <span class="priority">P${m.priority}</span>
+        </div>`;
+    }).join('');
+}
+
+function toggleModule(key) {
+    if (state.excludedIds.has(key)) state.excludedIds.delete(key);
+    else state.excludedIds.add(key);
+    renderModules();
+}
+
+// ============================================================
+// ELECTRODE INFO
+// ============================================================
+function applyCathode() {
+    state.cathode = {
+        type: document.getElementById('cathodeType').value,
+        content: document.getElementById('cathodeContent').value,
+        binder: document.getElementById('cathodeBinder').value,
+        cnt: document.getElementById('cathodeCNT').value,
+        loading: document.getElementById('cathodeLoading').value,
+        voltage: document.getElementById('cathodeVoltage').value
+    };
+    const s = document.getElementById('cathodeSummary');
+    s.style.display = 'block';
+    s.innerHTML = `✅ ${state.cathode.type} ${state.cathode.content}% | CNT ${state.cathode.cnt}% | ${state.cathode.loading} mg/cm²`;
+}
+
+function applyAnode() {
+    state.anode = {
+        type: document.getElementById('anodeType').value,
+        si: document.getElementById('anodeSi').value,
+        binder: document.getElementById('anodeBinder').value,
+        cnt: document.getElementById('anodeCNT').value,
+        loading: document.getElementById('anodeLoading').value,
+        voltage: document.getElementById('anodeVoltage').value
+    };
+    const s = document.getElementById('anodeSummary');
+    s.style.display = 'block';
+    s.innerHTML = `✅ ${state.anode.type} (Si ${state.anode.si}%) | CNT ${state.anode.cnt}% | ${state.anode.loading} mg/cm²`;
+}
+
+// ============================================================
+// PROMPT GENERATION
+// ============================================================
+function generatePrompt() {
+    const q = document.getElementById('question').value.trim();
+    if (!q) { alert('질문을 입력해주세요!'); return; }
+
+    const activeModules = state.selectedModules.filter(m => !state.excludedIds.has(m.id + m.version));
+    const preset = PRESETS[state.preset];
+
+    let p = `[Answer Policy – Jarvis CNT Lab]\n`;
+    p += `역할: ${CORE_POLICY.role}\n`;
+    p += `원칙: ${CORE_POLICY.output_principles.join(' → ')}\n\n`;
+    p += `═══════════════════════════════════════\n\n`;
+
+    p += `# 응답 구조 (${preset.name})\n`;
+    preset.sections.forEach(s => { p += `${s}\n`; });
+    p += `\n═══════════════════════════════════════\n\n`;
+
+    p += `## 📋 질문\n${q}\n\n`;
+
+    if (state.cathode) {
+        p += `## 🔋 양극\n`;
+        p += `- ${state.cathode.type} ${state.cathode.content}%, 바인더 ${state.cathode.binder}\n`;
+        p += `- CNT ${state.cathode.cnt}%, 로딩 ${state.cathode.loading} mg/cm², 전압 ${state.cathode.voltage}V\n\n`;
+    }
+    if (state.anode) {
+        p += `## ⚫ 음극\n`;
+        p += `- ${state.anode.type} (Si ${state.anode.si}%), 바인더 ${state.anode.binder}\n`;
+        p += `- CNT ${state.anode.cnt}%, 로딩 ${state.anode.loading} mg/cm², 전압 ${state.anode.voltage}V\n\n`;
+    }
+
+    if (activeModules.length > 0) {
+        p += `## 📦 참조 모듈\n\n`;
+        activeModules.forEach((m, i) => {
+            p += `### ${i + 1}. ${m.name} (v${m.version})\n`;
+            p += `${m.content?.description || ''}\n`;
+            if (preset.include_equations && m.content?.key_equations_latex) {
+                p += `\n**수식:**\n`;
+                m.content.key_equations_latex.forEach(eq => { p += `$$${eq}$$\n`; });
+            }
+            if (m.content?.procedure) {
+                p += `\n**절차:**\n`;
+                m.content.procedure.forEach((step, j) => { p += `${j + 1}. ${step}\n`; });
+            }
+            if (m.content?.rationale) {
+                p += `\n**근거:**\n`;
+                Object.entries(m.content.rationale).forEach(([k, v]) => { p += `- ${k}: ${v}\n`; });
+            }
+            if (m.content?.comparison) {
+                p += `\n**비교 (vs ${m.content.comparison.old}):** ${m.content.comparison.improvements.join(', ')}\n`;
+            }
+            p += `\n`;
+        });
+    }
+
+    p += `═══════════════════════════════════════\n\n`;
+    p += `## 📝 응답 요청\n위 컨텍스트 참조하여 응답해주세요.\n`;
+    p += `스타일: ${CORE_POLICY.style.tone}\n`;
+    p += `수치: ${CORE_POLICY.style.precision}\n`;
+    p += `추정 시: ${CORE_POLICY.inference_marker} 사용\n`;
+
+    document.getElementById('outputBox').textContent = p;
+    document.getElementById('outputSection').style.display = 'block';
+    document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyOutput() {
+    navigator.clipboard.writeText(document.getElementById('outputBox').textContent)
+        .then(() => alert('✅ 복사 완료!'))
+        .catch(() => alert('❌ 복사 실패'));
+}
+
+function clearAll() {
+    if (!confirm('초기화하시겠습니까?')) return;
+    document.getElementById('question').value = '';
+    state.selectedModules = [];
+    state.excludedIds.clear();
+    state.cathode = null;
+    state.anode = null;
+    document.getElementById('cathodeSummary').style.display = 'none';
+    document.getElementById('anodeSummary').style.display = 'none';
+    document.getElementById('modulesPanel').style.display = 'none';
+    document.getElementById('outputSection').style.display = 'none';
+    updateStats();
+}
+
+function exportDB() {
+    const data = { meta: { version: "1.1.0", exported: new Date().toISOString() }, modules: state.modules };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `CNT_Modules_DB_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+}
+
+window.onload = init;
+</script>
+</body>
+</html>

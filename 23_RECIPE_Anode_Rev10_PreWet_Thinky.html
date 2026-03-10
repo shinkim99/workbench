@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anode Slurry Manufacturing - Pre-wetting + Thinky Process v6.1</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe, #a7d8ff);
+            color: #0d47a1;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #0d47a1;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #3b82f6;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .card h3 {
+            color: #1e40af;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 8px;
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .input-group {
+            margin-bottom: 12px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 13px;
+        }
+        
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #bfdbfe;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .yellow-input {
+            background: #fef3c7 !important;
+            font-weight: bold;
+            border-color: #f59e0b !important;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 13px;
+        }
+        
+        .result-table th,
+        .result-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .result-table th {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .result-table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .result-table .bold {
+            font-weight: bold;
+        }
+        
+        .info-panel {
+            background: #f0f9ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border: 1px solid #bfdbfe;
+            font-size: 12px;
+        }
+        
+        .capacity-panel {
+            background: #fef3c7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border: 2px solid #f59e0b;
+            font-size: 12px;
+        }
+        
+        .balance-check {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 12px 0;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid;
+            font-size: 13px;
+        }
+        
+        .balance-check.good {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+        
+        .balance-check.bad {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        
+        /* Process steps - 2 column layout */
+        .process-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .process-column {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .process-column.premix {
+            border-color: #22c55e;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        }
+        
+        .process-column.thinky {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        }
+        
+        .process-column h4 {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .process-column.premix h4 {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .process-column.thinky h4 {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .process-step {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            font-size: 12px;
+        }
+        
+        .process-column.premix .process-step {
+            border-left-color: #22c55e;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 12px;
+        }
+        
+        .process-column.premix .step-number {
+            background: #22c55e;
+        }
+        
+        .warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: #e0f2fe;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 25px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background: #bfdbfe;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Loading calculation */
+        .loading-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .loading-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid #bfdbfe;
+        }
+
+        .loading-card.highlight {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .loading-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        .loading-label {
+            font-size: 0.85em;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        
+        /* Settings Modal */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .settings-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .close-btn {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            color: #6b7280;
+            cursor: pointer;
+        }
+        
+        .close-btn:hover {
+            color: #ef4444;
+        }
+        
+        .literature-panel {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px solid #3b82f6;
+            font-size: 12px;
+        }
+        
+        .literature-panel h4 {
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+        
+        /* Batch size highlight */
+        .batch-highlight {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .batch-highlight h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        
+        @media print {
+            body { 
+                background: white; 
+                padding: 5px;
+                font-size: 9px;
+                zoom: 0.7;
+            }
+            .container { 
+                box-shadow: none; 
+                padding: 8px;
+            }
+            .btn, .settings-modal, .tabs { display: none; }
+            .card { margin-bottom: 8px; padding: 10px; }
+            .process-grid { gap: 10px; }
+            .process-step { padding: 8px; margin-bottom: 6px; }
+            .print-page-break { page-break-before: always; }
+            @page { size: A4; margin: 10mm; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔋 Anode Slurry Run Sheet v6.1<br><span style="font-size: 0.6em; color: #6b7280;">CB in Phase1 + CNT Slurry in Phase2</span></h1>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-tab="recipe">Recipe Calculation</div>
+            <div class="tab" data-tab="loading">Loading Calculation</div>
+        </div>
+        
+        <!-- Recipe Tab Content -->
+        <div id="recipe-tab" class="tab-content active">
+        
+        <div class="grid">
+            <!-- Left Column: Base Formulation Setup -->
+            <div class="card">
+                <h3>🧪 Base Formulation Setup</h3>
+                
+                <!-- Primary & Secondary Material - 2 column -->
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Primary Material:</label>
+                        <select id="primary-material" onchange="updateMaterialInfo()">
+                            <option value="Natural-Graphite">Natural Graphite</option>
+                            <option value="Artificial-Graphite">Artificial Graphite</option>
+                            <option value="Artificial-Natural-Mix" selected>Artificial+Natural Graphite</option>
+                            <option value="LTO">LTO (Li₄Ti₅O₁₂)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Secondary Material:</label>
+                        <select id="secondary-material" onchange="toggleSecondaryRatio()">
+                            <option value="None">None (Single Material)</option>
+                            <option value="Si">Silicon (Si)</option>
+                            <option value="SiO">Silicon Oxide (SiO)</option>
+                            <option value="SiC" selected>Silicon Carbide (SiC)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Secondary Ratio & Active Content - 2 column -->
+                <div class="input-grid">
+                    <div class="input-group" id="secondary-ratio-group">
+                        <label>Secondary Material Ratio (%):</label>
+                        <input type="number" id="secondary-ratio" value="10" min="0" max="30" step="0.5" oninput="updateMaterialInfo()">
+                    </div>
+                    <div class="input-group">
+                        <label>Active Material (%):</label>
+                        <input type="number" id="active-content" value="97.4" min="90" max="99" step="0.001" readonly style="background: #e5e7eb;">
+                    </div>
+                </div>
+                
+                <!-- Binder Type & Content - 2 column -->
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Binder Type:</label>
+                        <select id="binder-type" onchange="updateBalance()">
+                            <option value="SBR-CMC" selected>SBR/CMC (1:1)</option>
+                            <option value="PAA">PAA (Polyacrylic Acid)</option>
+                            <option value="PVDF">PVDF (Organic)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Binder Content (%):</label>
+                        <input type="number" id="binder-content" value="2.5" min="0.5" max="8" step="0.1" oninput="updateBalance()">
+                    </div>
+                </div>
+                
+                <!-- Conductive 1 Type & Content - 2 column -->
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Conductive Additive 1:</label>
+                        <select id="conductive-type-1" onchange="updateBalance()">
+                            <option value="None">None</option>
+                            <option value="SuperP">Super P</option>
+                            <option value="C65">C65 (Carbon Black)</option>
+                            <option value="MWCNT">MW CNT</option>
+                            <option value="SWCNT" selected>SW CNT</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Conductive 1 Content (%):</label>
+                        <input type="number" id="conductive-content-1" class="yellow-input" value="0.035" min="0" max="5" step="0.001" oninput="updateBalance()">
+                    </div>
+                </div>
+                
+                <!-- Conductive 2 Type & Content - 2 column -->
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Conductive Additive 2:</label>
+                        <select id="conductive-type-2" onchange="updateBalance()">
+                            <option value="None">None</option>
+                            <option value="SuperP" selected>Super P</option>
+                            <option value="C65">C65 (Carbon Black)</option>
+                            <option value="MWCNT">MW CNT</option>
+                            <option value="SWCNT">SW CNT</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Conductive 2 Content (%):</label>
+                        <input type="number" id="conductive-content-2" class="yellow-input" value="0.5" min="0" max="5" step="0.001" oninput="updateBalance()">
+                    </div>
+                </div>
+                
+                <!-- SWCNT Solid & Solid Content - 2 column -->
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>SWCNT Solid Content (wt%):</label>
+                        <input type="number" id="swcnt-solid-content" value="0.8" min="0.5" max="5" step="0.1" oninput="calculateRecipe()">
+                    </div>
+                    <div class="input-group">
+                        <label>Solid Content (%):</label>
+                        <input type="number" id="solid-content" value="45.0" min="35" max="60" step="0.5" oninput="calculateRecipe()">
+                    </div>
+                </div>
+                
+                <!-- Batch Size Section - Highlighted -->
+                <div class="batch-highlight">
+                    <h4>📦 Batch Size Configuration</h4>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label>Pre-wetting Batch (g):</label>
+                            <input type="number" id="prewet-batch-size" class="yellow-input" value="38.0" min="10" max="100" step="1" oninput="calculateRecipe()">
+                        </div>
+                        <div class="input-group">
+                            <label>Thinky Batch (g):</label>
+                            <input type="number" id="thinky-batch-size" class="yellow-input" value="5.0" min="1" max="50" step="0.5" oninput="calculateRecipe()">
+                        </div>
+                    </div>
+                    <div class="info-panel" style="margin-top: 10px; background: #fff7ed;">
+                        <strong>💡 Batch 분리 운용:</strong><br>
+                        • Pre-wetting: Mechanical mixer (3엽 Propeller)로 대량 습윤<br>
+                        • Thinky: 소분된 batch에서 CMC/SBR 투입 및 최종 혼합<br>
+                        • Pre-wet에서 <span id="split-count">4</span>개 Thinky batch 제조 가능
+                    </div>
+                </div>
+                
+                <div id="balance-status" class="balance-check good">
+                    ✅ Perfect Balance (100.0%)
+                </div>
+                
+                <button class="btn" onclick="calculateRecipe()">🔄 Calculate Recipe</button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn" onclick="downloadRunSheet()">💾 Download CSV</button>
+                    <button class="btn" onclick="printRunSheet()">🖨️ Print</button>
+                </div>
+            </div>
+            
+            <!-- Right Column: Calculated Recipe -->
+            <div class="card">
+                <h3>📊 Calculated Recipe</h3>
+                
+                <!-- Pre-wetting Recipe -->
+                <div style="background: #dcfce7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 2px solid #22c55e;">
+                    <strong style="color: #166534;">🟢 Pre-wetting Master Batch (<span id="prewet-total-display">20g</span>, <span id="prewet-solid-display">55%</span> solid)</strong>
+                    <p style="font-size: 11px; color: #166534; margin-top: 4px;">※ Active + Carbon Black (CNT Slurry는 Phase 2)</p>
+                    <table class="result-table" style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Weight (g)</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Graphite</td><td id="prewet-graphite">8.740g</td><td>Primary Active</td></tr>
+                            <tr><td>Si/SiC</td><td id="prewet-secondary">1.000g</td><td>Secondary</td></tr>
+                            <tbody id="prewet-cb-container"></tbody>
+                            <tr><td>DIW (wetting)</td><td id="prewet-diw">10.135g</td><td>Wetting</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Thinky Recipe -->
+                <div style="background: #dbeafe; padding: 12px; border-radius: 8px; border: 2px solid #3b82f6;">
+                    <strong style="color: #1e40af;">🔵 Thinky Batch (<span id="thinky-total-display">5g</span>, <span id="thinky-solid-display">45%</span> solid)</strong>
+                    <p style="font-size: 11px; color: #1e40af; margin-top: 4px;">※ CNT 종류별 변수 실험에 최적화</p>
+                    <table class="result-table" style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Weight (g)</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody id="thinky-table-body">
+                            <tr><td>Pre-wet 소분</td><td id="thinky-prewet">4.500g</td><td>From Master</td></tr>
+                            <tr id="thinky-cnt1-row"><td id="thinky-cnt1-label">SWCNT Slurry</td><td id="thinky-cnt1">0.000g</td><td>Conductive 1</td></tr>
+                            <tr id="thinky-cnt2-row" style="display: none;"><td id="thinky-cnt2-label">Super P</td><td id="thinky-cnt2">0.000g</td><td>Conductive 2</td></tr>
+                            <tr><td>CMC 1.5% 용액</td><td id="thinky-cmc">2.630g</td><td>Binder 1</td></tr>
+                            <tr><td>SBR 40.4% 용액</td><td id="thinky-sbr">0.046g</td><td>Binder 2</td></tr>
+                            <tr><td>추가 DIW</td><td id="thinky-diw">0.000g</td><td>Adjust</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-panel">
+                    <strong>💧 DIW 분배 상세:</strong><br>
+                    Pre-wet 내 DIW: <span id="diw-prewet-amount">10.135g</span><br>
+                    CNT Slurry 내 DIW: <span id="diw-cnt-amount">0.000g</span><br>
+                    CMC 용액 내 DIW: <span id="diw-cmc-amount">2.591g</span><br>
+                    SBR 용액 내 DIW: <span id="diw-sbr-amount">0.027g</span><br>
+                    추가 DIW: <span id="diw-add-amount">0.000g</span><br>
+                    <strong>Thinky batch 총 DIW:</strong> <span id="diw-total-amount">2.618g</span>
+                </div>
+                
+                <!-- Capacity Panel -->
+                <div class="capacity-panel">
+                    <h4 style="color: #92400e; margin-bottom: 8px;">⚡ Electrode Capacity</h4>
+                    <div id="capacity-info">
+                        Calculated Capacity: <strong>XXX mAh/g</strong>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <div class="input-group">
+                        <label>SWCNT/CNT Lot:</label>
+                        <input type="text" id="cnt-lot" placeholder="예: SWCNT-LOT-20250101">
+                    </div>
+                    <div class="input-group">
+                        <label>실험상세:</label>
+                        <input type="text" id="experiment-details" placeholder="실험 목적 및 특이사항">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Button -->
+        <button style="position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px; background: linear-gradient(135deg, #6b7280, #4b5563); border: none; border-radius: 50%; cursor: pointer; font-size: 20px; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000;" onclick="openSettings()" title="Settings">⚙️</button>
+        
+        <!-- Manufacturing Process Steps - 2 Column Layout -->
+        <div class="card print-page-break" style="margin-top: 25px;">
+            <h3>⚙️ Manufacturing Process Steps</h3>
+            
+            <div class="process-grid">
+                <!-- Left: Pre-mixing (Mechanical Mixer) -->
+                <div class="process-column premix">
+                    <h4>🟢 Phase 1: Pre-wetting<br><small>(Mechanical Mixer + 3엽 Propeller)</small></h4>
+                    <div id="premix-steps-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                <!-- Right: Thinky Mixer -->
+                <div class="process-column thinky">
+                    <h4>🔵 Phase 2: Final Mixing<br><small>(Thinky Mixer)</small></h4>
+                    <div id="thinky-steps-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="warning">
+                <strong>⚠️ Critical Notes:</strong><br>
+                • Pre-wetting: 3엽 Propeller 사용, <strong>200~400 rpm</strong> (저전단)<br>
+                • SBR 투입 후: Thinky <strong>1300 rpm 이하</strong> (latex 파괴 방지)<br>
+                • CMC/SBR 1:1 비율로 변수 최소화<br>
+                • 건조: <strong>100°C 30분 → 120°C 6~8시간</strong> (바인더 마이그레이션 방지)
+            </div>
+        </div>
+        
+        <!-- Literature Panel -->
+        <div class="literature-panel">
+            <h4>📚 공정 원리 v6.1 (CB→Phase1, CNT Slurry→Phase2)</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <strong style="color: #166534;">Phase 1: Pre-wetting</strong>
+                    <ul style="margin-left: 15px; margin-top: 5px;">
+                        <li>Active + <strong>Carbon Black</strong> 습윤</li>
+                        <li>Mixer 가동 중 분체 천천히 투입</li>
+                        <li>고형분 55% (DIW 절약)</li>
+                        <li>동일 Master Batch 다회 사용</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong style="color: #1e40af;">Phase 2: Thinky</strong>
+                    <ul style="margin-left: 15px; margin-top: 5px;">
+                        <li><strong style="color: #f59e0b;">CNT Slurry만 변수</strong></li>
+                        <li>Thinky 고전단으로 CNT 분산</li>
+                        <li>CMC/SBR 순차 투입</li>
+                        <li>최종 고형분 45%</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center; color: #6b7280; font-size: 12px;">
+            <p>Generated on: <span id="current-date"></span></p>
+            <p>Anode Slurry Run Sheet v6.1 | CB in Phase1, CNT in Phase2 | CMC/SBR 1:1</p>
+        </div>
+        </div>
+        <!-- End of Recipe Tab -->
+        
+        <!-- Loading Calculation Tab -->
+        <div id="loading-tab" class="tab-content">
+            <div class="card">
+                <h3>📐 전극 기본 정보</h3>
+                <div class="input-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="input-group">
+                        <label>전극 지름 (mm):</label>
+                        <input type="number" id="loading-electrode-diameter" value="14" step="0.1" oninput="calculateAreaFromDiameter(); updateCuMass();">
+                    </div>
+                    <div class="input-group">
+                        <label>전극 면적 (cm²):</label>
+                        <input type="number" id="loading-electrode-area" value="1.5394" step="0.01" class="yellow-input">
+                    </div>
+                    <div class="input-group">
+                        <label>전극 두께 (μm):</label>
+                        <input type="number" id="loading-thickness" value="" step="0.1" placeholder="예: 20.5" class="yellow-input">
+                    </div>
+                    <div class="input-group">
+                        <label>코팅 질량 (mg, dry):</label>
+                        <input type="number" id="loading-coating-mass" value="" step="0.1" placeholder="예: 5.4" class="yellow-input">
+                    </div>
+                </div>
+                <div class="input-grid" style="grid-template-columns: repeat(4, 1fr); margin-top: 10px;">
+                    <div class="input-group">
+                        <label>Cu Foil 두께 (μm):</label>
+                        <input type="number" id="loading-cu-thickness" value="9.0" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label>Cu Foil 질량 (mg):</label>
+                        <input type="number" id="loading-cu-mass" value="11.0" step="0.1" style="background: #e5e7eb;">
+                    </div>
+                    <div class="input-group" style="grid-column: span 2;">
+                        <label style="color: #6b7280; font-size: 11px;">💡 Cu mass는 전극 지름 변경 시 자동 계산 (14mm 기준 11mg)</label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="calculateLoading()">🧮 Calculate Loading & Properties</button>
+
+            <div class="loading-grid">
+                <div class="loading-card highlight">
+                    <div class="loading-value" id="coating-loading-result">-</div>
+                    <div class="loading-label">Coating Loading (mg/cm²)</div>
+                </div>
+                <div class="loading-card highlight">
+                    <div class="loading-value" id="active-loading-result">-</div>
+                    <div class="loading-label">Active Loading (mg/cm²)</div>
+                </div>
+                <div class="loading-card highlight">
+                    <div class="loading-value" id="calc-density-result">-</div>
+                    <div class="loading-label">전극 밀도 (g/cm³)</div>
+                </div>
+                <div class="loading-card highlight">
+                    <div class="loading-value" id="porosity-result">-</div>
+                    <div class="loading-label">기공도 ε (%)</div>
+                </div>
+            </div>
+
+            <div class="loading-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="loading-card">
+                    <div class="loading-value" id="solid-density-result">-</div>
+                    <div class="loading-label">고형분 밀도 (g/cm³)</div>
+                </div>
+                <div class="loading-card">
+                    <div class="loading-value" id="areal-capacity-result">-</div>
+                    <div class="loading-label">면적 용량 (mAh/cm²)</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h3>📊 계산 결과 해석</h3>
+                <div id="loading-interpretation" class="info-panel">
+                    <strong>계산을 수행하면 결과가 여기에 표시됩니다.</strong>
+                </div>
+            </div>
+        </div>
+        <!-- End of Loading Tab -->
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="settings-modal">
+        <div class="settings-content">
+            <span class="close-btn" onclick="closeSettings()">&times;</span>
+            <h2 style="color: #1e40af; margin-bottom: 20px;">⚙️ Settings</h2>
+            
+            <h3 style="color: #1e40af; margin-top: 15px; margin-bottom: 10px;">Material Capacities</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Natural Graphite (mAh/g):</label>
+                    <input type="number" id="graphite-capacity" value="355">
+                </div>
+                <div class="input-group">
+                    <label>Artificial Graphite (mAh/g):</label>
+                    <input type="number" id="art-graphite-capacity" value="345">
+                </div>
+            </div>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Silicon (mAh/g):</label>
+                    <input type="number" id="si-capacity" value="3200">
+                </div>
+                <div class="input-group">
+                    <label>SiC (mAh/g):</label>
+                    <input type="number" id="sic-capacity" value="1450">
+                </div>
+            </div>
+            
+            <h3 style="color: #1e40af; margin-top: 20px; margin-bottom: 10px;">Binder Solution Settings</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>SBR solid content (%):</label>
+                    <input type="number" id="sbr-solid" value="40.40" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label>CMC solid content (%):</label>
+                    <input type="number" id="cmc-solid" value="1.5" step="0.1">
+                </div>
+            </div>
+            
+            <h3 style="color: #1e40af; margin-top: 20px; margin-bottom: 10px;">SBR/CMC Ratio (1:1 권장)</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>SBR ratio in slurry (%):</label>
+                    <input type="number" id="sbr-ratio" value="1.25" step="0.05">
+                </div>
+                <div class="input-group">
+                    <label>CMC ratio in slurry (%):</label>
+                    <input type="number" id="cmc-ratio" value="1.25" step="0.05">
+                </div>
+            </div>
+            
+            <h3 style="color: #1e40af; margin-top: 20px; margin-bottom: 10px;">CNT Dispersion Settings</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>CNT solid content (%):</label>
+                    <input type="number" id="cnt-dispersion-solid" value="0.8" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label>Dispersant ratio (CNT 대비):</label>
+                    <input type="number" id="dispersant-ratio" value="0.8" step="0.1">
+                </div>
+            </div>
+            
+            <h3 style="color: #1e40af; margin-top: 20px; margin-bottom: 10px;">Pre-wetting Settings</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Pre-wet 고형분 (%):</label>
+                    <input type="number" id="prewet-solid-content" value="55" step="1" min="45" max="65">
+                </div>
+                <div class="input-group">
+                    <label>Propeller RPM:</label>
+                    <input type="number" id="propeller-rpm" value="300" step="50">
+                </div>
+            </div>
+            
+            <button class="btn" onclick="saveAndCloseSettings()" style="margin-top: 20px; background: linear-gradient(135deg, #10b981, #059669);">💾 저장 및 닫기</button>
+            <button class="btn" onclick="closeSettings()" style="margin-top: 10px; background: linear-gradient(135deg, #6b7280, #4b5563);">취소</button>
+        </div>
+    </div>
+    
+    <script>
+        // ===== Material Database =====
+        var materialDB = {
+            "Natural-Graphite": { name: "Natural Graphite", capacity: 355, density: 2.25 },
+            "Artificial-Graphite": { name: "Artificial Graphite", capacity: 345, density: 2.25 },
+            "Artificial-Natural-Mix": { name: "Art+Nat Graphite", capacity: 350, density: 2.25 },
+            "LTO": { name: "LTO", capacity: 175, density: 3.5 },
+            "Si": { name: "Silicon (Si)", capacity: 3200, density: 2.33 },
+            "SiO": { name: "Silicon Oxide (SiO)", capacity: 1800, density: 2.18 },
+            "SiC": { name: "Silicon Carbide (SiC)", capacity: 1450, density: 3.21 }
+        };
+        
+        var componentDensities = {
+            "SBR": 0.94, "CMC": 1.60, "PAA": 1.22, "PVDF": 1.78,
+            "SWCNT": 1.80, "MWCNT": 2.15, "SuperP": 2.00, "C65": 2.00
+        };
+        
+        // Solution parameters - CMC/SBR 1:1
+        var solutionParams = {
+            sbr: 40.40,
+            cmc: 1.5,
+            paa: 8.0,
+            pvdf: 12.0,
+            cntDispersion: 0.8,  // Changed to 0.8%
+            dispersantRatio: 0.8,  // Changed to 0.8
+            sbrRatio: 1.25,  // 1:1 ratio
+            cmcRatio: 1.25,  // 1:1 ratio
+            prewetSolid: 55,  // v6.0: Pre-wet 고형분 55% (CNT 제외로 높일 수 있음)
+            propellerRpm: 300
+        };
+        
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+            });
+        });
+        
+        // Toggle secondary ratio
+        function toggleSecondaryRatio() {
+            var secondary = document.getElementById("secondary-material").value;
+            var ratioGroup = document.getElementById("secondary-ratio-group");
+            if (secondary === "None") {
+                ratioGroup.style.display = "none";
+                document.getElementById("secondary-ratio").value = "0";
+            } else {
+                ratioGroup.style.display = "block";
+            }
+            updateMaterialInfo();
+            updateBalance();
+        }
+        
+        // Update material info
+        function updateMaterialInfo() {
+            var primary = document.getElementById("primary-material").value;
+            var secondary = document.getElementById("secondary-material").value;
+            var secondaryRatio = parseFloat(document.getElementById("secondary-ratio").value) || 0;
+            
+            var primaryMat = materialDB[primary];
+            var calculatedCapacity = primaryMat.capacity;
+            
+            if (secondary !== "None" && secondaryRatio > 0) {
+                var secondaryMat = materialDB[secondary];
+                calculatedCapacity = primaryMat.capacity * (1 - secondaryRatio/100) + 
+                                    secondaryMat.capacity * (secondaryRatio/100);
+            }
+            
+            document.getElementById("capacity-info").innerHTML = 
+                `Calculated Capacity: <strong>${calculatedCapacity.toFixed(0)} mAh/g</strong>`;
+            
+            updateBalance();
+        }
+        
+        // Update balance
+        function updateBalance() {
+            var binder = parseFloat(document.getElementById("binder-content").value) || 0;
+            var conductive1 = parseFloat(document.getElementById("conductive-content-1").value) || 0;
+            var conductive2 = parseFloat(document.getElementById("conductive-content-2").value) || 0;
+            
+            var active = 100.0 - binder - conductive1 - conductive2;
+            document.getElementById("active-content").value = active.toFixed(3);
+            
+            var total = active + binder + conductive1 + conductive2;
+            var balanceDiv = document.getElementById("balance-status");
+            
+            if (Math.abs(total - 100.0) < 0.1) {
+                balanceDiv.className = "balance-check good";
+                balanceDiv.textContent = "✅ Perfect Balance (" + total.toFixed(3) + "%)";
+            } else {
+                balanceDiv.className = "balance-check bad";
+                balanceDiv.textContent = "⚠ Balance Error: " + total.toFixed(3) + "%";
+            }
+            
+            calculateRecipe();
+        }
+        
+        // Main calculation - v6.1: Carbon Black in Phase 1, CNT Slurry in Phase 2
+        function calculateRecipe() {
+            var primary = document.getElementById("primary-material").value;
+            var secondary = document.getElementById("secondary-material").value;
+            var secondaryRatio = parseFloat(document.getElementById("secondary-ratio").value) || 0;
+            var activePercent = parseFloat(document.getElementById("active-content").value) || 97.4;
+            var binderPercent = parseFloat(document.getElementById("binder-content").value) || 2.5;
+            var conductive1Percent = parseFloat(document.getElementById("conductive-content-1").value) || 0.1;
+            var conductive2Percent = parseFloat(document.getElementById("conductive-content-2").value) || 0;
+            var solidContent = parseFloat(document.getElementById("solid-content").value) || 45;
+            var prewetBatch = parseFloat(document.getElementById("prewet-batch-size").value) || 20;
+            var thinkyBatch = parseFloat(document.getElementById("thinky-batch-size").value) || 5;
+            var swcntSolidContent = parseFloat(document.getElementById("swcnt-solid-content").value) || 0.8;
+            
+            var binderType = document.getElementById("binder-type").value;
+            var conductive1Type = document.getElementById("conductive-type-1").value;
+            var conductive2Type = document.getElementById("conductive-type-2").value;
+            
+            // Classify conductives: CB (Carbon Black) → Phase 1, CNT Slurry → Phase 2
+            var isCB1 = (conductive1Type === "SuperP" || conductive1Type === "C65");
+            var isCB2 = (conductive2Type === "SuperP" || conductive2Type === "C65");
+            var isCNT1 = (conductive1Type === "SWCNT" || conductive1Type === "MWCNT");
+            var isCNT2 = (conductive2Type === "SWCNT" || conductive2Type === "MWCNT");
+            
+            // ===== Pre-wetting: Active + Carbon Black (no CNT slurry) =====
+            var prewetSolidPercent = solutionParams.prewetSolid;
+            var prewetSolid = prewetBatch * prewetSolidPercent / 100;
+            
+            // CB goes to Phase 1, CNT goes to Phase 2
+            var cbPercentInPhase1 = (isCB1 ? conductive1Percent : 0) + (isCB2 ? conductive2Percent : 0);
+            var cntPercentInPhase2 = (isCNT1 ? conductive1Percent : 0) + (isCNT2 ? conductive2Percent : 0);
+            
+            // Pre-wet solid composition (Active + CB only)
+            var prewetActiveRatio = activePercent / (activePercent + cbPercentInPhase1);
+            var prewetCBRatio = cbPercentInPhase1 / (activePercent + cbPercentInPhase1);
+            
+            var activeSolidInPrewet = prewetSolid * prewetActiveRatio;
+            var cbSolidInPrewet = prewetSolid * prewetCBRatio;
+            
+            var graphiteSolid = activeSolidInPrewet * (1 - secondaryRatio/100);
+            var secondarySolid = activeSolidInPrewet * (secondaryRatio/100);
+            
+            // CB breakdown for display
+            var cb1SolidInPrewet = isCB1 ? cbSolidInPrewet * conductive1Percent / cbPercentInPhase1 : 0;
+            var cb2SolidInPrewet = isCB2 ? cbSolidInPrewet * conductive2Percent / cbPercentInPhase1 : 0;
+            if (cbPercentInPhase1 === 0) { cb1SolidInPrewet = 0; cb2SolidInPrewet = 0; }
+            
+            var prewetDIW = prewetBatch - prewetSolid;
+            
+            // Update Pre-wet display
+            document.getElementById("prewet-total-display").textContent = prewetBatch.toFixed(1) + "g";
+            document.getElementById("prewet-solid-display").textContent = prewetSolidPercent + "%";
+            document.getElementById("prewet-graphite").textContent = graphiteSolid.toFixed(3) + "g";
+            document.getElementById("prewet-secondary").textContent = secondarySolid.toFixed(3) + "g";
+            document.getElementById("prewet-diw").textContent = prewetDIW.toFixed(3) + "g";
+            
+            // CB display in Pre-wet (dynamic rows)
+            updatePrewetCBDisplay(isCB1, isCB2, conductive1Type, conductive2Type, cb1SolidInPrewet, cb2SolidInPrewet);
+            
+            // ===== Thinky: Pre-wet portion + CNT Slurry + Binder =====
+            var thinkyTargetSolid = thinkyBatch * solidContent / 100;
+            
+            // Solid composition for final slurry
+            var activeSolidInThinky = thinkyTargetSolid * activePercent / 100;
+            var cbSolidInThinky = thinkyTargetSolid * cbPercentInPhase1 / 100;
+            var cntSolidInThinky = thinkyTargetSolid * cntPercentInPhase2 / 100;
+            var binderSolidInThinky = thinkyTargetSolid * binderPercent / 100;
+            
+            // Pre-wet portion (contains Active + CB at prewetSolidPercent)
+            var solidFromPrewet = activeSolidInThinky + cbSolidInThinky;
+            var prewetPortion = solidFromPrewet / (prewetSolidPercent / 100);
+            var diwInPrewetPortion = prewetPortion - solidFromPrewet;
+            
+            // CNT slurry for Phase 2
+            var cnt1SolidInThinky = isCNT1 ? thinkyTargetSolid * conductive1Percent / 100 : 0;
+            var cnt2SolidInThinky = isCNT2 ? thinkyTargetSolid * conductive2Percent / 100 : 0;
+            var cnt1DispersionMass = cnt1SolidInThinky > 0 ? cnt1SolidInThinky / swcntSolidContent * 100 : 0;
+            var cnt2DispersionMass = cnt2SolidInThinky > 0 ? cnt2SolidInThinky / swcntSolidContent * 100 : 0;
+            var cnt1DIW = cnt1DispersionMass - cnt1SolidInThinky;
+            var cnt2DIW = cnt2DispersionMass - cnt2SolidInThinky;
+            
+            // Binder calculation
+            var totalBinderRatio = solutionParams.sbrRatio + solutionParams.cmcRatio;
+            var sbrSolid = binderSolidInThinky * (solutionParams.sbrRatio / totalBinderRatio);
+            var cmcSolid = binderSolidInThinky * (solutionParams.cmcRatio / totalBinderRatio);
+            var sbrSolution = sbrSolid / solutionParams.sbr * 100;
+            var cmcSolution = cmcSolid / solutionParams.cmc * 100;
+            var sbrDIW = sbrSolution - sbrSolid;
+            var cmcDIW = cmcSolution - cmcSolid;
+            
+            // Additional DIW
+            var thinkyTotalDIW = thinkyBatch - thinkyTargetSolid;
+            var diwFromSources = diwInPrewetPortion + cnt1DIW + cnt2DIW + cmcDIW + sbrDIW;
+            var additionalDIW = Math.max(0, thinkyTotalDIW - diwFromSources);
+            
+            // Update Thinky display
+            document.getElementById("thinky-total-display").textContent = thinkyBatch.toFixed(1) + "g";
+            document.getElementById("thinky-solid-display").textContent = solidContent + "%";
+            document.getElementById("thinky-prewet").textContent = prewetPortion.toFixed(3) + "g";
+            document.getElementById("thinky-cmc").textContent = cmcSolution.toFixed(3) + "g";
+            document.getElementById("thinky-sbr").textContent = sbrSolution.toFixed(3) + "g";
+            document.getElementById("thinky-diw").textContent = additionalDIW.toFixed(3) + "g";
+            
+            // CNT display in Thinky
+            updateThinkyCNTDisplay(isCNT1, isCNT2, conductive1Type, conductive2Type, cnt1DispersionMass, cnt2DispersionMass);
+            
+            // DIW breakdown
+            document.getElementById("diw-prewet-amount").textContent = diwInPrewetPortion.toFixed(3) + "g";
+            document.getElementById("diw-cnt-amount").textContent = (cnt1DIW + cnt2DIW).toFixed(3) + "g";
+            document.getElementById("diw-cmc-amount").textContent = cmcDIW.toFixed(3) + "g";
+            document.getElementById("diw-sbr-amount").textContent = sbrDIW.toFixed(3) + "g";
+            document.getElementById("diw-add-amount").textContent = additionalDIW.toFixed(3) + "g";
+            document.getElementById("diw-total-amount").textContent = thinkyTotalDIW.toFixed(3) + "g";
+            
+            // Split count
+            document.getElementById("split-count").textContent = Math.floor(prewetBatch / prewetPortion);
+            
+            // Update process steps
+            updateProcessSteps(secondary, secondaryRatio, graphiteSolid, secondarySolid, prewetDIW, prewetPortion,
+                              isCB1, isCB2, cb1SolidInPrewet, cb2SolidInPrewet, conductive1Type, conductive2Type,
+                              isCNT1, isCNT2, cnt1DispersionMass, cnt2DispersionMass, cmcSolution, sbrSolution, additionalDIW);
+        }
+        
+        // Helper: Update Pre-wet CB display
+        function updatePrewetCBDisplay(isCB1, isCB2, type1, type2, cb1, cb2) {
+            var container = document.getElementById("prewet-cb-container");
+            if (!container) return;
+            var html = "";
+            if (isCB1 && cb1 > 0) html += `<tr><td>${type1}</td><td>${cb1.toFixed(3)}g</td><td>Conductive (Phase1)</td></tr>`;
+            if (isCB2 && cb2 > 0) html += `<tr><td>${type2}</td><td>${cb2.toFixed(3)}g</td><td>Conductive (Phase1)</td></tr>`;
+            container.innerHTML = html;
+        }
+        
+        // Helper: Update Thinky CNT display
+        function updateThinkyCNTDisplay(isCNT1, isCNT2, type1, type2, cnt1, cnt2) {
+            var row1 = document.getElementById("thinky-cnt1-row");
+            var row2 = document.getElementById("thinky-cnt2-row");
+            if (row1) {
+                if (isCNT1 && cnt1 > 0) {
+                    row1.style.display = "";
+                    document.getElementById("thinky-cnt1-label").textContent = type1 + " Slurry";
+                    document.getElementById("thinky-cnt1").textContent = cnt1.toFixed(3) + "g";
+                } else { row1.style.display = "none"; }
+            }
+            if (row2) {
+                if (isCNT2 && cnt2 > 0) {
+                    row2.style.display = "";
+                    document.getElementById("thinky-cnt2-label").textContent = type2 + " Slurry";
+                    document.getElementById("thinky-cnt2").textContent = cnt2.toFixed(3) + "g";
+                } else { row2.style.display = "none"; }
+            }
+        }
+        
+        // Update process steps - v6.1: CB in Phase 1, CNT Slurry in Phase 2
+        function updateProcessSteps(secondary, secondaryRatio, graphiteSolid, secondarySolid, prewetDIW, prewetPortion,
+                                   isCB1, isCB2, cb1Solid, cb2Solid, type1, type2,
+                                   isCNT1, isCNT2, cnt1Mass, cnt2Mass, cmcSolution, sbrSolution, additionalDIW) {
+            var hasSi = (secondary === "Si" || secondary === "SiO" || secondary === "SiC") && secondaryRatio > 0;
+            var hasCB = (isCB1 && cb1Solid > 0) || (isCB2 && cb2Solid > 0);
+            var hasCNT = (isCNT1 && cnt1Mass > 0) || (isCNT2 && cnt2Mass > 0);
+            
+            // CB list for Phase 1
+            var cbItems = [];
+            if (isCB1 && cb1Solid > 0) cbItems.push(`<p>• ${type1}: <strong>${cb1Solid.toFixed(3)}g</strong></p>`);
+            if (isCB2 && cb2Solid > 0) cbItems.push(`<p>• ${type2}: <strong>${cb2Solid.toFixed(3)}g</strong></p>`);
+            var cbContent = cbItems.join('\n                    ');
+            
+            // CNT list for Phase 2
+            var cntItems = [];
+            if (isCNT1 && cnt1Mass > 0) cntItems.push(`<p>• ${type1} Slurry: <strong>${cnt1Mass.toFixed(3)}g</strong></p>`);
+            if (isCNT2 && cnt2Mass > 0) cntItems.push(`<p>• ${type2} Slurry: <strong>${cnt2Mass.toFixed(3)}g</strong></p>`);
+            var cntContent = cntItems.join('\n                    ');
+            
+            // Phase 1: Pre-mixing (Mechanical Mixer)
+            var premixSteps = `
+                <div class="process-step">
+                    <span class="step-number">1</span>
+                    <strong>DIW 투입 & Mixer 가동</strong>
+                    <p>• DIW: <strong>${prewetDIW.toFixed(3)}g</strong> 먼저 투입</p>
+                    <p>• Mixer <strong>100~150 rpm</strong> 저속 가동</p>
+                </div>
+                
+                <div class="process-step">
+                    <span class="step-number">2</span>
+                    <strong>분체 천천히 투입</strong>
+                    <p>• <em>Mixer 가동 중</em> 분체 서서히 투입:</p>
+                    <p>• Graphite: <strong>${graphiteSolid.toFixed(3)}g</strong></p>
+                    ${hasSi ? `<p>• ${materialDB[secondary].name}: <strong>${secondarySolid.toFixed(3)}g</strong></p>` : ''}
+                    ${hasCB ? cbContent : ''}
+                    <p>• ⚠️ 뭉침 방지: 조금씩 투입</p>
+                </div>
+                
+                <div class="process-step">
+                    <span class="step-number">3</span>
+                    <strong>Wetting (핵심!)</strong>
+                    <p>• <strong>200~300 rpm, 5~10분</strong></p>
+                    <p>• ✅ "같이 도는 느낌" 확인</p>
+                    <p>• ✅ Dry core 없음 확인</p>
+                    <p>• 중간에 스패츌라로 벽면 긁기</p>
+                </div>
+                
+                <div class="process-step">
+                    <span class="step-number">4</span>
+                    <strong>Master Batch 완성</strong>
+                    <p>• 균일한 paste 상태 확인</p>
+                    <p>• <strong>소분: ${prewetPortion.toFixed(3)}g</strong>/batch</p>
+                    <p>• 나머지: 밀봉 냉장 (24hr)</p>
+                    <p style="color: #059669;">💡 동일 Pre-wet → 다양한 CNT 테스트!</p>
+                </div>
+            `;
+            
+            // Phase 2: Thinky (CNT Slurry + Binder)
+            var thinkySteps = hasCNT ? `
+                <div class="process-step" style="background: #fef3c7; border-color: #f59e0b;">
+                    <span class="step-number">5</span>
+                    <strong>🔶 CNT Slurry 투입 (변수!)</strong>
+                    <p>• Pre-wet 소분: <strong>${prewetPortion.toFixed(3)}g</strong></p>
+                    ${cntContent}
+                    <p>• Thinky <strong>2000 rpm, 3분</strong></p>
+                </div>
+            ` : `
+                <div class="process-step">
+                    <span class="step-number">5</span>
+                    <strong>Pre-wet 준비</strong>
+                    <p>• Pre-wet 소분: <strong>${prewetPortion.toFixed(3)}g</strong></p>
+                    <p style="color: #6b7280;">(CNT 미사용)</p>
+                </div>
+            `;
+            
+            thinkySteps += `
+                <div class="process-step">
+                    <span class="step-number">6</span>
+                    <strong>CMC 1차 투입 (50%)</strong>
+                    <p>• CMC 1.5%: <strong>${(cmcSolution/2).toFixed(3)}g</strong></p>
+                    <p>• Thinky <strong>2000 rpm, 3분</strong></p>
+                </div>
+                
+                <div class="process-step">
+                    <span class="step-number">7</span>
+                    <strong>CMC 2차 투입 (50%)</strong>
+                    <p>• CMC 1.5%: <strong>${(cmcSolution/2).toFixed(3)}g</strong></p>
+                    ${additionalDIW > 0.01 ? `<p>• 추가 DIW: <strong>${additionalDIW.toFixed(3)}g</strong></p>` : ''}
+                    <p>• Thinky <strong>2000 rpm, 3분</strong> + 탈포 2분</p>
+                </div>
+                
+                <div class="process-step">
+                    <span class="step-number">8</span>
+                    <strong>SBR 투입 ⚠️</strong>
+                    <p>• SBR 40.4%: <strong>${sbrSolution.toFixed(3)}g</strong></p>
+                    <p>• Thinky <strong style="color: #dc2626;">1300 rpm, 2분</strong></p>
+                    <p>• ❌ 1500 rpm 이상 금지!</p>
+                </div>
+                
+                <div class="process-step">
+                    <span class="step-number">9</span>
+                    <strong>최종 탈포</strong>
+                    <p>• Thinky <strong>2000 rpm, 5분</strong></p>
+                    <p>• 목표 점도: 4000~6000 cP</p>
+                </div>
+            `;
+            
+            document.getElementById("premix-steps-container").innerHTML = premixSteps;
+            document.getElementById("thinky-steps-container").innerHTML = thinkySteps;
+        }
+        
+        // Settings functions
+        function openSettings() {
+            document.getElementById("settings-modal").style.display = "flex";
+        }
+        
+        function closeSettings() {
+            document.getElementById("settings-modal").style.display = "none";
+        }
+        
+        function saveAndCloseSettings() {
+            solutionParams.sbr = parseFloat(document.getElementById("sbr-solid").value) || 40.40;
+            solutionParams.cmc = parseFloat(document.getElementById("cmc-solid").value) || 1.5;
+            solutionParams.cntDispersion = parseFloat(document.getElementById("cnt-dispersion-solid").value) || 0.8;
+            solutionParams.dispersantRatio = parseFloat(document.getElementById("dispersant-ratio").value) || 0.8;
+            solutionParams.sbrRatio = parseFloat(document.getElementById("sbr-ratio").value) || 1.25;
+            solutionParams.cmcRatio = parseFloat(document.getElementById("cmc-ratio").value) || 1.25;
+            solutionParams.prewetSolid = parseFloat(document.getElementById("prewet-solid-content").value) || 55;
+            solutionParams.propellerRpm = parseFloat(document.getElementById("propeller-rpm").value) || 300;
+            
+            // Update SWCNT input
+            document.getElementById("swcnt-solid-content").value = solutionParams.cntDispersion;
+            
+            // Update material capacities
+            materialDB["Natural-Graphite"].capacity = parseFloat(document.getElementById("graphite-capacity").value) || 355;
+            materialDB["Artificial-Graphite"].capacity = parseFloat(document.getElementById("art-graphite-capacity").value) || 345;
+            materialDB["Si"].capacity = parseFloat(document.getElementById("si-capacity").value) || 3200;
+            materialDB["SiC"].capacity = parseFloat(document.getElementById("sic-capacity").value) || 1450;
+            
+            closeSettings();
+            calculateRecipe();
+        }
+        
+        // Loading calculation
+        function calculateAreaFromDiameter() {
+            var diameter = parseFloat(document.getElementById("loading-electrode-diameter").value);
+            if (diameter > 0) {
+                var radius = diameter / 2 / 10;  // mm to cm
+                var area = Math.PI * radius * radius;
+                document.getElementById("loading-electrode-area").value = area.toFixed(4);
+            }
+        }
+        
+        // Cu mass 자동 계산 (14mm 기준 11mg)
+        function updateCuMass() {
+            var diameter = parseFloat(document.getElementById("loading-electrode-diameter").value);
+            var baseDiameter = 14;  // 기준 지름 (mm)
+            var baseCuMass = 11;    // 기준 Cu mass (mg)
+            
+            if (diameter > 0) {
+                // 면적 비율로 Cu mass 계산
+                var areaRatio = (diameter * diameter) / (baseDiameter * baseDiameter);
+                var newCuMass = baseCuMass * areaRatio;
+                document.getElementById("loading-cu-mass").value = newCuMass.toFixed(1);
+            }
+        }
+        
+        function calculateLoading() {
+            var area = parseFloat(document.getElementById("loading-electrode-area").value);
+            var thickness = parseFloat(document.getElementById("loading-thickness").value);
+            var coatingMass = parseFloat(document.getElementById("loading-coating-mass").value);
+            
+            if (!area || !thickness || !coatingMass) {
+                alert('전극 면적, 두께, 코팅 질량을 입력해주세요!');
+                return;
+            }
+            
+            var activeContent = parseFloat(document.getElementById("active-content").value) / 100;
+            var primary = document.getElementById("primary-material").value;
+            var secondary = document.getElementById("secondary-material").value;
+            var secondaryRatio = parseFloat(document.getElementById("secondary-ratio").value) / 100;
+            
+            // Density calculation
+            var rho_AM = materialDB[primary].density;
+            if (secondary !== "None" && secondaryRatio > 0) {
+                rho_AM = materialDB[primary].density * (1 - secondaryRatio) + 
+                        materialDB[secondary].density * secondaryRatio;
+            }
+            
+            var binderType = document.getElementById("binder-type").value;
+            var rho_binder = binderType === "SBR-CMC" ? 1.27 : (binderType === "PAA" ? 1.22 : 1.78);
+            var rho_CNT = 1.80;
+            
+            var w_AM = activeContent;
+            var w_binder = parseFloat(document.getElementById("binder-content").value) / 100;
+            var w_CNT = (parseFloat(document.getElementById("conductive-content-1").value) + 
+                        parseFloat(document.getElementById("conductive-content-2").value)) / 100;
+            
+            var rho_solid = 1 / ((w_AM/rho_AM) + (w_binder/rho_binder) + (w_CNT/rho_CNT));
+            
+            var L_cm = thickness / 10000;
+            var V_electrode = area * L_cm;
+            var m_electrode_g = coatingMass / 1000;
+            var rho_electrode = m_electrode_g / V_electrode;
+            
+            var porosity = (1 - (rho_electrode / rho_solid)) * 100;
+            var coatingLoading = coatingMass / area;
+            var activeLoading = coatingLoading * w_AM;
+            
+            var capacity = materialDB[primary].capacity;
+            if (secondary !== "None" && secondaryRatio > 0) {
+                capacity = materialDB[primary].capacity * (1 - secondaryRatio) + 
+                          materialDB[secondary].capacity * secondaryRatio;
+            }
+            var arealCapacity = (activeLoading * capacity) / 1000;
+            
+            document.getElementById("coating-loading-result").textContent = coatingLoading.toFixed(2);
+            document.getElementById("active-loading-result").textContent = activeLoading.toFixed(2);
+            document.getElementById("calc-density-result").textContent = rho_electrode.toFixed(3);
+            document.getElementById("porosity-result").textContent = porosity.toFixed(1);
+            document.getElementById("solid-density-result").textContent = rho_solid.toFixed(3);
+            document.getElementById("areal-capacity-result").textContent = arealCapacity.toFixed(2);
+            
+            var interpretation = `<strong>기공도:</strong> ${porosity.toFixed(1)}% `;
+            if (porosity < 20) interpretation += "(낮음 - 이온 전달 제한 우려)";
+            else if (porosity < 35) interpretation += "(적정 범위)";
+            else interpretation += "(높음 - 캘린더링 필요)";
+            interpretation += `<br><strong>면적 용량:</strong> ${arealCapacity.toFixed(2)} mAh/cm²`;
+            
+            document.getElementById("loading-interpretation").innerHTML = interpretation;
+        }
+        
+        // Download CSV
+        function downloadRunSheet() {
+            var currentDate = new Date().toISOString().split('T')[0];
+            var primary = document.getElementById("primary-material").value;
+            
+            var csvContent = "Anode Slurry Recipe - Pre-wetting + Thinky Process\n";
+            csvContent += "Date," + currentDate + "\n";
+            csvContent += "Version,5.0 (CMC/SBR 1:1)\n\n";
+            
+            csvContent += "Pre-wetting Batch\n";
+            csvContent += "Component,Weight (g)\n";
+            csvContent += "Graphite," + document.getElementById("prewet-graphite").textContent + "\n";
+            csvContent += "Secondary," + document.getElementById("prewet-secondary").textContent + "\n";
+            csvContent += "CNT Slurry," + document.getElementById("prewet-cnt").textContent + "\n";
+            csvContent += "DIW," + document.getElementById("prewet-diw").textContent + "\n\n";
+            
+            csvContent += "Thinky Batch\n";
+            csvContent += "Component,Weight (g)\n";
+            csvContent += "Pre-wet portion," + document.getElementById("thinky-prewet").textContent + "\n";
+            csvContent += "CMC Solution," + document.getElementById("thinky-cmc").textContent + "\n";
+            csvContent += "SBR Solution," + document.getElementById("thinky-sbr").textContent + "\n";
+            csvContent += "Additional DIW," + document.getElementById("thinky-diw").textContent + "\n";
+            
+            var blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'Anode_Recipe_Prewet_Thinky_' + currentDate + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        
+        // Print
+        function printRunSheet() {
+            window.print();
+        }
+        
+        // Initialize
+        document.getElementById("current-date").textContent = new Date().toLocaleDateString('ko-KR');
+        toggleSecondaryRatio();
+        calculateRecipe();
+    </script>
+</body>
+</html>

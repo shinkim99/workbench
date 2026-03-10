@@ -1,0 +1,3118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNT Percolation Analyzer - Rev 7.1</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  max-width: 1400px;
+  width: 100%;
+  padding: 30px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.header h1 {
+  font-size: 32px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.header p {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 12px 24px;
+  background: #f8f9fa;
+  color: #495057;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.tab-btn.active {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.tab-content {
+  display: none;
+  animation: slideIn 0.3s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.input-section {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+  flex: 1;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.concentration-table {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.concentration-table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.concentration-table th {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  padding: 12px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.concentration-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.concentration-table td input {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.concentration-table td input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+button {
+  padding: 10px 20px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success {
+  background: linear-gradient(45deg, #27ae60, #2ecc71);
+}
+
+.btn-warning {
+  background: linear-gradient(45deg, #f39c12, #f1c40f);
+}
+
+.btn-danger {
+  background: linear-gradient(45deg, #c0392b, #e74c3c);
+}
+
+.data-table-container {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.data-table th {
+  background: #2c3e50;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f3f5;
+  font-size: 13px;
+}
+
+.data-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.chart-container {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chart-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.chart-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.chart-controls-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background: #f8f9fa;
+  color: #495057;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  background: #e9ecef;
+}
+
+.filter-btn.active {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border-color: transparent;
+}
+
+.color-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.color-box:hover {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 2000;
+  border-left: 4px solid #667eea;
+  animation: slideIn 0.3s ease;
+}
+
+.toast.active {
+  display: block;
+}
+
+.toast.success {
+  border-left-color: #27ae60;
+}
+
+.toast.error {
+  border-left-color: #e74c3c;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+#percolationChart {
+  height: 400px;
+  max-height: 400px;
+}
+
+#inPlaneChart, #throughPlaneChart, #viscosityChart {
+  width: 100%;
+  height: 350px !important;
+  max-height: 350px !important;
+  display: block;
+}
+
+/* 색상 선택 모달 */
+.color-modal {
+  display: none;
+  position: fixed;
+  z-index: 3000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.color-modal-content {
+  background-color: white;
+  margin: 5% auto;
+  padding: 25px;
+  border-radius: 15px;
+  width: 350px;
+  box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+}
+
+.color-modal-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.color-palette {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.color-option-container {
+  text-align: center;
+}
+
+.color-option {
+  width: 100%;
+  height: 60px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.color-option:hover {
+  transform: scale(1.05);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.color-option.selected {
+  border: 3px solid #667eea;
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+}
+
+.color-category {
+  font-size: 11px;
+  color: #7f8c8d;
+  margin-top: 5px;
+}
+
+</style>
+</head>
+<body>
+<script>
+// 즉시 전역 함수 정의 - HTML 요소보다 먼저 실행
+window.switchTab = function(event, tabName) {
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  }
+  
+  const targetTab = document.getElementById(tabName + '-tab');
+  if (targetTab) {
+    targetTab.classList.add('active');
+    
+    if (tabName === 'graph' && typeof updateChart !== 'undefined') {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          updateChart();
+        }, 50);
+      });
+    }
+  }
+};
+
+window.toggleCNTTypeFields = function() {
+  const cntType = document.getElementById('cntType').value;
+  const cathodeGroup = document.getElementById('cathodeGroup');
+  const siContentGroup = document.getElementById('siContentGroup');
+  
+  if (cathodeGroup && siContentGroup) {
+    if (cntType === 'MWCNT') {
+      cathodeGroup.style.display = 'block';
+      siContentGroup.style.display = 'none';
+    } else if (cntType === 'SWCNT') {
+      cathodeGroup.style.display = 'none';
+      siContentGroup.style.display = 'block';
+    } else {
+      cathodeGroup.style.display = 'none';
+      siContentGroup.style.display = 'none';
+    }
+  }
+  
+  const standardTable = document.getElementById('standardMeasurement');
+  const eisTable = document.getElementById('eisMeasurement');
+  
+  if (standardTable && eisTable) {
+    if (cntType === 'SWCNT-EIS') {
+      standardTable.style.display = 'none';
+      eisTable.style.display = 'block';
+    } else {
+      standardTable.style.display = 'block';
+      eisTable.style.display = 'none';
+    }
+  }
+  
+  if (typeof initializeDefaultConcentrations !== 'undefined') {
+    initializeDefaultConcentrations();
+  }
+};
+
+// 빈 함수들 - 나중에 재정의됨
+window.updateManufacturers = function() {};
+window.updateGrades = function() {};
+window.updateLotNo = function() {};
+window.saveData = function() {};
+window.deleteData = function() {};
+window.editData = function() {};
+window.toggleDataSelection = function() {};
+window.openColorPicker = function() {};
+window.filterData = function() {};
+window.exportToCSV = function() {};
+window.saveProject = function() {};
+window.loadProject = function(event) {
+  // 실제 함수는 나중에 재정의되지만, 기본 동작 제공
+  if (event && event.target && event.target.files) {
+    console.log('Loading project file...');
+  }
+};
+window.selectAllForGraph = function() {};
+window.deselectAllForGraph = function() {};
+window.updateChart = function() {};
+window.toggleViscosityChart = function() {};
+window.updateSummaryTable = function() {};
+window.captureChart = function() {};
+window.addConcentration = function() {};
+window.removeConcentrationRow = function() {};
+window.clearInPlaneRow = function() {};
+window.clearThroughPlaneRow = function() {};
+
+console.log('Critical functions pre-loaded');
+</script>
+
+<div class="container">
+  <div class="header">
+    <h1>🧪 CNT Percolation Analyzer</h1>
+    <p>Rev 7.1 - MWCNT/SWCNT 전도성 분석 통합 시스템 (In-plane & Through-plane)</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(event, 'input')">📊 데이터 입력</button>
+    <button class="tab-btn" onclick="switchTab(event, 'data')">📋 데이터 관리</button>
+    <button class="tab-btn" onclick="switchTab(event, 'graph')">📈 그래프</button>
+  </div>
+
+  <div id="input-tab" class="tab-content active">
+    <div class="input-section">
+      <div class="section-title">🔬 기본 정보 입력</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>샘플 날짜 *</label>
+          <input type="date" id="sampleDate" onchange="updateLotNo()">
+        </div>
+
+        <div class="form-group">
+          <label>CNT 타입 *</label>
+          <select id="cntType" onchange="updateManufacturers(); toggleCNTTypeFields()">
+            <option value="MWCNT">MWCNT</option>
+            <option value="SWCNT">SWCNT</option>
+            <option value="SWCNT-EIS">SWCNT-EIS</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>제조사 *</label>
+          <select id="manufacturer" onchange="updateGrades()">
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>그레이드</label>
+          <select id="grade" onchange="updateLotNo()">
+            <option value="">선택 안함</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Lot No. *</label>
+          <input type="text" id="lotNo" placeholder="자동 생성 또는 직접 입력">
+        </div>
+
+        <div class="form-group">
+          <label>메모</label>
+          <input type="text" id="memo" placeholder="특이사항 입력">
+        </div>
+
+        <div class="form-group" id="cathodeGroup" style="display: flex;">
+          <label>양극재 타입 *</label>
+          <select id="cathodeType">
+            <option value="NCM622">NCM622</option>
+            <option value="NCM811">NCM811</option>
+            <option value="NCMA">NCMA</option>
+            <option value="LFP">LFP</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="siContentGroup" style="display: none;">
+          <label>Si 함량 *</label>
+          <select id="siContent">
+            <option value="5%">5%</option>
+            <option value="10%">10%</option>
+            <option value="15%">15%</option>
+            <option value="20%">20%</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>초기 점도 (cP)</label>
+          <input type="number" id="initialViscosity" placeholder="예: 5000" min="0" step="100">
+          <small style="color: #7f8c8d; font-size: 11px;">목표: 10000 cP 이하</small>
+        </div>
+
+        <div class="form-group">
+          <label>현재 점도 (cP)</label>
+          <input type="number" id="finalViscosity" placeholder="예: 6000" min="0" step="100">
+          <small style="color: #7f8c8d; font-size: 11px;">목표: 초기 대비 30% 이내</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-section">
+      <div class="section-title">
+        ⚡ 농도별 전기 특성 측정
+        <button onclick="addConcentration()" style="margin-left: auto; font-size: 12px;">+ 농도 추가</button>
+      </div>
+
+      <!-- Standard (MWCNT/SWCNT) 측정 섹션 -->
+      <div id="standardMeasurement" style="display: block;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+          <thead>
+            <tr>
+              <th colspan="7" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 10px; text-align: center;">
+                ≡ In-plane 측정 (Sheet Resistance)
+              </th>
+              <th style="width: 20px; background: white; border: none;"></th>
+              <th colspan="6" style="background: linear-gradient(45deg, #764ba2, #667eea); color: white; padding: 10px; text-align: center;">
+                ⊥ Through-plane 측정
+              </th>
+            </tr>
+            <tr>
+              <th style="background: #f8f9fa; padding: 8px;">CNT<br/>농도<br/>(wt%)</th>
+              <th style="background: #f8f9fa; padding: 8px;">두께<br/>(μm)</th>
+              <th style="background: #f8f9fa; padding: 8px;">Rs Min<br/>(Ω/sq)</th>
+              <th style="background: #f8f9fa; padding: 8px;">Rs Max<br/>(Ω/sq)</th>
+              <th style="background: #f8f9fa; padding: 8px;">Rs Avg<br/>(Ω/sq)</th>
+              <th style="background: #f8f9fa; padding: 8px;">σ<br/>(S/cm)</th>
+              <th style="background: #f8f9fa; padding: 8px;">액션</th>
+              <th style="background: white; border: none;"></th>
+              <th style="background: #f8f9fa; padding: 8px;">CNT<br/>농도<br/>(wt%)</th>
+              <th style="background: #f8f9fa; padding: 8px;">두께<br/>(μm)</th>
+              <th style="background: #f8f9fa; padding: 8px;">직경<br/>(mm)</th>
+              <th style="background: #f8f9fa; padding: 8px;">저항<br/>(Ω)</th>
+              <th style="background: #f8f9fa; padding: 8px;">σ<br/>(S/cm)</th>
+              <th style="background: #f8f9fa; padding: 8px;">액션</th>
+            </tr>
+          </thead>
+          <tbody id="combinedTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <!-- EIS 측정 섹션 -->
+      <div id="eisMeasurement" style="display: none;">
+        <div class="concentration-table">
+          <table>
+            <thead>
+              <tr>
+                <th>CNT 농도 (wt%)</th>
+                <th>저항 R (Ω)</th>
+                <th>전도도 κ (S/cm)</th>
+                <th>액션</th>
+              </tr>
+            </thead>
+            <tbody id="eisConcentrationTableBody">
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size: 12px; color: #555; margin-top: 10px; padding: 10px;">
+          💡 셀상수 K = d/A (설정에서 변경 가능) | 전도도 κ = K/R S/cm
+        </p>
+      </div>
+
+      <div class="action-buttons">
+        <button onclick="saveData()" class="btn-success">💾 데이터 저장</button>
+        <button onclick="clearForm()" class="btn-warning">🔄 입력 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="data-tab" class="tab-content">
+    <div class="input-section">
+      <div class="section-title">📋 저장된 데이터 목록</div>
+
+      <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterDataByType(event, 'ALL')">전체</button>
+        <button class="filter-btn" onclick="filterDataByType(event, 'MWCNT')">MWCNT</button>
+        <button class="filter-btn" onclick="filterDataByType(event, 'SWCNT')">SWCNT</button>
+        <button class="filter-btn" onclick="filterDataByType(event, 'SWCNT-EIS')">SWCNT-EIS</button>
+      </div>
+
+      <div class="action-buttons">
+        <button onclick="saveProject()" class="btn-success">💾 프로젝트 저장</button>
+        <button onclick="triggerProjectFileInput()" class="btn-warning">📂 프로젝트 불러오기</button>
+        <input type="file" id="projectFileInput" accept=".json" style="display:none" onchange="loadProject(event)">
+        <button onclick="triggerCSVFileInput()" class="btn-warning">📊 CSV 불러오기</button>
+        <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="loadCSV(event)">
+        <button onclick="exportToCSV()" class="btn-success">📥 CSV 다운로드</button>
+        <button onclick="clearAllData()" class="btn-danger">🗑️ 전체 삭제</button>
+      </div>
+
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+              <th>색상</th>
+              <th>날짜</th>
+              <th>Lot No.</th>
+              <th>CNT 타입</th>
+              <th>제조사</th>
+              <th>그레이드</th>
+              <th>양극재/Si</th>
+              <th>초기 점도</th>
+              <th>현재 점도</th>
+              <th>증가율</th>
+              <th>측정 타입</th>
+              <th>메모</th>
+              <th>액션</th>
+            </tr>
+          </thead>
+          <tbody id="dataTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="graph-tab" class="tab-content">
+    <div class="chart-container">
+      <div class="chart-header">
+        <div class="chart-title">📈 Percolation Curve Analysis</div>
+        <button onclick="captureChart()" class="btn-warning">📷 그래프 캡처</button>
+      </div>
+
+      <div class="chart-controls">
+        <div class="chart-controls-row">
+          <button onclick="selectAllForGraph()" class="btn-success">✓ 전체 선택</button>
+          <button onclick="deselectAllForGraph()" class="btn-warning">✗ 전체 해제</button>
+          <button onclick="updateChart()" class="btn-success">🔄 업데이트</button>
+          <button onclick="resetZoom()" class="btn-warning">🔍 확대 초기화</button>
+          <div style="padding: 8px 15px; background: #e3f2fd; border-radius: 6px; font-size: 12px; color: #1976d2;">
+            💡 <strong>드래그</strong> → 영역 확대 | <strong>마우스 휠</strong> → 줌 인/아웃 | <strong>더블클릭</strong> → 초기화
+          </div>
+        </div>
+        
+        <div class="chart-controls-row">
+          <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+            <!-- Y축 타입 -->
+            <div style="display: flex; gap: 10px; align-items: center; padding: 8px 15px; background: white; border-radius: 6px;">
+              <label style="font-size: 14px; font-weight: 600;">Y축:</label>
+              <select id="yAxisType" onchange="updateChart()" style="padding: 6px 10px; border: 2px solid #e9ecef; border-radius: 4px;">
+                <option value="conductivity">전도도 (σ)</option>
+                <option value="resistance">저항 (R/Rs)</option>
+              </select>
+            </div>
+            
+            <!-- X축 스케일 -->
+            <div style="display: flex; gap: 10px; align-items: center; padding: 8px 15px; background: white; border-radius: 6px;">
+              <label style="font-size: 14px; font-weight: 600;">X축 스케일:</label>
+              <select id="xAxisScale" onchange="updateChart()" style="padding: 6px 10px; border: 2px solid #e9ecef; border-radius: 4px;">
+                <option value="logarithmic">로그</option>
+                <option value="linear" selected>선형</option>
+              </select>
+            </div>
+            
+            <!-- Y축 스케일 -->
+            <div style="display: flex; gap: 10px; align-items: center; padding: 8px 15px; background: white; border-radius: 6px;">
+              <label style="font-size: 14px; font-weight: 600;">Y축 스케일:</label>
+              <select id="yAxisScale" onchange="updateChart()" style="padding: 6px 10px; border: 2px solid #e9ecef; border-radius: 4px;">
+                <option value="logarithmic">로그</option>
+                <option value="linear">선형</option>
+              </select>
+            </div>
+            
+            <!-- 우측 그래프 선택 -->
+            <div style="display: flex; gap: 10px; align-items: center; padding: 8px 15px; background: #f8f9fa; border-radius: 6px;">
+              <label style="font-size: 14px; font-weight: 600;">우측 그래프:</label>
+              <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                <input type="radio" name="rightGraph" value="throughplane" checked onchange="toggleRightGraph()" style="width: 16px; height: 16px;">
+                <span style="font-size: 13px;">Through-plane</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                <input type="radio" name="rightGraph" value="viscosity" onchange="toggleRightGraph()" style="width: 16px; height: 16px;">
+                <span style="font-size: 13px;">Viscosity vs Conductivity</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+        <!-- 좌측: In-plane (항상 표시) -->
+        <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative;">
+          <div style="font-size: 16px; font-weight: 600; color: #2c3e50; margin-bottom: 10px;">📈 In-plane Percolation Curve</div>
+          <div style="width: 100%; height: 350px; position: relative;">
+            <canvas id="inPlaneChart" width="600" height="350"></canvas>
+          </div>
+        </div>
+        
+        <!-- 우측: Through-plane 또는 Viscosity (선택에 따라 전환) -->
+        <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative;">
+          <div id="throughPlaneContainer">
+            <div style="font-size: 16px; font-weight: 600; color: #2c3e50; margin-bottom: 10px;">📈 Through-plane Percolation Curve</div>
+            <div style="width: 100%; height: 350px; position: relative;">
+              <canvas id="throughPlaneChart" width="600" height="350"></canvas>
+            </div>
+          </div>
+          
+          <div id="viscosityContainer" style="display: none;">
+            <div style="font-size: 16px; font-weight: 600; color: #2c3e50; margin-bottom: 10px;">📊 Viscosity vs Conductivity</div>
+            <div style="width: 100%; height: 350px; position: relative;">
+              <canvas id="viscosityChart" width="600" height="350"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-table-container" id="summaryTableContainer">
+        <div style="font-size: 18px; font-weight: 700; color: #2c3e50; margin: 20px 0 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+          📋 분석 요약 (Analysis Summary)
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 10px;">
+            <!-- MWCNT 농도 선택 -->
+            <label id="conc02Label" style="display: flex; align-items: center; gap: 5px; padding: 8px 15px; background: white; border: 2px solid #e9ecef; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="conc02" onchange="updateSummaryTable()">
+              <span>0.2 wt%</span>
+            </label>
+            <label id="conc05Label" style="display: flex; align-items: center; gap: 5px; padding: 8px 15px; background: white; border: 2px solid #e9ecef; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="conc05" checked onchange="updateSummaryTable()">
+              <span>0.5 wt%</span>
+            </label>
+            <label id="conc10Label" style="display: flex; align-items: center; gap: 5px; padding: 8px 15px; background: white; border: 2px solid #e9ecef; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="conc10" onchange="updateSummaryTable()">
+              <span>1.0 wt%</span>
+            </label>
+            
+            <!-- SWCNT 농도 선택 (기본 숨김) -->
+            <label id="conc005Label" style="display: none; align-items: center; gap: 5px; padding: 8px 15px; background: white; border: 2px solid #e9ecef; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="conc005" onchange="updateSummaryTable()">
+              <span>0.05 wt%</span>
+            </label>
+            <label id="conc01Label" style="display: none; align-items: center; gap: 5px; padding: 8px 15px; background: white; border: 2px solid #e9ecef; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="conc01" onchange="updateSummaryTable()">
+              <span>0.1 wt%</span>
+            </label>
+            <label id="conc05swcntLabel" style="display: none; align-items: center; gap: 5px; padding: 8px 15px; background: white; border: 2px solid #e9ecef; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="conc05swcnt" onchange="updateSummaryTable()">
+              <span>0.5 wt%</span>
+            </label>
+          </div>
+          
+          <div style="margin-left: auto; display: flex; gap: 10px;">
+            <!-- CNT Type 선택 -->
+            <label style="display: flex; align-items: center; gap: 5px; padding: 8px 15px; background: #667eea; color: white; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="showMWCNT" checked onchange="toggleCNTTypeInSummary()" style="accent-color: white;">
+              <span>MWCNT</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; padding: 8px 15px; background: #764ba2; color: white; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="showSWCNT" onchange="toggleCNTTypeInSummary()" style="accent-color: white;">
+              <span>SWCNT</span>
+            </label>
+            
+            <!-- 측정 타입 선택 -->
+            <label style="display: flex; align-items: center; gap: 5px; padding: 8px 15px; background: #28a745; color: white; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="showInPlaneSummary" checked onchange="updateSummaryTable()" style="accent-color: white;">
+              <span>In-plane</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; padding: 8px 15px; background: #17a2b8; color: white; border-radius: 6px; cursor: pointer;">
+              <input type="checkbox" id="showThroughPlaneSummary" checked onchange="updateSummaryTable()" style="accent-color: white;">
+              <span>Through-plane</span>
+            </label>
+          </div>
+        </div>
+        
+        <div style="overflow-x: auto;">
+          <table id="summaryTable" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <thead>
+              <tr style="background: linear-gradient(45deg, #667eea, #764ba2); color: white;">
+                <th style="padding: 12px; text-align: left; font-size: 13px;">Sample</th>
+                <th style="padding: 12px; text-align: center; font-size: 13px;">CNT Type</th>
+                <th style="padding: 12px; text-align: center; font-size: 13px;">측정 타입</th>
+                <th style="padding: 12px; text-align: center; font-size: 13px;">0.2 wt%<br/>σ (S/cm)</th>
+                <th style="padding: 12px; text-align: center; font-size: 13px;">0.5 wt%<br/>σ (S/cm)</th>
+                <th style="padding: 12px; text-align: center; font-size: 13px;">1.0 wt%<br/>σ (S/cm)</th>
+                <th style="padding: 12px; text-align: center; font-size: 13px;">Viscosity<br/>증가율 (%)</th>
+              </tr>
+            </thead>
+            <tbody id="summaryTableBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- 색상 선택 모달 -->
+<div id="colorModal" class="color-modal">
+  <div class="color-modal-content">
+    <div class="color-modal-title">색상 선택</div>
+    <div class="color-palette">
+      <!-- 검정/빨강/파랑 계열 -->
+      <div class="color-option-container">
+        <div class="color-option" data-color="#000000" style="background-color: #000000;"></div>
+        <div class="color-category">검정</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#FF0000" style="background-color: #FF0000;"></div>
+        <div class="color-category">빨강</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#0000FF" style="background-color: #0000FF;"></div>
+        <div class="color-category">파랑</div>
+      </div>
+      
+      <!-- 어두운 톤 -->
+      <div class="color-option-container">
+        <div class="color-option" data-color="#404040" style="background-color: #404040;"></div>
+        <div class="color-category">검정</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#CC0000" style="background-color: #CC0000;"></div>
+        <div class="color-category">빨강</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#0000CC" style="background-color: #0000CC;"></div>
+        <div class="color-category">파랑</div>
+      </div>
+      
+      <!-- 중간 톤 -->
+      <div class="color-option-container">
+        <div class="color-option" data-color="#808080" style="background-color: #808080;"></div>
+        <div class="color-category">검정</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#FF6B6B" style="background-color: #FF6B6B;"></div>
+        <div class="color-category">빨강</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#6B9BFF" style="background-color: #6B9BFF;"></div>
+        <div class="color-category">파랑</div>
+      </div>
+
+      <!-- 녹색 계열 -->
+      <div class="color-option-container">
+        <div class="color-option" data-color="#00CC00" style="background-color: #00CC00;"></div>
+        <div class="color-category">녹색</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#9933FF" style="background-color: #9933FF;"></div>
+        <div class="color-category">보라</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#CC0099" style="background-color: #CC0099;"></div>
+        <div class="color-category">자주</div>
+      </div>
+
+      <!-- 중간 톤 2 -->
+      <div class="color-option-container">
+        <div class="color-option" data-color="#228B22" style="background-color: #228B22;"></div>
+        <div class="color-category">녹색</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#7B3FCC" style="background-color: #7B3FCC;"></div>
+        <div class="color-category">보라</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#990066" style="background-color: #990066;"></div>
+        <div class="color-category">자주</div>
+      </div>
+
+      <!-- 밝은 톤 -->
+      <div class="color-option-container">
+        <div class="color-option" data-color="#90EE90" style="background-color: #90EE90;"></div>
+        <div class="color-category">녹색</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#CC99FF" style="background-color: #CC99FF;"></div>
+        <div class="color-category">보라</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#FF99CC" style="background-color: #FF99CC;"></div>
+        <div class="color-category">자주</div>
+      </div>
+
+      <!-- Magenta/Cyan -->
+      <div class="color-option-container">
+        <div class="color-option" data-color="#FF00FF" style="background-color: #FF00FF;"></div>
+        <div class="color-category">Magenta</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#00FFFF" style="background-color: #00FFFF;"></div>
+        <div class="color-category">Cyan</div>
+      </div>
+      <div class="color-option-container"></div>
+
+      <!-- 중간 톤 3 -->
+      <div class="color-option-container">
+        <div class="color-option" data-color="#CC00CC" style="background-color: #CC00CC;"></div>
+        <div class="color-category">Magenta</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#00CCCC" style="background-color: #00CCCC;"></div>
+        <div class="color-category">Cyan</div>
+      </div>
+      <div class="color-option-container"></div>
+
+      <!-- 밝은 톤 2 -->
+      <div class="color-option-container">
+        <div class="color-option" data-color="#FF99FF" style="background-color: #FF99FF;"></div>
+        <div class="color-category">Magenta</div>
+      </div>
+      <div class="color-option-container">
+        <div class="color-option" data-color="#99FFFF" style="background-color: #99FFFF;"></div>
+        <div class="color-category">Cyan</div>
+      </div>
+      <div class="color-option-container"></div>
+    </div>
+    <button onclick="closeColorModal()" class="btn-success" style="width: 100%; padding: 12px; font-size: 14px;">닫기</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1/dist/chartjs-plugin-zoom.min.js"></script>
+<script>
+// HTML에서 호출되는 모든 함수들을 전역으로 노출
+var switchTab, toggleCNTTypeFields, updateManufacturers, updateGrades, updateLotNo, saveData;
+var exportToCSV, saveProject, loadProject, filterData, toggleDataSelection, toggleSelectAll;
+var deleteData, editData, openColorPicker, selectAllForGraph, deselectAllForGraph;
+var updateChart, toggleViscosityChart, updateSummaryTable, captureChart;
+var addConcentration, removeConcentrationRow, clearInPlaneRow, clearThroughPlaneRow;
+
+// 전역 변수 및 초기 데이터
+let appData = {
+  manufacturers: {
+    MWCNT: ['LGC', 'JEIO', 'KUMHO', '카본나노텍', '기타'],
+    SWCNT: ['OCSiAl', 'JEIO', '기타'],
+    'SWCNT-EIS': ['OCSiAl', 'JEIO', '기타']
+  },
+  grades: {
+    'LGC': ['BT1001M', 'BT1003M', 'BT1005M'],
+    'JEIO': ['10B', 'JM-100', 'JM-200', '100A', '300A'],
+    'KUMHO': ['KH-100', 'KH-200'],
+    '카본나노텍': ['CNT-100', 'CNT-200'],
+    'OCSiAl': ['TUBALL'],
+    '기타': []
+  },
+  mwcntConcentrations: [0.2, 0.5, 1.0],
+  swcntConcentrations: [0.05, 0.10, 0.50],
+  eisConcentrations: [0.002, 0.005, 0.010, 0.030],
+  eisCellConstant: {
+    distance: 2,
+    area: 0.4
+  },
+  savedData: [],
+  currentChart: null,
+  inPlaneChart: null,
+  throughPlaneChart: null,
+  viscosityChart: null,
+  currentDataFilter: 'ALL',
+  defaultColors: [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+    '#FF9F40', '#E74C3C', '#3498DB', '#2ECC71', '#F39C12'
+  ]
+};
+
+// 초기화 함수
+window.onload = function() {
+  loadAppData();
+  updateManufacturers();
+  toggleCNTTypeFields();
+  initializeDefaultConcentrations();
+  updateDataTable();
+  setDefaultDate();
+  
+  // 저장된 데이터 확인
+  console.log('App initialized. Saved data:', appData.savedData);
+  
+  // 테스트용 샘플 데이터가 없으면 추가
+  if (appData.savedData.length === 0) {
+    addSampleData();
+  }
+  
+  // 차트 초기화를 약간 지연시켜 Canvas가 준비되도록 함
+  setTimeout(() => {
+    if (document.getElementById('graph-tab').classList.contains('active')) {
+      updateChart();
+    }
+  }, 500);
+  
+  showToast('애플리케이션이 로드되었습니다.', 'success');
+};
+
+// 테스트용 샘플 데이터 추가 함수
+function addSampleData() {
+  const sampleData = {
+    id: Date.now(),
+    date: '2025-11-26',
+    cntType: 'SWCNT',
+    manufacturer: 'OCSiAl',
+    grade: 'TUBALL',
+    lotNo: '251126-TUBALL-Anode',
+    memo: 'Test Data',
+    initialViscosity: '',
+    finalViscosity: '',
+    selected: true,
+    color: '#FF6384',
+    siContent: '10%',
+    inPlaneData: [
+      { concentration: 0.05, thickness: 100, sheetR_min: 1000, sheetR_max: 1100, sheetR_avg: 1050, deviation: 100, conductivity: 0.0952, measurementType: 'in-plane' },
+      { concentration: 0.10, thickness: 100, sheetR_min: 500, sheetR_max: 550, sheetR_avg: 525, deviation: 50, conductivity: 0.1905, measurementType: 'in-plane' },
+      { concentration: 0.50, thickness: 100, sheetR_min: 100, sheetR_max: 110, sheetR_avg: 105, deviation: 10, conductivity: 0.9524, measurementType: 'in-plane' }
+    ],
+    throughPlaneData: []
+  };
+  
+  appData.savedData.push(sampleData);
+  saveAppData();
+  console.log('Added sample data:', sampleData);
+}
+
+function loadAppData() {
+  try {
+    const saved = localStorage.getItem('conductiveMaterialDataV7');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      
+      // 기존 데이터 구조 변환
+      if (parsed.savedData && Array.isArray(parsed.savedData)) {
+        parsed.savedData.forEach(item => {
+          // concentrationData -> inPlaneData 변환
+          if (item.concentrationData && !item.inPlaneData) {
+            console.log('Converting old data structure for:', item.lotNo);
+            item.inPlaneData = item.concentrationData.map(d => ({
+              concentration: d.concentration,
+              thickness: d.thickness,
+              sheetR_min: d.sheetR_min || d.sheetRMin,
+              sheetR_max: d.sheetR_max || d.sheetRMax,
+              sheetR_avg: d.sheetR_avg || d.sheetRAvg || d.sheetR,
+              deviation: d.deviation,
+              conductivity: d.conductivity,
+              measurementType: 'in-plane'
+            }));
+            delete item.concentrationData;
+          }
+          
+          // throughPlaneData가 없으면 빈 배열로 초기화
+          if (!item.throughPlaneData) {
+            item.throughPlaneData = [];
+          }
+          
+          // selected 속성이 없으면 true로 설정
+          if (item.selected === undefined) {
+            item.selected = true;
+          }
+          
+          // color가 없으면 기본 색상 할당
+          if (!item.color) {
+            const index = parsed.savedData.indexOf(item);
+            item.color = appData.defaultColors[index % appData.defaultColors.length];
+          }
+        });
+      }
+      
+      // 차트 객체는 복원하지 않음
+      appData = { 
+        ...appData, 
+        ...parsed, 
+        currentChart: null,
+        inPlaneChart: null,
+        throughPlaneChart: null,
+        viscosityChart: null
+      };
+      
+      // 저장된 데이터가 있으면 로그 출력
+      console.log('Loaded saved data:', appData.savedData.length, 'items');
+      console.log('Selected items:', appData.savedData.filter(d => d.selected).length);
+      
+      // 변환된 데이터 다시 저장
+      saveAppData();
+    }
+  } catch (error) {
+    console.warn('localStorage 로드 실패:', error);
+  }
+}
+
+function saveAppData() {
+  try {
+    const dataToSave = {
+      manufacturers: appData.manufacturers,
+      grades: appData.grades,
+      mwcntConcentrations: appData.mwcntConcentrations,
+      swcntConcentrations: appData.swcntConcentrations,
+      eisConcentrations: appData.eisConcentrations,
+      eisCellConstant: appData.eisCellConstant,
+      savedData: appData.savedData,
+      currentDataFilter: appData.currentDataFilter
+    };
+    localStorage.setItem('conductiveMaterialDataV7', JSON.stringify(dataToSave));
+  } catch (error) {
+    console.warn('localStorage 저장 실패:', error);
+  }
+}
+
+function setDefaultDate() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('sampleDate').value = today;
+}
+
+// switchTab 함수를 window 객체에 직접 할당
+// switchTab 함수는 이미 body 시작 부분에서 정의됨
+
+function toggleCNTTypeFields() {
+  const cntType = document.getElementById('cntType').value;
+  const cathodeGroup = document.getElementById('cathodeGroup');
+  const siContentGroup = document.getElementById('siContentGroup');
+  const standardMeasurement = document.getElementById('standardMeasurement');
+  const eisMeasurement = document.getElementById('eisMeasurement');
+  
+  if (cntType === 'MWCNT') {
+    cathodeGroup.style.display = 'flex';
+    siContentGroup.style.display = 'none';
+    standardMeasurement.style.display = 'block';
+    eisMeasurement.style.display = 'none';
+  } else if (cntType === 'SWCNT') {
+    cathodeGroup.style.display = 'none';
+    siContentGroup.style.display = 'flex';
+    standardMeasurement.style.display = 'block';
+    eisMeasurement.style.display = 'none';
+  } else if (cntType === 'SWCNT-EIS') {
+    cathodeGroup.style.display = 'none';
+    siContentGroup.style.display = 'none';
+    standardMeasurement.style.display = 'none';
+    eisMeasurement.style.display = 'block';
+  }
+  
+  initializeDefaultConcentrations();
+}
+
+function updateManufacturers() {
+  const cntType = document.getElementById('cntType').value;
+  const select = document.getElementById('manufacturer');
+  select.innerHTML = '';
+  
+  appData.manufacturers[cntType].forEach(mfg => {
+    const option = document.createElement('option');
+    option.value = mfg;
+    option.textContent = mfg;
+    select.appendChild(option);
+  });
+  
+  updateGrades();
+}
+
+function updateGrades() {
+  const cntType = document.getElementById('cntType').value;
+  const manufacturer = document.getElementById('manufacturer').value;
+  const select = document.getElementById('grade');
+  select.innerHTML = '<option value="">선택 안함</option>';
+  
+  if (appData.grades[manufacturer]) {
+    if (cntType === 'MWCNT' && manufacturer === 'JEIO') {
+      const grades = appData.grades[manufacturer].filter(grade => grade === '10B');
+      grades.forEach(grade => {
+        const option = document.createElement('option');
+        option.value = grade;
+        option.textContent = grade;
+        select.appendChild(option);
+      });
+    } else {
+      appData.grades[manufacturer].forEach(grade => {
+        const option = document.createElement('option');
+        option.value = grade;
+        option.textContent = grade;
+        select.appendChild(option);
+      });
+    }
+  }
+  
+  updateLotNo();
+}
+
+function updateLotNo() {
+  const dateInput = document.getElementById('sampleDate').value;
+  const grade = document.getElementById('grade').value;
+  const lotNoInput = document.getElementById('lotNo');
+  
+  if (dateInput && grade) {
+    const date = new Date(dateInput);
+    const yy = date.getFullYear().toString().slice(-2);
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const dateStr = yy + mm + dd;
+    
+    const currentLotNo = lotNoInput.value;
+    const parts = currentLotNo.split('-');
+    let suffix = '';
+    
+    if (parts.length === 3 && parts[2]) {
+      suffix = parts[2];
+    }
+    
+    if (suffix) {
+      lotNoInput.value = `${dateStr}-${grade}-${suffix}`;
+    } else {
+      lotNoInput.value = `${dateStr}-${grade}-`;
+    }
+  }
+}
+
+function initializeDefaultConcentrations() {
+  const cntType = document.getElementById('cntType').value;
+  
+  if (cntType === 'SWCNT-EIS') {
+    // EIS 측정
+    const tbody = document.getElementById('eisConcentrationTableBody');
+    tbody.innerHTML = '';
+    
+    appData.eisConcentrations.forEach(conc => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><input type="number" value="${conc}" step="0.001" class="conc-input"></td>
+        <td><input type="number" step="0.1" placeholder="저항값 입력" class="resistance-input"></td>
+        <td class="calculated-value">-</td>
+        <td><button onclick="removeConcentrationRow(this)" class="btn-danger" style="padding: 5px 10px;">삭제</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+  } else {
+    // Standard 측정 - 통합 테이블
+    const tbody = document.getElementById('combinedTableBody');
+    tbody.innerHTML = '';
+    
+    const concentrations = cntType === 'MWCNT' ? appData.mwcntConcentrations : appData.swcntConcentrations;
+    
+    concentrations.forEach(conc => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <!-- In-plane 섹션 -->
+        <td><input type="number" value="${conc}" step="0.01" class="conc-input-ip" style="width: 60px;"></td>
+        <td><input type="number" step="0.1" placeholder="두께" class="thickness-input-ip" style="width: 60px;"></td>
+        <td><input type="number" step="0.1" placeholder="Min" class="rs-min-input" style="width: 60px;"></td>
+        <td><input type="number" step="0.1" placeholder="Max" class="rs-max-input" style="width: 60px;"></td>
+        <td><input type="number" step="0.1" placeholder="자동계산" class="rs-avg-input" readonly style="width: 60px; background: #f0f0f0;"></td>
+        <td class="calculated-value-ip" style="background: #e8f5e9; font-weight: 600;">-</td>
+        <td><button onclick="clearInPlaneRow(this)" class="btn-warning" style="padding: 3px 8px; font-size: 11px;">초기화</button></td>
+        <td style="border: none; background: white;"></td>
+        <!-- Through-plane 섹션 -->
+        <td><input type="number" value="${conc}" step="0.01" class="conc-input-tp" style="width: 60px;"></td>
+        <td><input type="number" step="0.1" placeholder="두께" class="thickness-input-tp" style="width: 60px;"></td>
+        <td><input type="number" value="13" step="0.1" class="diameter-input-tp" style="width: 60px;"></td>
+        <td><input type="number" step="0.1" placeholder="저항" class="resistance-input-tp" style="width: 60px;"></td>
+        <td class="calculated-value-tp" style="background: #e3f2fd; font-weight: 600;">-</td>
+        <td><button onclick="clearThroughPlaneRow(this)" class="btn-warning" style="padding: 3px 8px; font-size: 11px;">초기화</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+    
+    // 입력 이벤트 리스너 추가
+    attachAutoCalculationListeners();
+    attachCalculationListeners();
+  }
+}
+
+function attachAutoCalculationListeners() {
+  // Min/Max 입력 시 Avg 자동 계산
+  document.querySelectorAll('#combinedTableBody tr').forEach(row => {
+    const minInput = row.querySelector('.rs-min-input');
+    const maxInput = row.querySelector('.rs-max-input');
+    
+    if (minInput && maxInput) {
+      // Min 입력 시 Avg 자동 계산
+      minInput.addEventListener('input', function() {
+        calculateAverage(row);
+      });
+      
+      // Max 입력 시 Avg 자동 계산
+      maxInput.addEventListener('input', function() {
+        calculateAverage(row);
+      });
+    }
+  });
+}
+
+function calculateAverage(row) {
+  const minValue = parseFloat(row.querySelector('.rs-min-input').value);
+  const maxValue = parseFloat(row.querySelector('.rs-max-input').value);
+  const avgInput = row.querySelector('.rs-avg-input');
+  
+  if (!isNaN(minValue) && !isNaN(maxValue)) {
+    const avgValue = (minValue + maxValue) / 2;
+    avgInput.value = avgValue.toFixed(1);
+    // Avg가 계산되면 전도도도 자동 계산
+    calculateInPlaneConductivity(row);
+  }
+}
+
+function attachCalculationListeners() {
+  // In-plane 계산
+  document.querySelectorAll('#combinedTableBody tr').forEach(row => {
+    // In-plane inputs - thickness 변경 시에만 전도도 재계산
+    const thicknessInput = row.querySelector('.thickness-input-ip');
+    if (thicknessInput) {
+      thicknessInput.addEventListener('input', () => calculateInPlaneConductivity(row));
+    }
+    
+    // Through-plane inputs
+    const tpInputs = row.querySelectorAll('.thickness-input-tp, .diameter-input-tp, .resistance-input-tp');
+    tpInputs.forEach(input => {
+      if (input) {
+        input.addEventListener('input', () => calculateThroughPlaneConductivity(row));
+      }
+    });
+  });
+  
+  // EIS 계산
+  document.querySelectorAll('#eisConcentrationTableBody tr').forEach(row => {
+    const resistanceInput = row.querySelector('.resistance-input');
+    if (resistanceInput) {
+      resistanceInput.addEventListener('input', () => calculateEISConductivity(row));
+    }
+  });
+}
+
+function calculateInPlaneConductivity(row) {
+  const thickness = parseFloat(row.querySelector('.thickness-input-ip').value);
+  const rsAvg = parseFloat(row.querySelector('.rs-avg-input').value);
+  const conductivityCell = row.querySelector('.calculated-value-ip');
+  
+  if (!isNaN(thickness) && !isNaN(rsAvg) && thickness > 0 && rsAvg > 0) {
+    const conductivity = 10000 / (rsAvg * thickness);
+    conductivityCell.textContent = conductivity.toFixed(4);
+  } else {
+    conductivityCell.textContent = '-';
+  }
+}
+
+function calculateThroughPlaneConductivity(row) {
+  const thickness = parseFloat(row.querySelector('.thickness-input-tp').value);
+  const diameter = parseFloat(row.querySelector('.diameter-input-tp').value);
+  const resistance = parseFloat(row.querySelector('.resistance-input-tp').value);
+  const conductivityCell = row.querySelector('.calculated-value-tp');
+  
+  if (!isNaN(thickness) && !isNaN(diameter) && !isNaN(resistance) && diameter > 0 && resistance > 0) {
+    // 직경으로부터 면적 계산: A = π × (d/2)²
+    const radius = diameter / 20; // mm -> cm, 반지름
+    const area = Math.PI * radius * radius; // cm²
+    // σ = (t / A) / R
+    // t: thickness in μm -> cm (÷10000)
+    const conductivity = (thickness / 10000) / area / resistance;
+    conductivityCell.textContent = conductivity.toFixed(4);
+  } else {
+    conductivityCell.textContent = '-';
+  }
+}
+
+function calculateEISConductivity(row) {
+  const resistance = parseFloat(row.querySelector('.resistance-input').value);
+  const conductivityCell = row.querySelector('.calculated-value');
+  
+  if (!isNaN(resistance) && resistance > 0) {
+    const cellConstant = appData.eisCellConstant.distance / appData.eisCellConstant.area;
+    const conductivity = cellConstant / resistance;
+    conductivityCell.textContent = conductivity.toFixed(6);
+  } else {
+    conductivityCell.textContent = '-';
+  }
+}
+
+function clearInPlaneRow(button) {
+  const row = button.closest('tr');
+  row.querySelectorAll('.thickness-input-ip, .rs-min-input, .rs-max-input, .rs-avg-input').forEach(input => {
+    input.value = '';
+  });
+  row.querySelector('.calculated-value-ip').textContent = '-';
+}
+
+function clearThroughPlaneRow(button) {
+  const row = button.closest('tr');
+  row.querySelectorAll('.thickness-input-tp, .resistance-input-tp').forEach(input => {
+    input.value = '';
+  });
+  // 직경은 기본값 13으로 유지
+  const diameterInput = row.querySelector('.diameter-input-tp');
+  if (diameterInput) diameterInput.value = '13';
+  row.querySelector('.calculated-value-tp').textContent = '-';
+}
+
+function addConcentration() {
+  const cntType = document.getElementById('cntType').value;
+  
+  if (cntType === 'SWCNT-EIS') {
+    const tbody = document.getElementById('eisConcentrationTableBody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="number" step="0.001" placeholder="농도 입력" class="conc-input"></td>
+      <td><input type="number" step="0.1" placeholder="저항값 입력" class="resistance-input"></td>
+      <td class="calculated-value">-</td>
+      <td><button onclick="removeConcentrationRow(this)" class="btn-danger" style="padding: 5px 10px;">삭제</button></td>
+    `;
+    tbody.appendChild(row);
+  } else {
+    const tbody = document.getElementById('combinedTableBody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <!-- In-plane 섹션 -->
+      <td><input type="number" step="0.01" placeholder="농도" class="conc-input-ip" style="width: 60px;"></td>
+      <td><input type="number" step="0.1" placeholder="두께" class="thickness-input-ip" style="width: 60px;"></td>
+      <td><input type="number" step="0.1" placeholder="Min" class="rs-min-input" style="width: 60px;"></td>
+      <td><input type="number" step="0.1" placeholder="Max" class="rs-max-input" style="width: 60px;"></td>
+      <td><input type="number" step="0.1" placeholder="자동계산" class="rs-avg-input" readonly style="width: 60px; background: #f0f0f0;"></td>
+      <td class="calculated-value-ip" style="background: #e8f5e9; font-weight: 600;">-</td>
+      <td><button onclick="clearInPlaneRow(this)" class="btn-warning" style="padding: 3px 8px; font-size: 11px;">초기화</button></td>
+      <td style="border: none; background: white;"></td>
+      <!-- Through-plane 섹션 -->
+      <td><input type="number" step="0.01" placeholder="농도" class="conc-input-tp" style="width: 60px;"></td>
+      <td><input type="number" step="0.1" placeholder="두께" class="thickness-input-tp" style="width: 60px;"></td>
+      <td><input type="number" value="0.785" step="0.001" class="area-input-tp" style="width: 60px;"></td>
+      <td><input type="number" step="0.1" placeholder="저항" class="resistance-input-tp" style="width: 60px;"></td>
+      <td class="calculated-value-tp" style="background: #e3f2fd; font-weight: 600;">-</td>
+      <td><button onclick="clearThroughPlaneRow(this)" class="btn-warning" style="padding: 3px 8px; font-size: 11px;">초기화</button></td>
+    `;
+    tbody.appendChild(row);
+  }
+  
+  attachAutoCalculationListeners();
+  attachCalculationListeners();
+  showToast('농도 행이 추가되었습니다.', 'success');
+}
+
+function removeConcentrationRow(button) {
+  button.closest('tr').remove();
+  showToast('농도 행이 삭제되었습니다.', 'success');
+}
+
+function saveData() {
+  const cntType = document.getElementById('cntType').value;
+  const date = document.getElementById('sampleDate').value;
+  const lotNo = document.getElementById('lotNo').value;
+  
+  if (!date || !lotNo) {
+    showToast('날짜와 Lot No.는 필수 입력 항목입니다.', 'error');
+    return;
+  }
+  
+  const dataEntry = {
+    id: Date.now(),
+    date: date,
+    cntType: cntType,
+    manufacturer: document.getElementById('manufacturer').value,
+    grade: document.getElementById('grade').value,
+    lotNo: lotNo,
+    memo: document.getElementById('memo').value,
+    initialViscosity: document.getElementById('initialViscosity').value,
+    finalViscosity: document.getElementById('finalViscosity').value,
+    selected: true,
+    color: appData.defaultColors[appData.savedData.length % appData.defaultColors.length]
+  };
+  
+  if (cntType === 'MWCNT') {
+    dataEntry.cathodeType = document.getElementById('cathodeType').value;
+  } else if (cntType === 'SWCNT') {
+    dataEntry.siContent = document.getElementById('siContent').value;
+  }
+  
+  // 농도별 데이터 수집
+  if (cntType === 'SWCNT-EIS') {
+    dataEntry.eisData = [];
+    document.querySelectorAll('#eisConcentrationTableBody tr').forEach(row => {
+      const conc = parseFloat(row.querySelector('.conc-input').value);
+      const resistance = parseFloat(row.querySelector('.resistance-input').value);
+      const conductivity = parseFloat(row.querySelector('.calculated-value').textContent);
+      
+      if (!isNaN(conc) && !isNaN(resistance)) {
+        dataEntry.eisData.push({
+          concentration: conc,
+          resistance: resistance,
+          conductivity: conductivity
+        });
+      }
+    });
+  } else {
+    // 통합 테이블에서 데이터 수집
+    dataEntry.inPlaneData = [];
+    dataEntry.throughPlaneData = [];
+    
+    document.querySelectorAll('#combinedTableBody tr').forEach(row => {
+      // In-plane 데이터 수집
+      const concIP = parseFloat(row.querySelector('.conc-input-ip').value);
+      const thicknessIP = parseFloat(row.querySelector('.thickness-input-ip').value);
+      const rsMin = parseFloat(row.querySelector('.rs-min-input').value);
+      const rsMax = parseFloat(row.querySelector('.rs-max-input').value);
+      const rsAvg = parseFloat(row.querySelector('.rs-avg-input').value);
+      
+      // 전도도 값 처리 - textContent가 '-'이면 직접 계산
+      let conductivityIP = 0;
+      const condText = row.querySelector('.calculated-value-ip').textContent;
+      if (condText !== '-' && condText !== '') {
+        conductivityIP = parseFloat(condText);
+      } else if (!isNaN(thicknessIP) && !isNaN(rsAvg) && thicknessIP > 0 && rsAvg > 0) {
+        // 전도도 직접 계산: σ = 10000 / (Rs × thickness)
+        conductivityIP = 10000 / (rsAvg * thicknessIP);
+      }
+      
+      if (!isNaN(concIP) && !isNaN(rsAvg) && rsAvg > 0) {
+        dataEntry.inPlaneData.push({
+          concentration: concIP,
+          thickness: thicknessIP || 0,
+          sheetR_min: rsMin || 0,
+          sheetR_max: rsMax || 0,
+          sheetR_avg: rsAvg,
+          deviation: (rsMax - rsMin) || 0,
+          conductivity: conductivityIP,
+          measurementType: 'in-plane'
+        });
+        console.log('Saved in-plane data point:', {
+          conc: concIP,
+          rsAvg: rsAvg,
+          conductivity: conductivityIP
+        });
+      }
+      
+      // Through-plane 데이터 수집
+      const concTP = parseFloat(row.querySelector('.conc-input-tp').value);
+      const thicknessTP = parseFloat(row.querySelector('.thickness-input-tp').value);
+      const diameter = parseFloat(row.querySelector('.diameter-input-tp').value);
+      const resistance = parseFloat(row.querySelector('.resistance-input-tp').value);
+      
+      // 직경으로부터 면적 계산
+      const radius = diameter / 20; // mm -> cm, 반지름
+      const area = Math.PI * radius * radius; // cm²
+      
+      // 전도도 값 처리
+      let conductivityTP = 0;
+      const condTPText = row.querySelector('.calculated-value-tp').textContent;
+      if (condTPText !== '-' && condTPText !== '') {
+        conductivityTP = parseFloat(condTPText);
+      } else if (!isNaN(thicknessTP) && !isNaN(diameter) && !isNaN(resistance) && diameter > 0 && resistance > 0) {
+        // 전도도 직접 계산: σ = (t/A)/R
+        conductivityTP = (thicknessTP / 10000) / area / resistance;
+      }
+      
+      if (!isNaN(concTP) && !isNaN(resistance) && resistance > 0) {
+        dataEntry.throughPlaneData.push({
+          concentration: concTP,
+          thickness: thicknessTP || 0,
+          diameter: diameter || 13,
+          area: area,
+          resistance: resistance,
+          conductivity: conductivityTP,
+          measurementType: 'through-plane'
+        });
+        console.log('Saved through-plane data point:', {
+          conc: concTP,
+          diameter: diameter,
+          area: area.toFixed(4),
+          resistance: resistance,
+          conductivity: conductivityTP
+        });
+      }
+    });
+  }
+  
+  appData.savedData.push(dataEntry);
+  saveAppData();
+  updateDataTable();
+  clearForm();
+  showToast('데이터가 저장되었습니다.', 'success');
+}
+
+function clearForm() {
+  document.getElementById('memo').value = '';
+  document.getElementById('initialViscosity').value = '';
+  document.getElementById('finalViscosity').value = '';
+  
+  const grade = document.getElementById('grade').value;
+  if (grade) {
+    updateLotNo();
+  } else {
+    document.getElementById('lotNo').value = '';
+  }
+  
+  initializeDefaultConcentrations();
+  showToast('입력 폼이 초기화되었습니다.', 'success');
+}
+
+function updateDataTable() {
+  const tbody = document.getElementById('dataTableBody');
+  tbody.innerHTML = '';
+  
+  const filteredData = appData.currentDataFilter === 'ALL' 
+    ? appData.savedData 
+    : appData.savedData.filter(d => d.cntType === appData.currentDataFilter);
+  
+  filteredData.forEach((data, index) => {
+    const row = document.createElement('tr');
+    
+    const viscosityIncrease = data.initialViscosity && data.finalViscosity 
+      ? ((data.finalViscosity - data.initialViscosity) / data.initialViscosity * 100).toFixed(1)
+      : '-';
+    
+    const viscosityClass = viscosityIncrease !== '-' && parseFloat(viscosityIncrease) > 30 ? 'style="color: #e74c3c;"' : '';
+    
+    const measurementTypes = [];
+    if (data.inPlaneData && data.inPlaneData.length > 0) measurementTypes.push('In-plane');
+    if (data.throughPlaneData && data.throughPlaneData.length > 0) measurementTypes.push('Through-plane');
+    if (data.eisData && data.eisData.length > 0) measurementTypes.push('EIS');
+    const measurementType = measurementTypes.join(', ') || '-';
+    
+    row.innerHTML = `
+      <td><input type="checkbox" ${data.selected ? 'checked' : ''} onchange="toggleDataSelection(${data.id})"></td>
+      <td><div class="color-box" style="background: ${data.color}" onclick="openColorPicker(${data.id})"></div></td>
+      <td>${data.date}</td>
+      <td>${data.lotNo}</td>
+      <td>${data.cntType}</td>
+      <td>${data.manufacturer}</td>
+      <td>${data.grade || '-'}</td>
+      <td>${data.cathodeType || data.siContent || '-'}</td>
+      <td>${data.initialViscosity || '-'}</td>
+      <td>${data.finalViscosity || '-'}</td>
+      <td ${viscosityClass}>${viscosityIncrease}%</td>
+      <td>${measurementType}</td>
+      <td>${data.memo || '-'}</td>
+      <td>
+        <button onclick="editData(${data.id})" class="btn-success" style="padding: 5px 10px; margin-right: 5px;">수정</button>
+        <button onclick="deleteData(${data.id})" class="btn-danger" style="padding: 5px 10px;">삭제</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+  
+  if (filteredData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="14" style="text-align: center; padding: 20px; color: #7f8c8d;">저장된 데이터가 없습니다.</td></tr>';
+  }
+}
+
+function toggleDataSelection(id) {
+  const data = appData.savedData.find(d => d.id === id);
+  if (data) {
+    data.selected = !data.selected;
+    saveAppData();
+    
+    // 그래프 탭이 활성화되어 있으면 차트 즉시 업데이트
+    if (document.getElementById('graph-tab').classList.contains('active')) {
+      setTimeout(() => {
+        updateChart();
+      }, 100);
+    }
+  }
+}
+
+function toggleSelectAll() {
+  const selectAll = document.getElementById('selectAll').checked;
+  appData.savedData.forEach(data => {
+    if (appData.currentDataFilter === 'ALL' || data.cntType === appData.currentDataFilter) {
+      data.selected = selectAll;
+    }
+  });
+  saveAppData();
+  updateDataTable();
+}
+
+function deleteData(id) {
+  if (confirm('정말 삭제하시겠습니까?')) {
+    appData.savedData = appData.savedData.filter(d => d.id !== id);
+    saveAppData();
+    updateDataTable();
+    showToast('데이터가 삭제되었습니다.', 'success');
+  }
+}
+
+function editData(id) {
+  const data = appData.savedData.find(d => d.id === id);
+  if (!data) return;
+  
+  // 데이터 입력 탭으로 전환
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  document.querySelector('.tab-btn').classList.add('active');
+  document.getElementById('input-tab').classList.add('active');
+  
+  // 기본 정보 입력
+  document.getElementById('sampleDate').value = data.date;
+  document.getElementById('cntType').value = data.cntType;
+  toggleCNTTypeFields();
+  
+  setTimeout(() => {
+    document.getElementById('manufacturer').value = data.manufacturer;
+    updateGrades();
+    
+    setTimeout(() => {
+      document.getElementById('grade').value = data.grade || '';
+      document.getElementById('lotNo').value = data.lotNo;
+      document.getElementById('memo').value = data.memo || '';
+      document.getElementById('initialViscosity').value = data.initialViscosity || '';
+      document.getElementById('finalViscosity').value = data.finalViscosity || '';
+      
+      // CNT 타입별 추가 필드
+      if (data.cntType === 'MWCNT') {
+        document.getElementById('cathodeType').value = data.cathodeType || '';
+      } else if (data.cntType === 'SWCNT') {
+        document.getElementById('siContent').value = data.siContent || '';
+      }
+      
+      // 농도별 데이터 입력
+      if (data.cntType === 'SWCNT-EIS') {
+        // EIS 데이터
+        const tbody = document.getElementById('eisConcentrationTableBody');
+        tbody.innerHTML = '';
+        
+        if (data.eisData && data.eisData.length > 0) {
+          data.eisData.forEach(point => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td><input type="number" value="${point.concentration}" step="0.001" class="conc-input"></td>
+              <td><input type="number" value="${point.resistance || ''}" step="0.1" class="resistance-input"></td>
+              <td class="calculated-value">${point.conductivity ? point.conductivity.toFixed(4) : '-'}</td>
+              <td><button onclick="removeConcentrationRow(this)" class="btn-danger" style="padding: 5px 10px;">삭제</button></td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      } else {
+        // Standard 측정 - 통합 테이블
+        const tbody = document.getElementById('combinedTableBody');
+        tbody.innerHTML = '';
+        
+        // In-plane과 Through-plane 데이터 병합
+        const concentrations = new Set();
+        if (data.inPlaneData) {
+          data.inPlaneData.forEach(p => concentrations.add(p.concentration));
+        }
+        if (data.throughPlaneData) {
+          data.throughPlaneData.forEach(p => concentrations.add(p.concentration));
+        }
+        
+        // 농도가 없으면 기본값 사용
+        if (concentrations.size === 0) {
+          const defaultConcs = data.cntType === 'MWCNT' ? appData.mwcntConcentrations : appData.swcntConcentrations;
+          defaultConcs.forEach(c => concentrations.add(c));
+        }
+        
+        Array.from(concentrations).sort((a, b) => a - b).forEach(conc => {
+          const inPlane = data.inPlaneData?.find(p => p.concentration === conc) || {};
+          const throughPlane = data.throughPlaneData?.find(p => p.concentration === conc) || {};
+          
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <!-- In-plane 섹션 -->
+            <td><input type="number" value="${conc}" step="0.01" class="conc-input-ip" style="width: 60px;"></td>
+            <td><input type="number" value="${inPlane.thickness || ''}" step="0.1" class="thickness-input-ip" style="width: 60px;"></td>
+            <td><input type="number" value="${inPlane.sheetR_min || ''}" step="0.1" class="rs-min-input" style="width: 60px;"></td>
+            <td><input type="number" value="${inPlane.sheetR_max || ''}" step="0.1" class="rs-max-input" style="width: 60px;"></td>
+            <td><input type="number" value="${inPlane.sheetR_avg || ''}" step="0.1" class="rs-avg-input" readonly style="width: 60px; background: #f0f0f0;"></td>
+            <td class="calculated-value-ip" style="background: #e8f5e9; font-weight: 600;">${inPlane.conductivity ? inPlane.conductivity.toFixed(4) : '-'}</td>
+            <td><button onclick="clearInPlaneRow(this)" class="btn-warning" style="padding: 3px 8px; font-size: 11px;">초기화</button></td>
+            <td style="border: none; background: white;"></td>
+            <!-- Through-plane 섹션 -->
+            <td><input type="number" value="${conc}" step="0.01" class="conc-input-tp" style="width: 60px;"></td>
+            <td><input type="number" value="${throughPlane.thickness || ''}" step="0.1" class="thickness-input-tp" style="width: 60px;"></td>
+            <td><input type="number" value="${throughPlane.diameter || 13}" step="0.1" class="diameter-input-tp" style="width: 60px;"></td>
+            <td><input type="number" value="${throughPlane.resistance || ''}" step="0.1" class="resistance-input-tp" style="width: 60px;"></td>
+            <td class="calculated-value-tp" style="background: #e3f2fd; font-weight: 600;">${throughPlane.conductivity ? throughPlane.conductivity.toFixed(4) : '-'}</td>
+            <td><button onclick="clearThroughPlaneRow(this)" class="btn-warning" style="padding: 3px 8px; font-size: 11px;">초기화</button></td>
+          `;
+          tbody.appendChild(row);
+        });
+        
+        // 이벤트 리스너 재연결
+        attachAutoCalculationListeners();
+        attachCalculationListeners();
+      }
+      
+      // 기존 데이터 삭제
+      appData.savedData = appData.savedData.filter(d => d.id !== id);
+      saveAppData();
+      updateDataTable();
+      
+      showToast('데이터를 수정 모드로 불러왔습니다. 수정 후 다시 저장하세요.', 'info');
+    }, 100);
+  }, 100);
+}
+
+function clearAllData() {
+  if (confirm('모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+    appData.savedData = [];
+    saveAppData();
+    updateDataTable();
+    showToast('모든 데이터가 삭제되었습니다.', 'success');
+  }
+}
+
+function filterDataByType(event, type) {
+  appData.currentDataFilter = type;
+  
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  
+  updateDataTable();
+}
+
+function selectAllForGraph() {
+  appData.savedData.forEach(data => data.selected = true);
+  saveAppData();
+  updateDataTable();
+  
+  // 그래프 탭이 활성화되어 있으면 차트 업데이트
+  if (document.getElementById('graph-tab').classList.contains('active')) {
+    updateChart();
+  }
+}
+
+function deselectAllForGraph() {
+  appData.savedData.forEach(data => data.selected = false);
+  saveAppData();
+  updateDataTable();
+  
+  // 그래프 탭이 활성화되어 있으면 차트 업데이트
+  if (document.getElementById('graph-tab').classList.contains('active')) {
+    updateChart();
+  }
+}
+
+function updateChart() {
+  // 그래프 탭이 활성화되어 있는지 확인
+  const graphTab = document.getElementById('graph-tab');
+  if (!graphTab || !graphTab.classList.contains('active')) {
+    return;
+  }
+  
+  // 각 차트를 순차적으로 업데이트
+  try {
+    updateInPlaneChart();
+  } catch (e) {
+    console.error('In-plane chart error:', e);
+  }
+  
+  try {
+    updateThroughPlaneChart();
+  } catch (e) {
+    console.error('Through-plane chart error:', e);
+  }
+  
+  try {
+    updateViscosityChart();
+  } catch (e) {
+    console.error('Viscosity chart error:', e);
+  }
+  
+  try {
+    updateSummaryTable();
+  } catch (e) {
+    console.error('Summary table error:', e);
+  }
+}
+
+function updateInPlaneChart() {
+  const canvas = document.getElementById('inPlaneChart');
+  if (!canvas) {
+    console.log('In-plane canvas not found');
+    return;
+  }
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    console.log('Cannot get 2d context for in-plane chart');
+    return;
+  }
+  
+  // 기존 차트 파괴
+  if (appData.inPlaneChart) {
+    try {
+      appData.inPlaneChart.destroy();
+      appData.inPlaneChart = null;
+    } catch (e) {
+      console.log('Error destroying in-plane chart:', e);
+    }
+  }
+  
+  const yAxisType = document.getElementById('yAxisType')?.value || 'conductivity';
+  const yAxisScale = document.getElementById('yAxisScale')?.value || 'logarithmic';
+  const xAxisScale = document.getElementById('xAxisScale')?.value || 'linear';
+  
+  const datasets = [];
+  
+  // 선택된 데이터만 필터링
+  const selectedData = appData.savedData.filter(d => d.selected === true);
+  
+  console.log('Total saved data:', appData.savedData.length);
+  console.log('Selected data for in-plane:', selectedData.length);
+  
+  selectedData.forEach((data, index) => {
+    console.log(`Checking data ${index}: ${data.lotNo}`);
+    console.log('- Has inPlaneData?', !!data.inPlaneData);
+    console.log('- inPlaneData length:', data.inPlaneData ? data.inPlaneData.length : 0);
+    console.log('- inPlaneData:', data.inPlaneData);
+    
+    if (data.inPlaneData && Array.isArray(data.inPlaneData) && data.inPlaneData.length > 0) {
+      console.log(`Processing ${data.lotNo}:`, data.inPlaneData);
+      
+      const points = [];
+      data.inPlaneData.forEach(point => {
+        const x = parseFloat(point.concentration);
+        let y = 0;
+        
+        if (yAxisType === 'conductivity') {
+          y = parseFloat(point.conductivity);
+          // 전도도가 0이거나 NaN인 경우 직접 계산
+          if ((isNaN(y) || y === 0) && point.sheetR_avg && point.thickness) {
+            y = 10000 / (parseFloat(point.sheetR_avg) * parseFloat(point.thickness));
+            console.log(`Calculated conductivity: ${y} from Rs=${point.sheetR_avg}, t=${point.thickness}`);
+          }
+        } else {
+          y = parseFloat(point.sheetR_avg);
+        }
+        
+        // x > 0이고 y가 숫자이면 추가 (y는 0보다 클 필요 있음)
+        if (!isNaN(x) && !isNaN(y) && x > 0 && y > 0) {
+          points.push({ x: x, y: y });
+          console.log(`Added point: x=${x}, y=${y}`);
+        } else {
+          console.log(`Skipped invalid point: x=${x}, y=${y}`);
+        }
+      });
+      
+      if (points.length > 0) {
+        const color = data.color || appData.defaultColors[index % appData.defaultColors.length];
+        const dataset = {
+          label: data.lotNo || `Sample ${index + 1}`,
+          data: points,
+          borderColor: color,
+          backgroundColor: color + '33',
+          borderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          fill: false,
+          tension: 0.1
+        };
+        datasets.push(dataset);
+        console.log('Added dataset to chart:', dataset);
+      }
+    }
+  });
+  
+  // 데이터셋이 없으면 빈 차트라도 그리기
+  if (datasets.length === 0) {
+    datasets.push({
+      label: 'No Data',
+      data: [],
+      borderColor: '#ccc',
+      backgroundColor: '#ccc33'
+    });
+  }
+  
+  const yAxisLabel = yAxisType === 'conductivity' 
+    ? 'Conductivity σ (S/cm)' 
+    : 'Sheet Resistance (Ω/sq)';
+  
+  try {
+    appData.inPlaneChart = new Chart(ctx, {
+      type: 'line',
+      data: { datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              font: { size: 10 },
+              boxWidth: 10,
+              padding: 8
+            }
+          },
+          title: {
+            display: false
+          },
+          zoom: {
+            zoom: {
+              drag: {
+                enabled: true,
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                borderColor: 'rgba(52, 152, 219, 0.8)',
+                borderWidth: 2
+              },
+              wheel: {
+                enabled: true,
+                speed: 0.1
+              },
+              mode: 'xy'
+            },
+            pan: {
+              enabled: true,
+              mode: 'xy'
+            }
+          }
+        },
+        scales: {
+          x: {
+            type: xAxisScale,
+            position: 'bottom',
+            title: {
+              display: true,
+              text: 'CNT Concentration (wt%)',
+              font: { size: 12 }
+            },
+            grid: {
+              color: '#e9ecef'
+            },
+            min: xAxisScale === 'logarithmic' ? 0.01 : 0,
+            max: xAxisScale === 'logarithmic' ? 10 : undefined
+          },
+          y: {
+            type: yAxisScale,
+            title: {
+              display: true,
+              text: yAxisLabel,
+              font: { size: 12 }
+            },
+            grid: {
+              color: '#e9ecef'
+            }
+          }
+        }
+      }
+    });
+  } catch (e) {
+    console.error('Error creating in-plane chart:', e);
+  }
+}
+
+function updateThroughPlaneChart() {
+  const canvas = document.getElementById('throughPlaneChart');
+  if (!canvas) {
+    console.log('Through-plane canvas not found');
+    return;
+  }
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    console.log('Cannot get 2d context for through-plane chart');
+    return;
+  }
+  
+  // 기존 차트 파괴
+  if (appData.throughPlaneChart) {
+    try {
+      appData.throughPlaneChart.destroy();
+      appData.throughPlaneChart = null;
+    } catch (e) {
+      console.log('Error destroying through-plane chart:', e);
+    }
+  }
+  
+  const yAxisType = document.getElementById('yAxisType')?.value || 'conductivity';
+  const yAxisScale = document.getElementById('yAxisScale')?.value || 'logarithmic';
+  
+  const datasets = [];
+  
+  // 선택된 데이터만 필터링
+  const selectedData = appData.savedData.filter(d => d.selected === true);
+  
+  console.log('Selected data for through-plane:', selectedData.length);
+  
+  selectedData.forEach((data, index) => {
+    if (data.throughPlaneData && Array.isArray(data.throughPlaneData) && data.throughPlaneData.length > 0) {
+      console.log(`Processing through-plane ${data.lotNo}:`, data.throughPlaneData);
+      
+      const points = [];
+      data.throughPlaneData.forEach(point => {
+        const x = parseFloat(point.concentration);
+        let y = 0;
+        
+        if (yAxisType === 'conductivity') {
+          y = parseFloat(point.conductivity);
+        } else {
+          y = parseFloat(point.resistance);
+        }
+        
+        // x > 0이고 y가 숫자이면 추가
+        if (!isNaN(x) && !isNaN(y) && x > 0) {
+          points.push({ x: x, y: y });
+          console.log(`Added through-plane point: x=${x}, y=${y}`);
+        } else {
+          console.log(`Skipped invalid through-plane point: x=${x}, y=${y}`);
+        }
+      });
+      
+      if (points.length > 0) {
+        const color = data.color || appData.defaultColors[index % appData.defaultColors.length];
+        const dataset = {
+          label: data.lotNo || `Sample ${index + 1}`,
+          data: points,
+          borderColor: color,
+          backgroundColor: color + '33',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointStyle: 'rectRot',
+          fill: false,
+          tension: 0.1
+        };
+        datasets.push(dataset);
+        console.log('Added through-plane dataset:', dataset);
+      }
+    }
+  });
+  
+  // 데이터셋이 없으면 빈 차트라도 그리기
+  if (datasets.length === 0) {
+    datasets.push({
+      label: 'No Data',
+      data: [],
+      borderColor: '#ccc',
+      backgroundColor: '#ccc33'
+    });
+  }
+  
+  const yAxisLabel = yAxisType === 'conductivity' 
+    ? 'Conductivity σ (S/cm)' 
+    : 'Resistance (Ω)';
+  
+  try {
+    appData.throughPlaneChart = new Chart(ctx, {
+      type: 'line',
+      data: { datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              font: { size: 10 },
+              boxWidth: 10,
+              padding: 8
+            }
+          },
+          title: {
+            display: false
+          },
+          zoom: {
+            zoom: {
+              drag: {
+                enabled: true,
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                borderColor: 'rgba(52, 152, 219, 0.8)',
+                borderWidth: 2
+              },
+              wheel: {
+                enabled: true,
+                speed: 0.1
+              },
+              mode: 'xy'
+            },
+            pan: {
+              enabled: true,
+              mode: 'xy'
+            }
+          }
+        },
+        scales: {
+          x: {
+            type: 'logarithmic',
+            position: 'bottom',
+            title: {
+              display: true,
+              text: 'CNT Concentration (wt%)',
+              font: { size: 12 }
+            },
+            grid: {
+              color: '#e9ecef'
+            },
+            min: 0.01,
+            max: 10
+          },
+          y: {
+            type: yAxisScale,
+            title: {
+              display: true,
+              text: yAxisLabel,
+              font: { size: 12 }
+            },
+            grid: {
+              color: '#e9ecef'
+            }
+          }
+        }
+      }
+    });
+  } catch (e) {
+    console.error('Error creating through-plane chart:', e);
+  }
+}
+
+function updateViscosityChart() {
+  const showChart = document.getElementById('showViscosityChart')?.checked;
+  const container = document.getElementById('viscosityChartContainer');
+  
+  if (!showChart || !container) {
+    if (container) container.style.display = 'none';
+    return;
+  }
+  
+  container.style.display = 'block';
+  
+  const canvas = document.getElementById('viscosityChart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  
+  if (appData.viscosityChart) {
+    appData.viscosityChart.destroy();
+  }
+  
+  const datasets = [];
+  const selectedData = appData.savedData.filter(d => d.selected && d.initialViscosity && d.finalViscosity);
+  
+  // In-plane 데이터
+  const inPlanePoints = [];
+  selectedData.forEach(data => {
+    if (data.inPlaneData && data.inPlaneData.length > 0) {
+      const avgConductivity = data.inPlaneData.reduce((sum, p) => sum + (p.conductivity || 0), 0) / data.inPlaneData.length;
+      const viscosityIncrease = ((data.finalViscosity - data.initialViscosity) / data.initialViscosity) * 100;
+      
+      if (!isNaN(avgConductivity) && !isNaN(viscosityIncrease)) {
+        inPlanePoints.push({
+          x: viscosityIncrease,
+          y: avgConductivity,
+          label: data.lotNo
+        });
+      }
+    }
+  });
+  
+  if (inPlanePoints.length > 0) {
+    datasets.push({
+      label: 'In-plane',
+      data: inPlanePoints,
+      backgroundColor: '#667eea',
+      borderColor: '#667eea',
+      pointRadius: 6,
+      pointHoverRadius: 8
+    });
+  }
+  
+  // Through-plane 데이터
+  const throughPlanePoints = [];
+  selectedData.forEach(data => {
+    if (data.throughPlaneData && data.throughPlaneData.length > 0) {
+      const avgConductivity = data.throughPlaneData.reduce((sum, p) => sum + (p.conductivity || 0), 0) / data.throughPlaneData.length;
+      const viscosityIncrease = ((data.finalViscosity - data.initialViscosity) / data.initialViscosity) * 100;
+      
+      if (!isNaN(avgConductivity) && !isNaN(viscosityIncrease)) {
+        throughPlanePoints.push({
+          x: viscosityIncrease,
+          y: avgConductivity,
+          label: data.lotNo
+        });
+      }
+    }
+  });
+  
+  if (throughPlanePoints.length > 0) {
+    datasets.push({
+      label: 'Through-plane',
+      data: throughPlanePoints,
+      backgroundColor: '#764ba2',
+      borderColor: '#764ba2',
+      pointRadius: 6,
+      pointHoverRadius: 8,
+      pointStyle: 'rectRot'
+    });
+  }
+  
+  appData.viscosityChart = new Chart(ctx, {
+    type: 'scatter',
+    data: { datasets: datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: { size: 11 }
+          }
+        },
+        zoom: {
+          zoom: {
+            drag: {
+              enabled: true,
+              backgroundColor: 'rgba(52, 152, 219, 0.2)',
+              borderColor: 'rgba(52, 152, 219, 0.8)',
+              borderWidth: 2
+            },
+            wheel: {
+              enabled: true,
+              speed: 0.1
+            },
+            mode: 'xy'
+          },
+          pan: {
+            enabled: true,
+            mode: 'xy'
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          position: 'bottom',
+          title: {
+            display: true,
+            text: 'Viscosity Increase (%)',
+            font: { size: 12 }
+          },
+          grid: {
+            color: '#e9ecef'
+          }
+        },
+        y: {
+          type: 'logarithmic',
+          title: {
+            display: true,
+            text: 'Average Conductivity (S/cm)',
+            font: { size: 12 }
+          },
+          grid: {
+            color: '#e9ecef'
+          }
+        }
+      }
+    }
+  });
+}
+
+function toggleRightGraph() {
+  const rightGraphType = document.querySelector('input[name="rightGraph"]:checked').value;
+  const throughPlaneContainer = document.getElementById('throughPlaneContainer');
+  const viscosityContainer = document.getElementById('viscosityContainer');
+  
+  if (rightGraphType === 'throughplane') {
+    throughPlaneContainer.style.display = 'block';
+    viscosityContainer.style.display = 'none';
+    updateThroughPlaneChart();
+  } else {
+    throughPlaneContainer.style.display = 'none';
+    viscosityContainer.style.display = 'block';
+    updateViscosityChart();
+  }
+}
+
+function toggleViscosityChart() {
+  updateViscosityChart();
+}
+
+function toggleCNTTypeInSummary() {
+  const showMWCNT = document.getElementById('showMWCNT')?.checked;
+  const showSWCNT = document.getElementById('showSWCNT')?.checked;
+  
+  // MWCNT 농도 체크박스 표시/숨김
+  const mwcntLabels = ['conc02Label', 'conc05Label', 'conc10Label'];
+  mwcntLabels.forEach(id => {
+    const label = document.getElementById(id);
+    if (label) {
+      label.style.display = showMWCNT ? 'flex' : 'none';
+    }
+  });
+  
+  // SWCNT 농도 체크박스 표시/숨김
+  const swcntLabels = ['conc005Label', 'conc01Label', 'conc05swcntLabel'];
+  swcntLabels.forEach(id => {
+    const label = document.getElementById(id);
+    if (label) {
+      label.style.display = showSWCNT ? 'flex' : 'none';
+    }
+  });
+  
+  // 기본값 설정
+  if (showSWCNT && !showMWCNT) {
+    // SWCNT만 선택된 경우 0.1 wt% 기본 선택
+    document.getElementById('conc01').checked = true;
+  } else if (showMWCNT && !showSWCNT) {
+    // MWCNT만 선택된 경우 0.5 wt% 기본 선택
+    document.getElementById('conc05').checked = true;
+  }
+  
+  updateSummaryTable();
+}
+
+function updateSummaryTable() {
+  const tbody = document.getElementById('summaryTableBody');
+  if (!tbody) return;
+  
+  tbody.innerHTML = '';
+  
+  // MWCNT 농도
+  const show02 = document.getElementById('conc02')?.checked;
+  const show05 = document.getElementById('conc05')?.checked;
+  const show10 = document.getElementById('conc10')?.checked;
+  
+  // SWCNT 농도
+  const show005 = document.getElementById('conc005')?.checked;
+  const show01 = document.getElementById('conc01')?.checked;
+  const show05swcnt = document.getElementById('conc05swcnt')?.checked;
+  
+  // CNT Type
+  const showMWCNT = document.getElementById('showMWCNT')?.checked;
+  const showSWCNT = document.getElementById('showSWCNT')?.checked;
+  
+  // 측정 타입
+  const showInPlane = document.getElementById('showInPlaneSummary')?.checked;
+  const showThroughPlane = document.getElementById('showThroughPlaneSummary')?.checked;
+  
+  const selectedData = appData.savedData.filter(d => d.selected);
+  
+  selectedData.forEach(data => {
+    // CNT Type 필터링
+    if (data.cntType === 'MWCNT' && !showMWCNT) return;
+    if ((data.cntType === 'SWCNT' || data.cntType === 'SWCNT-EIS') && !showSWCNT) return;
+    // Mix 타입은 둘 중 하나라도 선택되면 표시
+    if (data.cntType === 'Mix' && !showMWCNT && !showSWCNT) return;
+    
+    const isSWCNT = data.cntType === 'SWCNT' || data.cntType === 'SWCNT-EIS';
+    
+    // In-plane 데이터 행
+    if (showInPlane && data.inPlaneData && data.inPlaneData.length > 0) {
+      const row = document.createElement('tr');
+      row.style.borderBottom = '1px solid #e9ecef';
+      
+      let concentrations = {};
+      if (isSWCNT) {
+        // SWCNT: 0.05, 0.1, 0.5
+        concentrations = {
+          '005': data.inPlaneData.find(p => Math.abs(p.concentration - 0.05) < 0.025),
+          '01': data.inPlaneData.find(p => Math.abs(p.concentration - 0.1) < 0.025),
+          '05swcnt': data.inPlaneData.find(p => Math.abs(p.concentration - 0.5) < 0.05)
+        };
+      } else {
+        // MWCNT: 0.2, 0.5, 1.0
+        concentrations = {
+          '02': data.inPlaneData.find(p => Math.abs(p.concentration - 0.2) < 0.05),
+          '05': data.inPlaneData.find(p => Math.abs(p.concentration - 0.5) < 0.05),
+          '10': data.inPlaneData.find(p => Math.abs(p.concentration - 1.0) < 0.05)
+        };
+      }
+      
+      const viscosityIncrease = data.initialViscosity && data.finalViscosity 
+        ? ((data.finalViscosity - data.initialViscosity) / data.initialViscosity * 100).toFixed(1)
+        : '-';
+      
+      let concColumns = '';
+      if (isSWCNT) {
+        concColumns = `
+          <td style="padding: 10px; text-align: center; ${!show005 ? 'display:none;' : ''}">${concentrations['005'] ? concentrations['005'].conductivity.toFixed(4) : '-'}</td>
+          <td style="padding: 10px; text-align: center; ${!show01 ? 'display:none;' : ''}">${concentrations['01'] ? concentrations['01'].conductivity.toFixed(4) : '-'}</td>
+          <td style="padding: 10px; text-align: center; ${!show05swcnt ? 'display:none;' : ''}">${concentrations['05swcnt'] ? concentrations['05swcnt'].conductivity.toFixed(4) : '-'}</td>
+        `;
+      } else {
+        concColumns = `
+          <td style="padding: 10px; text-align: center; ${!show02 ? 'display:none;' : ''}">${concentrations['02'] ? concentrations['02'].conductivity.toFixed(4) : '-'}</td>
+          <td style="padding: 10px; text-align: center; ${!show05 ? 'display:none;' : ''}">${concentrations['05'] ? concentrations['05'].conductivity.toFixed(4) : '-'}</td>
+          <td style="padding: 10px; text-align: center; ${!show10 ? 'display:none;' : ''}">${concentrations['10'] ? concentrations['10'].conductivity.toFixed(4) : '-'}</td>
+        `;
+      }
+      
+      row.innerHTML = `
+        <td style="padding: 10px; font-weight: 600;">${data.lotNo}</td>
+        <td style="padding: 10px; text-align: center;">${data.cntType}</td>
+        <td style="padding: 10px; text-align: center;">In-plane</td>
+        ${concColumns}
+        <td style="padding: 10px; text-align: center; ${parseFloat(viscosityIncrease) > 30 ? 'color: #e74c3c;' : ''}">${viscosityIncrease}%</td>
+      `;
+      tbody.appendChild(row);
+    }
+    
+    // Through-plane 데이터 행
+    if (showThroughPlane && data.throughPlaneData && data.throughPlaneData.length > 0) {
+      const row = document.createElement('tr');
+      row.style.borderBottom = '1px solid #e9ecef';
+      
+      let concentrations = {};
+      if (isSWCNT) {
+        // SWCNT: 0.05, 0.1, 0.5
+        concentrations = {
+          '005': data.throughPlaneData.find(p => Math.abs(p.concentration - 0.05) < 0.025),
+          '01': data.throughPlaneData.find(p => Math.abs(p.concentration - 0.1) < 0.025),
+          '05swcnt': data.throughPlaneData.find(p => Math.abs(p.concentration - 0.5) < 0.05)
+        };
+      } else {
+        // MWCNT: 0.2, 0.5, 1.0
+        concentrations = {
+          '02': data.throughPlaneData.find(p => Math.abs(p.concentration - 0.2) < 0.05),
+          '05': data.throughPlaneData.find(p => Math.abs(p.concentration - 0.5) < 0.05),
+          '10': data.throughPlaneData.find(p => Math.abs(p.concentration - 1.0) < 0.05)
+        };
+      }
+      
+      const viscosityIncrease = data.initialViscosity && data.finalViscosity 
+        ? ((data.finalViscosity - data.initialViscosity) / data.initialViscosity * 100).toFixed(1)
+        : '-';
+      
+      let concColumns = '';
+      if (isSWCNT) {
+        concColumns = `
+          <td style="padding: 10px; text-align: center; ${!show005 ? 'display:none;' : ''}">${concentrations['005'] ? concentrations['005'].conductivity.toFixed(4) : '-'}</td>
+          <td style="padding: 10px; text-align: center; ${!show01 ? 'display:none;' : ''}">${concentrations['01'] ? concentrations['01'].conductivity.toFixed(4) : '-'}</td>
+          <td style="padding: 10px; text-align: center; ${!show05swcnt ? 'display:none;' : ''}">${concentrations['05swcnt'] ? concentrations['05swcnt'].conductivity.toFixed(4) : '-'}</td>
+        `;
+      } else {
+        concColumns = `
+          <td style="padding: 10px; text-align: center; ${!show02 ? 'display:none;' : ''}">${concentrations['02'] ? concentrations['02'].conductivity.toFixed(4) : '-'}</td>
+          <td style="padding: 10px; text-align: center; ${!show05 ? 'display:none;' : ''}">${concentrations['05'] ? concentrations['05'].conductivity.toFixed(4) : '-'}</td>
+          <td style="padding: 10px; text-align: center; ${!show10 ? 'display:none;' : ''}">${concentrations['10'] ? concentrations['10'].conductivity.toFixed(4) : '-'}</td>
+        `;
+      }
+      
+      row.innerHTML = `
+        <td style="padding: 10px; font-weight: 600;">${data.lotNo}</td>
+        <td style="padding: 10px; text-align: center;">${data.cntType}</td>
+        <td style="padding: 10px; text-align: center;">Through-plane</td>
+        ${concColumns}
+        <td style="padding: 10px; text-align: center; ${parseFloat(viscosityIncrease) > 30 ? 'color: #e74c3c;' : ''}">${viscosityIncrease}%</td>
+      `;
+      tbody.appendChild(row);
+    }
+  });
+  
+  // 컬럼 헤더 표시/숨김 업데이트 (CNT Type에 따라)
+  const headers = document.querySelectorAll('#summaryTable thead th');
+  if (showMWCNT && !showSWCNT) {
+    // MWCNT만 표시
+    if (headers[3]) headers[3].style.display = show02 ? '' : 'none';
+    if (headers[4]) headers[4].style.display = show05 ? '' : 'none';
+    if (headers[5]) headers[5].style.display = show10 ? '' : 'none';
+  } else if (showSWCNT && !showMWCNT) {
+    // SWCNT만 표시
+    if (headers[3]) headers[3].style.display = show005 ? '' : 'none';
+    if (headers[4]) headers[4].style.display = show01 ? '' : 'none';
+    if (headers[5]) headers[5].style.display = show05swcnt ? '' : 'none';
+  } else {
+    // 둘 다 표시 - 모든 컬럼 보이기
+    if (headers[3]) headers[3].style.display = (show02 || show005) ? '' : 'none';
+    if (headers[4]) headers[4].style.display = (show05 || show01) ? '' : 'none';
+    if (headers[5]) headers[5].style.display = (show10 || show05swcnt) ? '' : 'none';
+  }
+}
+
+function captureChart() {
+  // 전체 그래프 영역을 캡처하기 위한 임시 canvas 생성
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d');
+  
+  // 캡처할 차트들
+  const inPlaneCanvas = document.getElementById('inPlaneChart');
+  const throughPlaneCanvas = document.getElementById('throughPlaneChart');
+  
+  if (inPlaneCanvas && throughPlaneCanvas) {
+    tempCanvas.width = inPlaneCanvas.width + throughPlaneCanvas.width + 20;
+    tempCanvas.height = Math.max(inPlaneCanvas.height, throughPlaneCanvas.height);
+    
+    // 배경을 흰색으로
+    tempCtx.fillStyle = 'white';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // 차트들을 나란히 그리기
+    tempCtx.drawImage(inPlaneCanvas, 0, 0);
+    tempCtx.drawImage(throughPlaneCanvas, inPlaneCanvas.width + 20, 0);
+    
+    // 다운로드
+    const url = tempCanvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = `percolation_curves_${new Date().toISOString().split('T')[0]}.png`;
+    link.href = url;
+    link.click();
+    
+    showToast('그래프가 캡처되었습니다.', 'success');
+  } else {
+    showToast('캡처할 그래프가 없습니다.', 'error');
+  }
+}
+
+function saveProject() {
+  // Chart 객체와 임시 데이터를 제외하고 저장할 데이터만 복사
+  const dataToSave = {
+    savedData: appData.savedData,
+    mwcntConcentrations: appData.mwcntConcentrations,
+    swcntConcentrations: appData.swcntConcentrations,
+    eisConcentrations: appData.eisConcentrations,
+    manufacturers: appData.manufacturers,
+    defaultColors: appData.defaultColors,
+    currentDataFilter: appData.currentDataFilter
+  };
+  
+  const dataStr = JSON.stringify(dataToSave, null, 2);
+  const dataBlob = new Blob([dataStr], {type: 'application/json'});
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.download = `CNT_Analysis_${new Date().toISOString().split('T')[0]}.json`;
+  link.href = url;
+  link.click();
+  showToast('프로젝트가 저장되었습니다.', 'success');
+}
+
+function triggerProjectFileInput() {
+  document.getElementById('projectFileInput').click();
+}
+
+function triggerCSVFileInput() {
+  document.getElementById('csvFileInput').click();
+}
+
+function loadCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const text = e.target.result;
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        showToast('CSV 파일이 비어있거나 형식이 잘못되었습니다.', 'error');
+        return;
+      }
+      
+      // 헤더 확인
+      const headers = lines[0].split(',').map(h => h.trim());
+      
+      let importCount = 0;
+      
+      // 데이터 파싱
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values.length < 4) continue;
+        
+        const dataEntry = {
+          id: Date.now() + Math.random(),
+          date: values[0] || new Date().toISOString().split('T')[0],
+          lotNo: values[1] || 'CSV Import',
+          cntType: values[2] || 'MWCNT',
+          manufacturer: values[3] || 'Unknown',
+          grade: values[4] || '',
+          cathodeType: values[5] || '',
+          siContent: values[6] || '',
+          initialViscosity: values[7] || '',
+          finalViscosity: values[8] || '',
+          memo: values[9] || 'CSV Import',
+          color: getRandomColor(),
+          selected: true,
+          inPlaneData: [],
+          throughPlaneData: [],
+          eisData: []
+        };
+        
+        appData.savedData.push(dataEntry);
+        importCount++;
+      }
+      
+      saveAppData();
+      updateDataTable();
+      showToast(`${importCount}개의 데이터를 불러왔습니다.`, 'success');
+      
+      // 파일 입력 초기화
+      event.target.value = '';
+    } catch (error) {
+      console.error('CSV loading error:', error);
+      showToast('CSV 파일을 불러오는 중 오류가 발생했습니다.', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function loadProject(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    console.log('No file selected');
+    return;
+  }
+  
+  console.log('Loading project file:', file.name);
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      console.log('File read successfully, parsing JSON...');
+      const data = JSON.parse(e.target.result);
+      console.log('JSON parsed successfully');
+      console.log('Data keys:', Object.keys(data));
+      console.log('SavedData count:', data.savedData ? data.savedData.length : 0);
+      
+      // 기존 데이터 구조 변환 (concentrationData -> inPlaneData)
+      if (data.savedData && Array.isArray(data.savedData)) {
+        console.log('Processing savedData...');
+        data.savedData.forEach((item, idx) => {
+          console.log(`Processing item ${idx}:`, item.lotNo, item.cntType);
+          
+          // measurements -> inPlaneData 변환 (새로운 변환 추가)
+          if (item.measurements && !item.inPlaneData && !item.eisData) {
+            if (item.cntType === 'SWCNT-EIS') {
+              // EIS 데이터 변환
+              item.eisData = item.measurements.map(m => ({
+                concentration: m.concentration,
+                resistance: m.resistance,
+                conductivity: typeof m.conductivity === 'string' ? parseFloat(m.conductivity) : m.conductivity
+              }));
+            } else {
+              // MWCNT/SWCNT 데이터 변환
+              item.inPlaneData = item.measurements.map(m => ({
+                concentration: m.concentration,
+                thickness: m.thickness || 0,
+                sheetR_min: m.rsMin || m.sheetR_min || 0,
+                sheetR_max: m.rsMax || m.sheetR_max || 0,
+                sheetR_avg: typeof m.rsAvg === 'string' ? parseFloat(m.rsAvg) : (m.rsAvg || m.sheetR_avg || 0),
+                deviation: (m.rsMax - m.rsMin) || 0,
+                conductivity: typeof m.conductivity === 'string' ? parseFloat(m.conductivity) : (m.conductivity || 0),
+                measurementType: 'in-plane'
+              }));
+            }
+            delete item.measurements;
+          }
+          
+          // 이전 버전 데이터 구조 변환 (concentrationData -> inPlaneData)
+          if (item.concentrationData && !item.inPlaneData) {
+            item.inPlaneData = item.concentrationData.map(d => ({
+              concentration: d.concentration,
+              thickness: d.thickness,
+              sheetR_min: d.sheetR_min || d.sheetRMin,
+              sheetR_max: d.sheetR_max || d.sheetRMax,
+              sheetR_avg: d.sheetR_avg || d.sheetRAvg || d.sheetR,
+              deviation: d.deviation,
+              conductivity: d.conductivity,
+              measurementType: 'in-plane'
+            }));
+            delete item.concentrationData;
+          }
+          
+          // cathode -> cathodeType 변환
+          if (item.cathode && !item.cathodeType) {
+            item.cathodeType = item.cathode;
+            delete item.cathode;
+          }
+          
+          // EIS 데이터가 없으면 빈 배열로 초기화
+          if (!item.eisData) {
+            item.eisData = [];
+          }
+          
+          // inPlaneData가 없으면 빈 배열로 초기화
+          if (!item.inPlaneData) {
+            item.inPlaneData = [];
+          }
+          
+          // throughPlaneData가 없으면 빈 배열로 초기화
+          if (!item.throughPlaneData) {
+            item.throughPlaneData = [];
+          }
+          
+          // selected 속성이 없으면 true로 설정
+          if (item.selected === undefined) {
+            item.selected = true;
+          }
+          
+          // color가 없으면 기본 색상 할당
+          if (!item.color) {
+            const index = data.savedData.indexOf(item);
+            item.color = appData.defaultColors[index % appData.defaultColors.length];
+          }
+        });
+      }
+      
+      console.log('Merging data into appData...');
+      appData = { 
+        ...appData, 
+        ...data, 
+        currentChart: null,
+        inPlaneChart: null,
+        throughPlaneChart: null,
+        viscosityChart: null,
+        currentDataFilter: 'ALL'
+      };
+      
+      console.log('Saving to localStorage...');
+      saveAppData();
+      
+      console.log('Updating data table...');
+      updateDataTable();
+      
+      console.log('Updating manufacturers...');
+      updateManufacturers();
+      
+      console.log('Project loaded successfully');
+      console.log('Final appData.savedData count:', appData.savedData.length);
+      
+      showToast(`프로젝트를 불러왔습니다. (${appData.savedData.length}개 데이터)`, 'success');
+      
+      // 데이터 관리 탭으로 이동
+      const dataTab = document.querySelector('.tab-btn:nth-child(2)');
+      if (dataTab) {
+        dataTab.click();
+      }
+      
+      // 그래프 탭이 활성화되어 있으면 차트 업데이트
+      if (document.getElementById('graph-tab').classList.contains('active')) {
+        setTimeout(updateChart, 100);
+      }
+      
+      // 파일 입력 초기화 (같은 파일을 다시 선택할 수 있도록)
+      event.target.value = '';
+      
+    } catch (error) {
+      console.error('Project load error:', error);
+      console.error('Error stack:', error.stack);
+      showToast('파일을 불러오는데 실패했습니다: ' + error.message, 'error');
+    }
+  };
+  
+  reader.onerror = function(error) {
+    console.error('File read error:', error);
+    showToast('파일을 읽는데 실패했습니다.', 'error');
+  };
+  
+  reader.readAsText(file);
+}
+
+function exportToCSV() {
+  let csv = 'Date,Lot No,CNT Type,Manufacturer,Grade,Cathode/Si,Initial Viscosity,Final Viscosity,Measurement Type,Concentration,Conductivity,Resistance/Sheet R,Thickness,Area,Memo\n';
+  
+  appData.savedData.forEach(data => {
+    // In-plane 데이터
+    if (data.inPlaneData) {
+      data.inPlaneData.forEach(point => {
+        csv += `${data.date},${data.lotNo},${data.cntType},${data.manufacturer},${data.grade || ''},`;
+        csv += `${data.cathodeType || data.siContent || ''},${data.initialViscosity || ''},${data.finalViscosity || ''},`;
+        csv += `In-plane,${point.concentration},${point.conductivity || ''},${point.sheetR_avg || ''},${point.thickness || ''},,${data.memo || ''}\n`;
+      });
+    }
+    
+    // Through-plane 데이터
+    if (data.throughPlaneData) {
+      data.throughPlaneData.forEach(point => {
+        csv += `${data.date},${data.lotNo},${data.cntType},${data.manufacturer},${data.grade || ''},`;
+        csv += `${data.cathodeType || data.siContent || ''},${data.initialViscosity || ''},${data.finalViscosity || ''},`;
+        csv += `Through-plane,${point.concentration},${point.conductivity || ''},${point.resistance || ''},${point.thickness || ''},${point.area || ''},${data.memo || ''}\n`;
+      });
+    }
+    
+    // EIS 데이터
+    if (data.eisData) {
+      data.eisData.forEach(point => {
+        csv += `${data.date},${data.lotNo},${data.cntType},${data.manufacturer},${data.grade || ''},`;
+        csv += `,${data.initialViscosity || ''},${data.finalViscosity || ''},`;
+        csv += `EIS,${point.concentration},${point.conductivity || ''},${point.resistance || ''},,,${data.memo || ''}\n`;
+      });
+    }
+  });
+  
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `CNT_Analysis_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  showToast('CSV 파일이 다운로드되었습니다.', 'success');
+}
+
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast active ${type}`;
+  
+  setTimeout(() => {
+    toast.classList.remove('active');
+  }, 3000);
+}
+
+let currentColorPickerDataId = null;
+
+function openColorPicker(dataId) {
+  currentColorPickerDataId = dataId;
+  const data = appData.savedData.find(d => d.id === dataId);
+  if (data) {
+    // 현재 색상 표시
+    document.querySelectorAll('.color-option').forEach(option => {
+      option.classList.remove('selected');
+      if (option.dataset.color === data.color) {
+        option.classList.add('selected');
+      }
+    });
+    document.getElementById('colorModal').style.display = 'block';
+  }
+}
+
+function closeColorModal() {
+  document.getElementById('colorModal').style.display = 'none';
+  currentColorPickerDataId = null;
+}
+
+// 그래프 확대/축소 초기화 함수
+function resetZoom() {
+  if (appData.inPlaneChart) {
+    appData.inPlaneChart.resetZoom();
+  }
+  if (appData.throughPlaneChart) {
+    appData.throughPlaneChart.resetZoom();
+  }
+  if (appData.viscosityChart) {
+    appData.viscosityChart.resetZoom();
+  }
+  showToast('그래프 확대/축소가 초기화되었습니다.', 'success');
+}
+
+// 색상 옵션 클릭 이벤트
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.color-option').forEach(option => {
+    option.addEventListener('click', function() {
+      if (currentColorPickerDataId !== null) {
+        const color = this.dataset.color;
+        const data = appData.savedData.find(d => d.id === currentColorPickerDataId);
+        if (data) {
+          data.color = color;
+          saveAppData();
+          updateDataTable();
+          if (document.getElementById('graph-tab').classList.contains('active')) {
+            updateChart();
+          }
+          closeColorModal();
+          showToast('색상이 변경되었습니다.', 'success');
+        }
+      }
+    });
+  });
+  
+  // 모달 외부 클릭 시 닫기
+  window.onclick = function(event) {
+    const modal = document.getElementById('colorModal');
+    if (event.target === modal) {
+      closeColorModal();
+    }
+  };
+});
+
+// 모든 함수를 전역으로 노출 (HTML onclick에서 호출 가능하도록)
+window.switchTab = switchTab;
+window.toggleCNTTypeFields = toggleCNTTypeFields;
+window.updateManufacturers = updateManufacturers;
+window.updateGrades = updateGrades;
+window.updateLotNo = updateLotNo;
+window.saveData = saveData;
+window.exportToCSV = exportToCSV;
+window.saveProject = saveProject;
+window.loadProject = loadProject;
+window.triggerProjectFileInput = triggerProjectFileInput;
+window.triggerCSVFileInput = triggerCSVFileInput;
+window.loadCSV = loadCSV;
+window.filterData = filterData;
+window.toggleDataSelection = toggleDataSelection;
+window.toggleSelectAll = toggleSelectAll;
+window.deleteData = deleteData;
+window.editData = editData;
+window.openColorPicker = openColorPicker;
+window.closeColorModal = closeColorModal;
+window.selectAllForGraph = selectAllForGraph;
+window.deselectAllForGraph = deselectAllForGraph;
+window.updateChart = updateChart;
+window.toggleViscosityChart = toggleViscosityChart;
+window.toggleRightGraph = toggleRightGraph;
+window.toggleCNTTypeInSummary = toggleCNTTypeInSummary;
+window.updateSummaryTable = updateSummaryTable;
+window.captureChart = captureChart;
+window.addConcentration = addConcentration;
+window.removeConcentrationRow = removeConcentrationRow;
+window.clearInPlaneRow = clearInPlaneRow;
+window.clearThroughPlaneRow = clearThroughPlaneRow;
+window.initializeDefaultConcentrations = initializeDefaultConcentrations;
+window.attachAutoCalculationListeners = attachAutoCalculationListeners;
+window.attachCalculationListeners = attachCalculationListeners;
+window.resetZoom = resetZoom;
+
+</script>
+
+</body>
+</html>

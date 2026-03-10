@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rate Capability Analyzer v10</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+/* ========== 기본 스타일 ========== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  padding: 20px; 
+  background: #f5f5f5;
+}
+
+.container { 
+  max-width: 1900px; 
+  margin: 0 auto; 
+  background: white; 
+  padding: 30px; 
+  border-radius: 10px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+h1 { 
+  color: #2c3e50; 
+  margin-bottom: 30px; 
+  text-align: center;
+  font-size: 28px;
+}
+
+/* ========== 업로드 섹션 ========== */
+.upload-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.upload-area {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.upload-box {
+  flex: 1;
+  padding: 20px;
+  border: 2px dashed #3498db;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+}
+
+.upload-box h3 {
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+input[type="file"] {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 100%;
+}
+
+button {
+  padding: 10px 20px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+button:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.capture-btn {
+  background: #e74c3c;
+  margin-left: 10px;
+}
+
+.capture-btn:hover {
+  background: #c0392b;
+}
+
+/* ========== 데이터셋 관리 섹션 ========== */
+.dataset-management {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #fff3cd;
+  border-radius: 8px;
+  border: 2px solid #ffc107;
+}
+
+.dataset-management h2 {
+  margin-bottom: 15px;
+  color: #856404;
+  font-size: 20px;
+}
+
+/* 2x4 그리드 레이아웃 */
+.dataset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.dataset-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: white;
+  border-radius: 5px;
+  border: 2px solid #ddd;
+  cursor: move;
+}
+
+.dataset-item.dragging {
+  opacity: 0.5;
+}
+
+.dataset-item .drag-handle {
+  font-size: 16px;
+  color: #666;
+}
+
+.dataset-item input[type="text"] {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 12px;
+  min-width: 0;
+}
+
+.dataset-item .type-badge {
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  background: #3498db;
+  white-space: nowrap;
+}
+
+.dataset-item button {
+  padding: 4px 8px;
+  font-size: 11px;
+  background: #e74c3c;
+}
+
+.color-selector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.color-selector:hover {
+  border-color: #999;
+}
+
+.color-preview {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 2px solid #ddd;
+}
+
+.color-selector-text {
+  font-size: 10px;
+  color: #666;
+}
+
+/* 색상 팔레트 팝업 */
+.color-palette-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  z-index: 10000;
+  display: none;
+}
+
+.color-palette-popup.active {
+  display: block;
+}
+
+.color-palette-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: none;
+}
+
+.color-palette-overlay.active {
+  display: block;
+}
+
+.color-palette-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.color-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.color-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.color-group-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.color-option {
+  width: 100%;
+  height: 40px;
+  border: 3px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.color-option:hover {
+  border-color: #666;
+  transform: scale(1.05);
+}
+
+.color-option.selected {
+  border-color: #3498db;
+  border-width: 4px;
+}
+
+.color-option.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
+
+.palette-close-btn {
+  width: 100%;
+  padding: 10px;
+  background: #95a5a6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.palette-close-btn:hover {
+  background: #7f8c8d;
+}
+
+/* ========== 차트 섹션 ========== */
+.charts-section {
+  margin-bottom: 40px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+}
+
+.section-header h2 {
+  color: white;
+  font-size: 22px;
+  margin: 0;
+}
+
+/* 용량/효율 차트 그리드 (1:1 비율) */
+.capacity-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.chart-wrapper {
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  position: relative;
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.individual-capture-btn {
+  padding: 6px 10px;
+  font-size: 18px;
+  background: transparent;
+  border: none;
+  color: #666;
+  opacity: 0.5;
+  transition: all 0.3s;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.individual-capture-btn:hover {
+  opacity: 1;
+  color: #333;
+  transform: scale(1.1);
+}
+
+.chart-container {
+  position: relative;
+  height: 500px;
+}
+
+/* 줌 컨트롤 */
+.zoom-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding: 12px;
+  background: white;
+  border-radius: 5px;
+}
+
+.zoom-controls input[type="number"] {
+  width: 90px;
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.zoom-controls button {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.zoom-controls label {
+  font-weight: 600;
+  color: #34495e;
+  font-size: 13px;
+}
+
+/* X축 토글 */
+.axis-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #e3f2fd;
+  border-radius: 5px;
+  border: 1px solid #2196f3;
+}
+
+.axis-toggle label {
+  font-weight: 600;
+  color: #1976d2;
+  font-size: 13px;
+}
+
+.axis-toggle select {
+  padding: 5px 10px;
+  border: 2px solid #2196f3;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: white;
+}
+
+/* ========== 요약 섹션 ========== */
+.summary-section {
+  margin-top: 40px;
+  padding: 20px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  border: 2px solid #4caf50;
+}
+
+.summary-section h2 {
+  text-align: center;
+  color: #2e7d32;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.summary-table th {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.summary-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+  text-align: center;
+}
+
+.summary-table tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+/* ========== 상태 메시지 ========== */
+.status {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.status.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.status.info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+/* ========== 클릭 정보 ========== */
+.click-info {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  color: #333;
+  min-width: 150px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: none;
+  z-index: 1000;
+}
+
+.click-info.active {
+  display: block;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>⚡ Rate Capability Analyzer v10</h1>
+  
+  <!-- ========== 업로드 섹션 ========== -->
+  <div class="upload-section">
+    <div class="upload-area">
+      <div class="upload-box">
+        <h3>📂 Capacity 파일 업로드 (최대 16개)</h3>
+        
+        <!-- 셀 타입 선택 -->
+        <div style="margin-bottom: 15px; padding: 10px; background: #e3f2fd; border-radius: 5px;">
+          <label style="font-weight: 600; color: #1976d2; margin-right: 10px;">
+            🔋 Cell Type:
+          </label>
+          <select id="cellTypeSelect" onchange="updateCellType()" style="padding: 8px 15px; border: 2px solid #1976d2; border-radius: 5px; font-size: 14px; font-weight: 600; cursor: pointer; background: white;">
+            <option value="Fullcell">Fullcell (풀셀)</option>
+            <option value="Cathode" selected>Cathode Halfcell (양극 하프셀)</option>
+          </select>
+          <span id="cellTypeBadge" style="margin-left: 10px; padding: 5px 10px; background: #ff9800; color: white; border-radius: 3px; font-size: 12px; font-weight: 600;">
+            ⚡ Cathode Mode
+          </span>
+        </div>
+        
+        <input type="file" id="fileInput" multiple accept=".csv,.xlsx,.xls">
+        <p style="margin-top: 10px; font-size: 12px; color: #666;">
+          Rate Capability 테스트 Capacity 파일을 업로드하세요
+        </p>
+      </div>
+      <div style="flex: 1;">
+        <button onclick="analyzeAllData()" style="width: 100%; padding: 15px; font-size: 16px; margin-bottom: 10px;">
+          📊 데이터 분석 실행
+        </button>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+          <button onclick="saveProject()" style="flex: 1; padding: 10px; background: #28a745; font-size: 14px;">
+            💾 프로젝트 저장
+          </button>
+          <button onclick="document.getElementById('projectInput').click()" style="flex: 1; padding: 10px; background: #17a2b8; font-size: 14px;">
+            📂 프로젝트 불러오기
+          </button>
+        </div>
+        <input type="file" id="projectInput" accept=".json" style="display: none;" onchange="loadProject(event)">
+        <div id="statusMessage"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 데이터셋 관리 섹션 (2x4 그리드) ========== -->
+  <div class="dataset-management" id="datasetManagement" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h2 style="margin: 0;">📋 Capacity 데이터셋 관리 (드래그로 순서 변경 가능)</h2>
+      <button onclick="resetAllDatasets()" style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;">
+        🗑️ 모두 삭제
+      </button>
+    </div>
+    <div class="dataset-grid" id="capacityDatasetList"></div>
+  </div>
+
+  <!-- ========== 용량/Retention 차트 섹션 ========== -->
+  <div class="charts-section" id="capacitySection" style="display: none;">
+    <div class="section-header">
+      <h2>📈 Rate Capability Analysis <span id="capacityModeLabel" style="margin-left: 15px; padding: 5px 12px; background: #ff9800; color: white; border-radius: 5px; font-size: 14px;">⚡ Cathode Mode</span></h2>
+      <button class="capture-btn" onclick="captureSection('capacitySection')">📸 화면 캡처</button>
+    </div>
+    
+    <!-- 줌 컨트롤 및 X축 토글 -->
+    <div class="zoom-controls">
+      <label>Cycle 범위:</label>
+      <input type="number" id="capacityMinCycle" placeholder="Min">
+      <input type="number" id="capacityMaxCycle" placeholder="Max">
+      
+      <label>Y축 범위:</label>
+      <input type="number" id="capacityMinY" placeholder="Min" step="0.1">
+      <input type="number" id="capacityMaxY" placeholder="Max" step="0.1">
+      
+      <button onclick="applyZoom('capacity')">🔍 확대</button>
+      <button onclick="resetZoom('capacity')">🔄 초기화</button>
+      
+      <div class="axis-toggle">
+        <label>X축 표시:</label>
+        <select id="xAxisMode" onchange="toggleXAxisMode()">
+          <option value="cycle">Cycle (1, 2, 3...)</option>
+          <option value="crate">C-rate (0.1C, 1/3C...)</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="capacity-charts-grid">
+      <div class="chart-wrapper" id="capacityChartWrapper">
+        <div class="chart-title">
+          <span id="capacityChartTitle">방전 용량 (Discharge Capacity)</span>
+          <select id="capacityYAxisMode" onchange="toggleCapacityYAxis()" style="margin-left: 15px; padding: 5px 10px; border-radius: 5px; border: 2px solid #3498db; font-size: 13px; font-weight: 600; cursor: pointer;">
+            <option value="absolute">mAh/g (절대값)</option>
+            <option value="retention">Capacity Retention (%)</option>
+          </select>
+          <button class="individual-capture-btn" onclick="captureIndividualChart('capacityChartWrapper')">📸</button>
+        </div>
+        <div class="chart-container">
+          <canvas id="capacityChart"></canvas>
+          <div id="clickInfoCapacity" class="click-info"></div>
+        </div>
+      </div>
+      
+      <div class="chart-wrapper" id="retentionChartWrapper">
+        <div class="chart-title">
+          <span>Capacity Retention (1/3C 기준)</span>
+          <button class="individual-capture-btn" onclick="captureIndividualChart('retentionChartWrapper')">📸</button>
+        </div>
+        <div class="chart-container">
+          <canvas id="retentionChart"></canvas>
+          <div id="clickInfoRetention" class="click-info"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 요약 테이블 섹션 ========== -->
+  <div class="summary-section" id="summarySection" style="display: none;">
+    <div class="section-header" style="background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);">
+      <h2>📊 분석 요약 <span id="summaryModeLabel" style="margin-left: 15px; padding: 5px 12px; background: rgba(255,255,255,0.3); color: white; border-radius: 5px; font-size: 14px;">⚡ Cathode Mode</span></h2>
+      <button class="capture-btn" onclick="captureSection('summarySection')">📸 화면 캡처</button>
+    </div>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>샘플명</th>
+          <th>1st Chg<br>(mAh/g)</th>
+          <th>1st Dchg<br>(mAh/g)</th>
+          <th>ICE<br>(%)</th>
+          <th>1/3C Recovery<br>(%)</th>
+          <th>1C/0.33C<br>(%)</th>
+          <th>2C/0.33C<br>(%)</th>
+          <th>3C/0.33C<br>(%)</th>
+          <th>4C/0.33C<br>(%)</th>
+          <th>5C/0.33C<br>(%)</th>
+        </tr>
+      </thead>
+      <tbody id="summaryBody"></tbody>
+    </table>
+    <button class="export-btn" onclick="exportSummaryCSV()" style="margin-top: 15px; background: #28a745;">
+      💾 요약 CSV 다운로드
+    </button>
+  </div>
+
+  <!-- ========== 색상 팔레트 팝업 ========== -->
+  <div class="color-palette-overlay" id="colorPaletteOverlay" onclick="closeColorPalette()"></div>
+  <div class="color-palette-popup" id="colorPalettePopup">
+    <div class="color-palette-title">색상 선택</div>
+    <div class="color-palette-grid" id="colorPaletteGrid"></div>
+    <button class="palette-close-btn" onclick="closeColorPalette()">닫기</button>
+  </div>
+</div>
+
+<script>
+// ========================================
+// 전역 변수 및 데이터 구조
+// ========================================
+let cellType = 'Cathode'; // 기본값: 양극 하프셀
+
+// C-rate 정의 (0.1C → 1/3C → 1C → 2C → 3C → 4C → 5C → 1/3C Recovery)
+// 각 C-rate별 cycle 수
+const CRATE_SEQUENCE = [
+  { name: '0.1C', cycles: 3 },
+  { name: '1/3C', cycles: 3 },
+  { name: '1C', cycles: 3 },
+  { name: '2C', cycles: 3 },
+  { name: '3C', cycles: 3 },
+  { name: '4C', cycles: 3 },
+  { name: '5C', cycles: 3 },
+  { name: '1/3C*', cycles: 3 }  // Recovery (1/3C*)
+];
+
+// X축 모드: 'cycle' 또는 'crate'
+let xAxisMode = 'cycle';
+
+const charts = {
+  capacity: null,
+  retention: null
+};
+
+let allDatasets = []; // 모든 데이터셋 저장
+let nextId = 1; // 데이터셋 ID 카운터
+
+// 9가지 기본 색상, 각 3단계 변형
+const colorPalette = {
+  '검정': ['#000000', '#333333', '#666666'],
+  '빨강': ['#CC0000', '#FF0000', '#FF6666'],
+  '파랑': ['#0000CC', '#0000FF', '#6666FF'],
+  '녹색': ['#006600', '#009900', '#00CC00'],
+  '보라': ['#660099', '#9900CC', '#CC66FF'],
+  '자주': ['#990033', '#CC0044', '#FF6699'],
+  'Magenta': ['#CC00CC', '#FF00FF', '#FF66FF'],
+  'Cyan': ['#007777', '#00AAAA', '#00DDDD'],
+  '회색': ['#444444', '#888888', '#BBBBBB']
+};
+
+const colorNames = Object.keys(colorPalette);
+
+const defaultColors = [
+  '#000000', '#CC0000', '#0000CC', '#006600',
+  '#660099', '#990033', '#CC00CC', '#007777', '#444444'
+];
+
+// ========================================
+// 셀 타입 변경 함수
+// ========================================
+function updateCellType() {
+  const select = document.getElementById('cellTypeSelect');
+  const newCellType = select.value;
+  
+  if (newCellType !== cellType && allDatasets.length > 0) {
+    if (confirm(`Cell Type을 변경하면 현재 데이터셋(${allDatasets.length}개)이 모두 삭제됩니다.\n계속하시겠습니까?`)) {
+      allDatasets = [];
+      nextId = 1;
+      document.getElementById('capacitySection').style.display = 'none';
+      document.getElementById('summarySection').style.display = 'none';
+      updateDatasetManagement();
+      showStatus('Cell Type이 변경되었습니다. 새로운 파일을 업로드하세요.', 'info');
+    } else {
+      select.value = cellType;
+      return;
+    }
+  }
+  
+  cellType = newCellType;
+  const badge = document.getElementById('cellTypeBadge');
+  
+  const modeText = cellType === 'Fullcell' ? '🔋 Fullcell Mode' : '⚡ Cathode Mode';
+  const bgColor = cellType === 'Fullcell' ? '#4caf50' : '#ff9800';
+  
+  badge.textContent = modeText;
+  badge.style.background = bgColor;
+  
+  // 차트 섹션 라벨 업데이트
+  const capacityLabel = document.getElementById('capacityModeLabel');
+  const summaryLabel = document.getElementById('summaryModeLabel');
+  
+  if (capacityLabel) {
+    capacityLabel.textContent = modeText;
+    capacityLabel.style.background = bgColor;
+  }
+  if (summaryLabel) {
+    summaryLabel.textContent = modeText;
+    summaryLabel.style.background = 'rgba(255,255,255,0.3)';
+  }
+  
+  console.log(`Cell type changed to: ${cellType}`);
+}
+
+// ========================================
+// C-rate 라벨 생성 함수
+// ========================================
+function getCRateLabel(cycleIndex, detailed = true) {
+  let cumulativeCycles = 0;
+  
+  for (let i = 0; i < CRATE_SEQUENCE.length; i++) {
+    const crateInfo = CRATE_SEQUENCE[i];
+    const startCycle = cumulativeCycles + 1;
+    const endCycle = cumulativeCycles + crateInfo.cycles;
+    
+    if (cycleIndex >= startCycle && cycleIndex <= endCycle) {
+      const cycleInRate = cycleIndex - cumulativeCycles;
+      if (detailed) {
+        return `${crateInfo.name}-${cycleInRate}`;
+      } else {
+        return crateInfo.name;
+      }
+    }
+    cumulativeCycles += crateInfo.cycles;
+  }
+  
+  return `Cycle ${cycleIndex}`;
+}
+
+// C-rate의 마지막 cycle 인덱스 반환
+function getCRateLastCycleIndex(crateName, occurrence = 1) {
+  let cumulativeCycles = 0;
+  let count = 0;
+  
+  for (let i = 0; i < CRATE_SEQUENCE.length; i++) {
+    const crateInfo = CRATE_SEQUENCE[i];
+    cumulativeCycles += crateInfo.cycles;
+    
+    if (crateInfo.name === crateName) {
+      count++;
+      if (count === occurrence) {
+        return cumulativeCycles;
+      }
+    }
+  }
+  return -1;
+}
+
+// ========================================
+// 1. 파일 업로드 및 분류
+// ========================================
+document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+
+async function handleFileUpload(event) {
+  const files = Array.from(event.target.files);
+  
+  if (files.length === 0) return;
+  
+  if (allDatasets.length + files.length > 16) {
+    showStatus('최대 16개의 파일만 업로드 가능합니다', 'error');
+    return;
+  }
+  
+  showStatus(`${files.length}개 파일 처리 중...`, 'info');
+  
+  for (const file of files) {
+    try {
+      const fileName = file.name;
+      const result = await readFile(file);
+      
+      if (result && result.data) {
+        const colorIdx = allDatasets.length % defaultColors.length;
+        allDatasets.push({
+          id: nextId++,
+          name: fileName.replace(/\.(csv|xlsx|xls)$/i, ''),
+          type: 'capacity',
+          fileName: fileName,
+          color: defaultColors[colorIdx],
+          colorName: colorNames[colorIdx % colorNames.length],
+          colorVariant: 0,
+          data: result.data
+        });
+      }
+    } catch (error) {
+      console.error(`Error processing ${file.name}:`, error);
+      showStatus(`${file.name} 처리 실패: ${error.message}`, 'error');
+    }
+  }
+  
+  updateDatasetManagement();
+  showStatus(`${files.length}개 파일 업로드 완료! "데이터 분석 실행" 버튼을 클릭하세요.`, 'success');
+}
+
+// CSV 파일의 따옴표 안에 있는 줄바꿈을 공백으로 치환
+function fixCSVQuotedNewlines(csvContent) {
+  let result = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < csvContent.length; i++) {
+    const char = csvContent[i];
+    const nextChar = csvContent[i + 1];
+    
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        result += '""';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+        result += char;
+      }
+    } else if (inQuotes && (char === '\n' || char === '\r')) {
+      if (char === '\r' && nextChar === '\n') {
+        result += ' ';
+        i++;
+      } else {
+        result += ' ';
+      }
+    } else {
+      result += char;
+    }
+  }
+  
+  return result;
+}
+
+async function readFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    const isExcel = file.name.match(/\.(xlsx|xls)$/i);
+    
+    reader.onload = (e) => {
+      try {
+        let content;
+        
+        if (isExcel) {
+          const workbook = XLSX.read(e.target.result, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          content = XLSX.utils.sheet_to_csv(firstSheet);
+        } else {
+          content = e.target.result;
+          content = fixCSVQuotedNewlines(content);
+        }
+        
+        const lines = content.split('\n').filter(line => line.trim());
+        const data = parseCapacityCSV(lines);
+        
+        resolve({ type: 'capacity', data: data });
+      } catch (error) {
+        console.error('File reading error:', error);
+        reject(error);
+      }
+    };
+    
+    reader.onerror = () => reject(new Error('파일 읽기 실패'));
+    
+    if (isExcel) {
+      reader.readAsArrayBuffer(file);
+    } else {
+      reader.readAsText(file);
+    }
+  });
+}
+
+// Capacity 데이터 파싱
+function parseCapacityCSV(lines) {
+  const cycleData = {};
+  
+  const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
+  console.log('=== CSV Headers ===');
+  console.log(headers);
+  
+  const cycleIdx = headers.findIndex(h => 
+    h.includes('cycle') || h.includes('cyc') || h.includes('사이클')
+  );
+  
+  // Discharge 컬럼 우선 탐색 (mAh/g 우선)
+  let dischargeIdx = headers.findIndex(h => 
+    (h.includes('q_dis/m') || h.includes('q_discharge/m') || 
+     (h.includes('dis') && h.includes('mah/g')))
+  );
+  
+  // mAh/g 없으면 일반 discharge 컬럼
+  if (dischargeIdx === -1) {
+    dischargeIdx = headers.findIndex(h => 
+      (h.includes('q_dis') || h.includes('discharge') || h.includes('방전')) &&
+      !h.includes('charge') && !h.includes('chg')
+    );
+  }
+  
+  // Charge 컬럼 탐색 (mAh/g 우선)
+  let chargeIdx = headers.findIndex(h => 
+    (h.includes('q_ch/m') || h.includes('q_charge/m') || 
+     (h.includes('ch') && h.includes('mah/g') && !h.includes('dis')))
+  );
+  
+  if (chargeIdx === -1) {
+    chargeIdx = headers.findIndex(h => 
+      (h.includes('q_ch') || h.includes('charge') || h.includes('충전')) &&
+      !h.includes('dis')
+    );
+  }
+  
+  console.log('Column indices:', {cycleIdx, chargeIdx, dischargeIdx});
+  console.log('Charge column:', headers[chargeIdx]);
+  console.log('Discharge column:', headers[dischargeIdx]);
+  
+  if (cycleIdx === -1 || chargeIdx === -1 || dischargeIdx === -1) {
+    console.error('Required columns not found in capacity file');
+    return { cycles: [], chargeCapacity: [], dischargeCapacity: [], coulombicEfficiency: [] };
+  }
+  
+  // 데이터 파싱 - 첫 몇 줄 로그
+  for (let i = 1; i < lines.length; i++) {
+    const parts = parseCSVLine(lines[i]);
+    if (parts.length < 3) continue;
+    
+    const cycle = parseInt(parts[cycleIdx]);
+    const chg = Math.abs(parseFloat(parts[chargeIdx]));
+    const dchg = Math.abs(parseFloat(parts[dischargeIdx]));
+    
+    if (i <= 5) {
+      console.log(`Row ${i}: cycle=${cycle}, charge=${chg.toFixed(2)}, discharge=${dchg.toFixed(2)}`);
+    }
+    
+    if (isNaN(cycle) || isNaN(chg) || isNaN(dchg)) continue;
+    
+    if (!cycleData[cycle]) {
+      cycleData[cycle] = { charge: 0, discharge: 0 };
+    }
+    
+    cycleData[cycle].charge = Math.max(cycleData[cycle].charge, chg);
+    cycleData[cycle].discharge = Math.max(cycleData[cycle].discharge, dchg);
+  }
+  
+  // 결과 배열 생성
+  const cycles = [];
+  const chargeCapacity = [];
+  const dischargeCapacity = [];
+  const coulombicEfficiency = [];
+  
+  // 사이클 순서대로 정렬하고 결과 생성
+  const sortedCycles = Object.keys(cycleData).map(Number).sort((a, b) => a - b);
+  
+  console.log('=== Parsed Cycle Data ===');
+  console.log('Total cycles:', sortedCycles.length);
+  console.log('Cycle range:', sortedCycles[0], '-', sortedCycles[sortedCycles.length - 1]);
+  
+  // 처음 몇 개 사이클 데이터 출력
+  sortedCycles.slice(0, 10).forEach(cycle => {
+    const data = cycleData[cycle];
+    console.log(`Cycle ${cycle}: Charge=${data.charge.toFixed(2)}, Discharge=${data.discharge.toFixed(2)}`);
+  });
+  
+  sortedCycles.forEach(cycle => {
+    const data = cycleData[cycle];
+    
+    if (data.charge >= 0.01 && data.discharge >= 0.01) {
+      cycles.push(cycle);
+      chargeCapacity.push(data.charge);
+      dischargeCapacity.push(data.discharge);
+      
+      // CE = discharge / charge * 100
+      const ce = (data.discharge / data.charge) * 100;
+      coulombicEfficiency.push(ce);
+    }
+  });
+  
+  console.log(`Parsed ${cycles.length} valid cycles`);
+  
+  return { cycles, chargeCapacity, dischargeCapacity, coulombicEfficiency };
+}
+
+// CSV 파서
+function parseCSVLine(line, delimiter = ',') {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+    
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === delimiter && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  
+  result.push(current.trim());
+  return result;
+}
+
+// ========================================
+// 2. 데이터셋 관리 UI
+// ========================================
+function updateDatasetManagement() {
+  const section = document.getElementById('datasetManagement');
+  const list = document.getElementById('capacityDatasetList');
+  
+  if (allDatasets.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  
+  section.style.display = 'block';
+  list.innerHTML = '';
+  
+  allDatasets.forEach((dataset, index) => {
+    const item = document.createElement('div');
+    item.className = 'dataset-item';
+    item.draggable = true;
+    item.dataset.index = index;
+    item.dataset.id = dataset.id;
+    
+    item.innerHTML = `
+      <span class="drag-handle">☰</span>
+      <input type="text" value="${dataset.name}" 
+             onchange="updateDatasetName(${index}, this.value)">
+      <div class="color-selector" onclick="openColorPalette(${index}, event)">
+        <div class="color-preview" style="background-color: ${dataset.color}"></div>
+        <span class="color-selector-text">${dataset.colorName}</span>
+      </div>
+      <span class="type-badge">CAPACITY</span>
+      <button onclick="removeDatasetById(${dataset.id}); event.stopPropagation();">❌</button>
+    `;
+    
+    item.addEventListener('dragstart', handleDragStart);
+    item.addEventListener('dragover', handleDragOver);
+    item.addEventListener('drop', handleDrop);
+    item.addEventListener('dragend', handleDragEnd);
+    
+    list.appendChild(item);
+  });
+  
+  if (list.children.length === 0) {
+    list.innerHTML = '<div style="color: #999; padding: 20px; text-align: center; font-size: 13px; grid-column: 1/-1;">Capacity 파일이 없습니다</div>';
+  }
+}
+
+function updateDatasetName(index, newName) {
+  allDatasets[index].name = newName;
+  showStatus('데이터셋 이름이 변경되었습니다', 'success');
+}
+
+function removeDatasetById(id) {
+  const dataset = allDatasets.find(d => d.id === id);
+  if (!dataset) {
+    showStatus('데이터셋을 찾을 수 없습니다', 'error');
+    return;
+  }
+  
+  if (confirm(`"${dataset.name}" 데이터셋을 삭제하시겠습니까?`)) {
+    allDatasets = allDatasets.filter(d => d.id !== id);
+    updateDatasetManagement();
+    
+    if (allDatasets.length === 0) {
+      document.getElementById('capacitySection').style.display = 'none';
+      document.getElementById('summarySection').style.display = 'none';
+    }
+    
+    showStatus('데이터셋이 삭제되었습니다', 'info');
+  }
+}
+
+function resetAllDatasets() {
+  if (allDatasets.length === 0) {
+    showStatus('삭제할 데이터가 없습니다', 'info');
+    return;
+  }
+  
+  if (confirm(`모든 데이터셋(${allDatasets.length}개)을 삭제하시겠습니까?`)) {
+    allDatasets = [];
+    nextId = 1;
+    
+    document.getElementById('capacitySection').style.display = 'none';
+    document.getElementById('summarySection').style.display = 'none';
+    
+    updateDatasetManagement();
+    showStatus('모든 데이터셋이 삭제되었습니다', 'success');
+  }
+}
+
+let currentColorSelectIndex = null;
+
+function openColorPalette(index, event) {
+  event.stopPropagation();
+  
+  const dataset = allDatasets[index];
+  currentColorSelectIndex = index;
+  
+  const grid = document.getElementById('colorPaletteGrid');
+  grid.innerHTML = '';
+  
+  colorNames.forEach(colorName => {
+    const group = document.createElement('div');
+    group.className = 'color-group';
+    
+    const nameLabel = document.createElement('div');
+    nameLabel.className = 'color-group-name';
+    nameLabel.textContent = colorName;
+    group.appendChild(nameLabel);
+    
+    colorPalette[colorName].forEach((color, variant) => {
+      const option = document.createElement('div');
+      option.className = 'color-option';
+      option.style.backgroundColor = color;
+      option.dataset.colorName = colorName;
+      option.dataset.variant = variant;
+      
+      if (dataset.colorName === colorName && dataset.colorVariant === variant) {
+        option.classList.add('selected');
+      }
+      
+      option.onclick = () => selectColor(colorName, variant);
+      group.appendChild(option);
+    });
+    
+    grid.appendChild(group);
+  });
+  
+  document.getElementById('colorPaletteOverlay').classList.add('active');
+  document.getElementById('colorPalettePopup').classList.add('active');
+}
+
+function selectColor(colorName, variant) {
+  if (currentColorSelectIndex === null) return;
+  
+  const dataset = allDatasets[currentColorSelectIndex];
+  dataset.colorName = colorName;
+  dataset.colorVariant = variant;
+  dataset.color = colorPalette[colorName][variant];
+  
+  closeColorPalette();
+  updateDatasetManagement();
+  
+  if (charts.capacity || charts.retention) {
+    createCapacityCharts(allDatasets);
+  }
+  
+  showStatus(`색상 변경: ${colorName} (단계 ${variant + 1})`, 'success');
+}
+
+function closeColorPalette() {
+  document.getElementById('colorPaletteOverlay').classList.remove('active');
+  document.getElementById('colorPalettePopup').classList.remove('active');
+  currentColorSelectIndex = null;
+}
+
+// 드래그 앤 드롭 핸들러
+let draggedIndex = null;
+
+function handleDragStart(e) {
+  draggedIndex = parseInt(e.target.dataset.index);
+  e.target.classList.add('dragging');
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  const dropTarget = e.target.closest('.dataset-item');
+  
+  if (!dropTarget) return;
+  
+  const dropIndex = parseInt(dropTarget.dataset.index);
+  
+  if (draggedIndex !== null && draggedIndex !== dropIndex) {
+    const draggedItem = allDatasets[draggedIndex];
+    allDatasets.splice(draggedIndex, 1);
+    allDatasets.splice(dropIndex, 0, draggedItem);
+    updateDatasetManagement();
+    showStatus('데이터셋 순서가 변경되었습니다', 'success');
+  }
+}
+
+function handleDragEnd(e) {
+  e.target.classList.remove('dragging');
+  draggedIndex = null;
+}
+
+// ========================================
+// 3. 데이터 분석 및 차트 생성
+// ========================================
+function analyzeAllData() {
+  if (allDatasets.length === 0) {
+    showStatus('먼저 파일을 업로드해주세요', 'error');
+    return;
+  }
+  
+  const modeText = cellType === 'Fullcell' ? '🔋 Fullcell Mode' : '⚡ Cathode Mode';
+  const bgColor = cellType === 'Fullcell' ? '#4caf50' : '#ff9800';
+  
+  const capacityLabel = document.getElementById('capacityModeLabel');
+  const summaryLabel = document.getElementById('summaryModeLabel');
+  
+  if (capacityLabel) {
+    capacityLabel.textContent = modeText;
+    capacityLabel.style.background = bgColor;
+  }
+  if (summaryLabel) {
+    summaryLabel.textContent = modeText;
+    summaryLabel.style.background = 'rgba(255,255,255,0.3)';
+  }
+  
+  console.log(`Starting analysis in ${cellType} mode`);
+  
+  createCapacityCharts(allDatasets);
+  document.getElementById('capacitySection').style.display = 'block';
+  
+  generateSummaryTable(allDatasets);
+  document.getElementById('summarySection').style.display = 'block';
+  
+  showStatus('데이터 분석 완료!', 'success');
+}
+
+// ========================================
+// 4. Capacity 차트 생성
+// ========================================
+let capacityYAxisMode = 'absolute';
+
+// C-rate 경계 자동 감지 함수
+// Discharge 값의 급격한 변화를 기준으로 C-rate 변경점 탐지
+function detectCRateBoundaries(dischargeCapacity) {
+  const boundaries = [0]; // 첫 번째 경계는 항상 0
+  const threshold = 0.05; // 5% 이상 변화시 새 C-rate로 판단
+  
+  for (let i = 1; i < dischargeCapacity.length; i++) {
+    const prev = dischargeCapacity[i - 1];
+    const curr = dischargeCapacity[i];
+    const change = (curr - prev) / prev;
+    
+    // 용량이 급격히 감소하거나 증가하면 (5% 이상) 새 C-rate 시작
+    if (Math.abs(change) > threshold) {
+      boundaries.push(i);
+    }
+  }
+  
+  // 마지막 경계 추가
+  boundaries.push(dischargeCapacity.length);
+  
+  console.log('Detected boundaries:', boundaries);
+  
+  // 각 C-rate 구간의 마지막 인덱스 계산
+  const crateLastIndices = [];
+  for (let i = 0; i < boundaries.length - 1; i++) {
+    crateLastIndices.push(boundaries[i + 1] - 1);
+  }
+  
+  return { boundaries, crateLastIndices };
+}
+
+// C-rate 이름 배열
+const CRATE_NAMES = ['0.1C', '1/3C', '1C', '2C', '3C', '4C', '5C', '1C*'];
+
+function createCapacityCharts(datasets) {
+  const yAxisMode = document.getElementById('capacityYAxisMode')?.value || 'absolute';
+  capacityYAxisMode = yAxisMode;
+  xAxisMode = document.getElementById('xAxisMode')?.value || 'cycle';
+  
+  // 첫 번째 데이터셋으로 C-rate 경계 감지
+  const firstData = datasets[0].data;
+  const { boundaries, crateLastIndices } = detectCRateBoundaries(firstData.dischargeCapacity);
+  
+  console.log('=== C-rate Detection ===');
+  console.log('Boundaries (indices):', boundaries);
+  console.log('C-rate last indices:', crateLastIndices);
+  
+  // 각 C-rate 구간 정보 출력
+  for (let i = 0; i < crateLastIndices.length && i < CRATE_NAMES.length; i++) {
+    const startIdx = boundaries[i];
+    const endIdx = crateLastIndices[i];
+    const startCycle = firstData.cycles[startIdx];
+    const endCycle = firstData.cycles[endIdx];
+    console.log(`${CRATE_NAMES[i]}: cycles ${startCycle}-${endCycle} (indices ${startIdx}-${endIdx})`);
+  }
+  
+  // 1/3C 마지막 인덱스 (Retention 기준) - 두 번째 C-rate 구간의 마지막
+  const baselineIdx = crateLastIndices.length > 1 ? crateLastIndices[1] : 0;
+  
+  // ===== 좌측 차트: 방전 용량 (모든 데이터 포인트) =====
+  const capacityData = {
+    labels: [],
+    datasets: []
+  };
+  
+  // X축 라벨 생성 (C-rate 모드일 때)
+  if (xAxisMode === 'crate') {
+    const maxCycles = Math.max(...datasets.map(d => d.data.cycles.length));
+    for (let i = 0; i < maxCycles; i++) {
+      const label = getCRateLabelFromBoundaries(i, boundaries, true);
+      capacityData.labels.push(label);
+    }
+  }
+  
+  datasets.forEach((dataset) => {
+    const data = dataset.data;
+    
+    // 1/3C 마지막 값을 기준으로
+    const baselineDischarge = data.dischargeCapacity[baselineIdx] || data.dischargeCapacity[0];
+    
+    let chartData;
+    if (xAxisMode === 'crate') {
+      chartData = data.dischargeCapacity.map((dchg, i) => {
+        return yAxisMode === 'retention' 
+          ? (baselineDischarge > 0 ? (dchg / baselineDischarge) * 100 : 0)
+          : dchg;
+      });
+    } else {
+      chartData = data.cycles.map((cycle, i) => ({
+        x: cycle,
+        y: yAxisMode === 'retention' 
+          ? (baselineDischarge > 0 ? (data.dischargeCapacity[i] / baselineDischarge) * 100 : 0)
+          : data.dischargeCapacity[i]
+      }));
+    }
+    
+    capacityData.datasets.push({
+      label: dataset.name,
+      data: chartData,
+      borderColor: dataset.color,
+      backgroundColor: dataset.color + '40',
+      borderWidth: 2,
+      pointRadius: 3,
+      pointHoverRadius: 5,
+      tension: 0.1
+    });
+  });
+  
+  const yLabel = yAxisMode === 'retention' ? 'Capacity Retention (%)' : 'Discharge Capacity (mAh/g)';
+  
+  const titleElement = document.getElementById('capacityChartTitle');
+  if (titleElement) {
+    titleElement.textContent = yAxisMode === 'retention' 
+      ? '용량 유지율 (Capacity Retention, 1/3C 기준)' 
+      : '방전 용량 (Discharge Capacity)';
+  }
+  
+  createCapacityChart('capacityChart', capacityData, yLabel, 'capacity', xAxisMode, 4);
+  
+  // ===== 우측 차트: Capacity Retention (각 C-rate 마지막 값만, 5C까지) =====
+  // 실제 감지된 C-rate 수에 따라 라벨 결정 (최대 7개: 0.1C ~ 5C)
+  const numCRates = Math.min(crateLastIndices.length, 7);
+  const retentionLabels = CRATE_NAMES.slice(0, numCRates);
+  
+  const retentionData = {
+    labels: retentionLabels,
+    datasets: []
+  };
+  
+  datasets.forEach((dataset) => {
+    const data = dataset.data;
+    
+    // 1/3C 마지막 값을 100% 기준으로
+    const baselineDischarge = data.dischargeCapacity[baselineIdx] || data.dischargeCapacity[0];
+    
+    const chartData = [];
+    for (let i = 0; i < numCRates; i++) {
+      const lastIdx = crateLastIndices[i];
+      if (lastIdx !== undefined && lastIdx < data.dischargeCapacity.length && baselineDischarge > 0) {
+        chartData.push((data.dischargeCapacity[lastIdx] / baselineDischarge) * 100);
+      } else {
+        chartData.push(null);
+      }
+    }
+    
+    retentionData.datasets.push({
+      label: dataset.name,
+      data: chartData,
+      borderColor: dataset.color,
+      backgroundColor: dataset.color + '40',
+      borderWidth: 2,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      tension: 0.1,
+      spanGaps: false
+    });
+  });
+  
+  createRetentionChart('retentionChart', retentionData, 'Capacity Retention (%)', 'retention', 2);
+  
+  // 전역 변수로 저장 (Summary table에서 사용)
+  window.crateLastIndices = crateLastIndices;
+  window.baselineIdx = baselineIdx;
+}
+
+// 경계 기반 C-rate 라벨 생성
+function getCRateLabelFromBoundaries(index, boundaries, detailed = true) {
+  for (let i = 0; i < boundaries.length - 1; i++) {
+    if (index >= boundaries[i] && index < boundaries[i + 1]) {
+      const crateName = CRATE_NAMES[i] || `Rate${i + 1}`;
+      if (detailed) {
+        const cycleInRate = index - boundaries[i] + 1;
+        return `${crateName}-${cycleInRate}`;
+      }
+      return crateName;
+    }
+  }
+  return `Cycle ${index + 1}`;
+}
+
+// Capacity 차트 생성 (좌측)
+function createCapacityChart(canvasId, data, yLabel, chartType, axisMode, legendPerRow = 4) {
+  const ctx = document.getElementById(canvasId);
+  
+  if (charts[chartType]) {
+    charts[chartType].destroy();
+  }
+  
+  const isCategory = axisMode === 'crate';
+  
+  const xAxisConfig = isCategory ? {
+    type: 'category',
+    labels: data.labels,
+    title: {
+      display: true,
+      text: 'C-rate',
+      font: { size: 21, weight: 'bold' }
+    },
+    ticks: { 
+      font: { size: 20 },
+      maxRotation: 45,
+      minRotation: 45
+    },
+    grid: { color: '#e0e0e0' }
+  } : {
+    type: 'linear',
+    title: {
+      display: true,
+      text: 'Cycle',
+      font: { size: 21, weight: 'bold' }
+    },
+    ticks: { font: { size: 18, weight: 'bold' } },
+    grid: { color: '#e0e0e0' }
+  };
+  
+  charts[chartType] = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: xAxisConfig,
+        y: {
+          title: {
+            display: true,
+            text: yLabel,
+            font: { size: 21, weight: 'bold' }
+          },
+          ticks: { font: { size: 18, weight: 'bold' } },
+          grid: { color: '#e0e0e0' }
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { 
+            font: { size: 11 }, 
+            usePointStyle: true,
+            padding: 8,
+            boxWidth: 12
+          },
+          onClick: (e, legendItem, legend) => {
+            const index = legendItem.datasetIndex;
+            const chart = legend.chart;
+            const meta = chart.getDatasetMeta(index);
+            meta.hidden = !meta.hidden;
+            chart.update();
+          }
+        },
+        tooltip: {
+          mode: 'nearest',
+          intersect: false,
+          bodyFont: { size: 12 },
+          titleFont: { size: 13 },
+          callbacks: {
+            title: function(context) {
+              if (isCategory) {
+                return data.labels[context[0].dataIndex];
+              }
+              return 'Cycle ' + context[0].parsed.x;
+            }
+          }
+        },
+        zoom: {
+          zoom: {
+            wheel: {
+              enabled: true
+            },
+            pinch: {
+              enabled: true
+            },
+            drag: {
+              enabled: true,
+              backgroundColor: 'rgba(52, 152, 219, 0.3)',
+              borderColor: 'rgba(52, 152, 219, 1)',
+              borderWidth: 1
+            },
+            mode: 'xy'
+          },
+          pan: {
+            enabled: true,
+            mode: 'xy',
+            modifierKey: 'shift'
+          }
+        }
+      },
+      onClick: (event, elements) => {
+        handleChartClick(event, elements, chartType);
+      }
+    }
+  });
+}
+
+// Retention 차트 생성 (우측)
+function createRetentionChart(canvasId, data, yLabel, chartType, legendPerRow = 2) {
+  const ctx = document.getElementById(canvasId);
+  
+  if (charts[chartType]) {
+    charts[chartType].destroy();
+  }
+  
+  charts[chartType] = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: 'category',
+          title: {
+            display: true,
+            text: 'C-rate',
+            font: { size: 21, weight: 'bold' }
+          },
+          ticks: { font: { size: 18, weight: 'bold' } },
+          grid: { color: '#e0e0e0' }
+        },
+        y: {
+          title: {
+            display: true,
+            text: yLabel,
+            font: { size: 21, weight: 'bold' }
+          },
+          ticks: { font: { size: 18, weight: 'bold' } },
+          grid: { color: '#e0e0e0' }
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { 
+            font: { size: 10 }, 
+            usePointStyle: true,
+            padding: 6,
+            boxWidth: 10
+          },
+          onClick: (e, legendItem, legend) => {
+            const index = legendItem.datasetIndex;
+            const chart = legend.chart;
+            const meta = chart.getDatasetMeta(index);
+            meta.hidden = !meta.hidden;
+            chart.update();
+          }
+        },
+        tooltip: {
+          mode: 'nearest',
+          intersect: false,
+          bodyFont: { size: 12 },
+          titleFont: { size: 13 }
+        },
+        zoom: {
+          zoom: {
+            wheel: {
+              enabled: true
+            },
+            pinch: {
+              enabled: true
+            },
+            drag: {
+              enabled: true,
+              backgroundColor: 'rgba(52, 152, 219, 0.3)',
+              borderColor: 'rgba(52, 152, 219, 1)',
+              borderWidth: 1
+            },
+            mode: 'xy'
+          },
+          pan: {
+            enabled: true,
+            mode: 'xy',
+            modifierKey: 'shift'
+          }
+        }
+      },
+      onClick: (event, elements) => {
+        handleChartClick(event, elements, chartType);
+      }
+    }
+  });
+}
+
+function handleChartClick(event, elements, chartType) {
+  const infoId = chartType === 'capacity' ? 'clickInfoCapacity' : 'clickInfoRetention';
+  const infoDiv = document.getElementById(infoId);
+  
+  if (elements.length > 0) {
+    const element = elements[0];
+    const chart = charts[chartType];
+    const dataset = chart.data.datasets[element.datasetIndex];
+    const point = dataset.data[element.index];
+    
+    infoDiv.innerHTML = `
+      <strong>${dataset.label}</strong><br>
+      X: ${point.x}<br>
+      값: ${point.y.toFixed(2)}
+    `;
+    infoDiv.classList.add('active');
+  } else {
+    infoDiv.classList.remove('active');
+  }
+}
+
+function toggleCapacityYAxis() {
+  createCapacityCharts(allDatasets);
+}
+
+function toggleXAxisMode() {
+  xAxisMode = document.getElementById('xAxisMode').value;
+  createCapacityCharts(allDatasets);
+}
+
+function applyZoom(chartType) {
+  const minCycle = parseFloat(document.getElementById(`${chartType}MinCycle`).value);
+  const maxCycle = parseFloat(document.getElementById(`${chartType}MaxCycle`).value);
+  const minY = parseFloat(document.getElementById(`${chartType}MinY`).value);
+  const maxY = parseFloat(document.getElementById(`${chartType}MaxY`).value);
+  
+  // 좌우 차트 모두 적용
+  ['capacity', 'retention'].forEach(type => {
+    const chart = charts[type];
+    if (!chart) return;
+    
+    if (!isNaN(minCycle) || !isNaN(maxCycle)) {
+      chart.options.scales.x.min = isNaN(minCycle) ? undefined : minCycle;
+      chart.options.scales.x.max = isNaN(maxCycle) ? undefined : maxCycle;
+    }
+    
+    if (!isNaN(minY) || !isNaN(maxY)) {
+      chart.options.scales.y.min = isNaN(minY) ? undefined : minY;
+      chart.options.scales.y.max = isNaN(maxY) ? undefined : maxY;
+    }
+    
+    chart.update();
+  });
+  
+  showStatus('줌 적용 완료', 'success');
+}
+
+function resetZoom(chartType) {
+  ['capacity', 'retention'].forEach(type => {
+    const chart = charts[type];
+    if (!chart) return;
+    
+    chart.options.scales.x.min = undefined;
+    chart.options.scales.x.max = undefined;
+    chart.options.scales.y.min = undefined;
+    chart.options.scales.y.max = undefined;
+    
+    chart.resetZoom();
+    chart.update();
+  });
+  
+  document.getElementById(`${chartType}MinCycle`).value = '';
+  document.getElementById(`${chartType}MaxCycle`).value = '';
+  document.getElementById(`${chartType}MinY`).value = '';
+  document.getElementById(`${chartType}MaxY`).value = '';
+  
+  showStatus('줌 초기화 완료', 'success');
+}
+
+// ========================================
+// 5. 요약 테이블 생성
+// ========================================
+function generateSummaryTable(datasets) {
+  const tbody = document.getElementById('summaryBody');
+  tbody.innerHTML = '';
+  
+  // 첫 번째 데이터셋으로 C-rate 경계 감지
+  const firstData = datasets[0].data;
+  const { boundaries, crateLastIndices } = detectCRateBoundaries(firstData.dischargeCapacity);
+  
+  // 1/3C 마지막 인덱스 (두 번째 C-rate)
+  const baselineIdx = crateLastIndices.length > 1 ? crateLastIndices[1] : 0;
+  
+  // 각 C-rate의 마지막 인덱스 (최대 8개: 0.1C, 1/3C, 1C, 2C, 3C, 4C, 5C, 1C*)
+  // 인덱스: 0=0.1C, 1=1/3C, 2=1C, 3=2C, 4=3C, 5=4C, 6=5C, 7=1C*
+  
+  console.log('=== Summary Table Calculation ===');
+  console.log('Baseline index (1/3C last):', baselineIdx);
+  console.log('C-rate last indices:', crateLastIndices);
+  
+  datasets.forEach(dataset => {
+    const data = dataset.data;
+    const row = document.createElement('tr');
+    
+    console.log(`\n--- ${dataset.name} ---`);
+    
+    const firstCharge = data.chargeCapacity[0] || 0;
+    const firstDischarge = data.dischargeCapacity[0] || 0;
+    
+    // ICE = (방전 / 충전) × 100
+    const ice = firstCharge > 0 ? (firstDischarge / firstCharge * 100).toFixed(2) : '0.00';
+    
+    // 1/3C 마지막 값을 기준으로
+    const baselineDischarge = data.dischargeCapacity[baselineIdx] || data.dischargeCapacity[0];
+    console.log(`Baseline (1/3C, idx ${baselineIdx}): ${baselineDischarge?.toFixed(2)} mAh/g`);
+    
+    // 1/3C Recovery Rate (마지막 1/3C* / 처음 1/3C)
+    const oneThirdCFirstIdx = crateLastIndices[1]; // 1/3C (두 번째 C-rate)
+    const oneThirdCRecoveryIdx = crateLastIndices[7]; // 1/3C* (여덟 번째 C-rate)
+    
+    let recoveryRate = '-';
+    if (oneThirdCFirstIdx !== undefined && oneThirdCRecoveryIdx !== undefined && 
+        oneThirdCFirstIdx < data.dischargeCapacity.length && oneThirdCRecoveryIdx < data.dischargeCapacity.length) {
+      const oneThirdCFirst = data.dischargeCapacity[oneThirdCFirstIdx];
+      const oneThirdCRecovery = data.dischargeCapacity[oneThirdCRecoveryIdx];
+      console.log(`1/3C Recovery: first(idx ${oneThirdCFirstIdx})=${oneThirdCFirst?.toFixed(2)}, recovery(idx ${oneThirdCRecoveryIdx})=${oneThirdCRecovery?.toFixed(2)}`);
+      if (oneThirdCFirst > 0) {
+        recoveryRate = ((oneThirdCRecovery / oneThirdCFirst) * 100).toFixed(2);
+      }
+    } else {
+      console.log('1/3C Recovery: indices not available');
+    }
+    
+    // Rate Capability 계산 함수
+    function getRateCapability(crateIndex) {
+      const idx = crateLastIndices[crateIndex];
+      if (idx !== undefined && idx < data.dischargeCapacity.length && baselineDischarge > 0) {
+        const val = data.dischargeCapacity[idx];
+        const ratio = (val / baselineDischarge * 100).toFixed(2);
+        console.log(`${CRATE_NAMES[crateIndex]} (idx ${idx}): ${val?.toFixed(2)} mAh/g, ratio=${ratio}%`);
+        return ratio;
+      }
+      return '-';
+    }
+    
+    row.innerHTML = `
+      <td style="color: ${dataset.color}; font-weight: bold;">${dataset.name}</td>
+      <td>${firstCharge.toFixed(2)}</td>
+      <td>${firstDischarge.toFixed(2)}</td>
+      <td>${ice}</td>
+      <td>${recoveryRate}</td>
+      <td>${getRateCapability(2)}</td>
+      <td>${getRateCapability(3)}</td>
+      <td>${getRateCapability(4)}</td>
+      <td>${getRateCapability(5)}</td>
+      <td>${getRateCapability(6)}</td>
+    `;
+    
+    tbody.appendChild(row);
+  });
+}
+
+function exportSummaryCSV() {
+  if (allDatasets.length === 0) {
+    showStatus('요약할 데이터가 없습니다', 'error');
+    return;
+  }
+  
+  let csvContent = 'Sample,1st Chg (mAh/g),1st Dchg (mAh/g),ICE (%),1/3C Recovery (%),1C/0.33C (%),2C/0.33C (%),3C/0.33C (%),4C/0.33C (%),5C/0.33C (%)\n';
+  
+  // 첫 번째 데이터셋으로 C-rate 경계 감지
+  const firstData = allDatasets[0].data;
+  const { crateLastIndices } = detectCRateBoundaries(firstData.dischargeCapacity);
+  const baselineIdx = crateLastIndices.length > 1 ? crateLastIndices[1] : 0;
+  
+  allDatasets.forEach(dataset => {
+    const data = dataset.data;
+    
+    const firstCharge = data.chargeCapacity[0] || 0;
+    const firstDischarge = data.dischargeCapacity[0] || 0;
+    const ice = firstCharge > 0 ? (firstDischarge / firstCharge * 100).toFixed(2) : '0.00';
+    
+    const baselineDischarge = data.dischargeCapacity[baselineIdx] || data.dischargeCapacity[0];
+    
+    // 1/3C Recovery
+    const oneThirdCFirstIdx = crateLastIndices[1];
+    const oneThirdCRecoveryIdx = crateLastIndices[7];
+    let recoveryRate = '-';
+    if (oneThirdCFirstIdx !== undefined && oneThirdCRecoveryIdx !== undefined &&
+        oneThirdCFirstIdx < data.dischargeCapacity.length && oneThirdCRecoveryIdx < data.dischargeCapacity.length) {
+      const oneThirdCFirst = data.dischargeCapacity[oneThirdCFirstIdx];
+      const oneThirdCRecovery = data.dischargeCapacity[oneThirdCRecoveryIdx];
+      if (oneThirdCFirst > 0) {
+        recoveryRate = ((oneThirdCRecovery / oneThirdCFirst) * 100).toFixed(2);
+      }
+    }
+    
+    function getRateCapability(crateIndex) {
+      const idx = crateLastIndices[crateIndex];
+      if (idx !== undefined && idx < data.dischargeCapacity.length && baselineDischarge > 0) {
+        return ((data.dischargeCapacity[idx] / baselineDischarge) * 100).toFixed(2);
+      }
+      return '-';
+    }
+    
+    csvContent += `${dataset.name},${firstCharge.toFixed(2)},${firstDischarge.toFixed(2)},${ice},${recoveryRate},${getRateCapability(2)},${getRateCapability(3)},${getRateCapability(4)},${getRateCapability(5)},${getRateCapability(6)}\n`;
+  });
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'rate_capability_summary_' + new Date().toISOString().slice(0,10) + '.csv');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  showStatus('CSV 파일이 다운로드되었습니다', 'success');
+}
+
+// ========================================
+// 6. 화면 캡처 기능
+// ========================================
+async function captureSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  
+  if (!section) {
+    showStatus('캡처할 섹션을 찾을 수 없습니다', 'error');
+    return;
+  }
+  
+  try {
+    showStatus('화면 캡처 중...', 'info');
+    
+    const canvas = await html2canvas(section, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      logging: false,
+      useCORS: true
+    });
+    
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${sectionId}_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.png`;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      showStatus('화면 캡처 완료!', 'success');
+    });
+  } catch (error) {
+    console.error('Capture error:', error);
+    showStatus('화면 캡처 실패: ' + error.message, 'error');
+  }
+}
+
+async function captureIndividualChart(wrapperId) {
+  const wrapper = document.getElementById(wrapperId);
+  
+  if (!wrapper) {
+    showStatus('캡처할 차트를 찾을 수 없습니다', 'error');
+    return;
+  }
+  
+  try {
+    showStatus('차트 캡처 중...', 'info');
+    
+    const canvas = await html2canvas(wrapper, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      logging: false,
+      useCORS: true
+    });
+    
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      const titleElement = wrapper.querySelector('.chart-title span');
+      const chartName = titleElement ? titleElement.textContent.trim() : 'chart';
+      const fileName = `${chartName.replace(/[^a-zA-Z0-9가-힣]/g, '_')}_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.png`;
+      
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      showStatus('차트 캡처 완료!', 'success');
+    });
+  } catch (error) {
+    console.error('Capture error:', error);
+    showStatus('차트 캡처 실패: ' + error.message, 'error');
+  }
+}
+
+// ========================================
+// 7. 유틸리티 함수
+// ========================================
+function showStatus(message, type = 'info') {
+  const statusDiv = document.getElementById('statusMessage');
+  statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+  
+  setTimeout(() => {
+    statusDiv.innerHTML = '';
+  }, 5000);
+}
+
+// ========================================
+// 8. 프로젝트 저장/불러오기
+// ========================================
+async function saveProject() {
+  if (allDatasets.length === 0) {
+    showStatus('저장할 데이터가 없습니다. 먼저 파일을 업로드하세요.', 'error');
+    return;
+  }
+  
+  try {
+    const projectData = {
+      version: '2.0',
+      timestamp: new Date().toISOString(),
+      cellType: cellType,
+      datasets: allDatasets.map(ds => ({
+        id: ds.id,
+        name: ds.name,
+        type: ds.type,
+        fileName: ds.fileName,
+        color: ds.color,
+        colorName: ds.colorName,
+        colorVariant: ds.colorVariant,
+        data: ds.data
+      })),
+      nextId: nextId
+    };
+    
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    const fileName = `rate_capability_project_${timestamp}.json`;
+    const jsonString = JSON.stringify(projectData, null, 2);
+    
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showStatus(`프로젝트 저장 완료! (${allDatasets.length}개 데이터셋)`, 'success')
+    
+  } catch (error) {
+    console.error('Save project error:', error);
+    showStatus('프로젝트 저장 실패: ' + error.message, 'error');
+  }
+}
+
+function loadProject(event) {
+  const file = event.target.files[0];
+  
+  if (!file) return;
+  
+  const reader = new FileReader();
+  
+  reader.onload = (e) => {
+    try {
+      showStatus('프로젝트 불러오는 중...', 'info');
+      
+      const projectData = JSON.parse(e.target.result);
+      
+      if (!projectData.version || !projectData.datasets) {
+        throw new Error('유효하지 않은 프로젝트 파일입니다');
+      }
+      
+      if (projectData.cellType) {
+        cellType = projectData.cellType;
+        const select = document.getElementById('cellTypeSelect');
+        const badge = document.getElementById('cellTypeBadge');
+        
+        select.value = cellType;
+        
+        const modeText = cellType === 'Fullcell' ? '🔋 Fullcell Mode' : '⚡ Cathode Mode';
+        const bgColor = cellType === 'Fullcell' ? '#4caf50' : '#ff9800';
+        
+        badge.textContent = modeText;
+        badge.style.background = bgColor;
+      }
+      
+      allDatasets = projectData.datasets.map(ds => ({
+        id: ds.id,
+        name: ds.name,
+        type: ds.type || 'capacity',
+        fileName: ds.fileName,
+        color: ds.color,
+        colorName: ds.colorName || colorNames[0],
+        colorVariant: ds.colorVariant || 0,
+        data: ds.data
+      }));
+      
+      nextId = projectData.nextId || (allDatasets.length > 0 ? Math.max(...allDatasets.map(d => d.id)) + 1 : 1);
+      
+      updateDatasetManagement();
+      
+      showStatus(`프로젝트 불러오기 완료! (${allDatasets.length}개 데이터셋, ${cellType} 모드) - "데이터 분석 실행" 버튼을 클릭하세요.`, 'success');
+      
+    } catch (error) {
+      console.error('Load project error:', error);
+      showStatus('프로젝트 불러오기 실패: ' + error.message, 'error');
+    }
+  };
+  
+  reader.onerror = () => {
+    showStatus('파일 읽기 실패', 'error');
+  };
+  
+  reader.readAsText(file);
+  
+  event.target.value = '';
+}
+
+</script>
+</body>
+</html>
