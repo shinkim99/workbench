@@ -561,19 +561,16 @@
     <div class="panel-title">API 설정</div>
     <div class="config-grid">
       <div class="field-group">
-        <label>CLAUDE_API_KEY <span style="font-size:9px;color:var(--green);">● 자동저장</span></label>
-        <input type="password" id="claudeKey" placeholder="sk-ant-..."
-          oninput="localStorage.setItem('sf_claude_key', this.value)" />
+        <label>CLAUDE_API_KEY</label>
+        <input type="password" id="claudeKey" placeholder="sk-ant-..." />
       </div>
       <div class="field-group">
-        <label>N8N_WEBHOOK_URL (Zotero 저장용) <span style="font-size:9px;color:var(--green);">● 자동저장</span></label>
-        <input type="text" id="n8nWebhook" placeholder="https://your-n8n.cloud/webhook/..."
-          oninput="localStorage.setItem('sf_n8n_webhook', this.value)" />
+        <label>N8N_WEBHOOK_URL (Zotero 저장용)</label>
+        <input type="text" id="n8nWebhook" placeholder="https://your-n8n.cloud/webhook/..." />
       </div>
       <div class="field-group">
-        <label>ZOTERO 컬렉션 이름 <span style="color:var(--muted); font-weight:300;">(비워두면 My Library에 저장)</span> <span style="font-size:9px;color:var(--green);">● 자동저장</span></label>
-        <input type="text" id="zoteroCollection" placeholder="예: CNT_배터리_2024, 리튬이온_전극..."
-          oninput="localStorage.setItem('sf_zotero_collection', this.value)" />
+        <label>ZOTERO 컬렉션 이름 <span style="color:var(--muted); font-weight:300;">(비워두면 My Library에 저장)</span></label>
+        <input type="text" id="zoteroCollection" placeholder="예: CNT_배터리_2024, 리튬이온_전극..." />
       </div>
     </div>
   </div>
@@ -583,14 +580,13 @@
     <div class="panel-title">검색 설정</div>
 
     <div class="search-row">
-      <div class="search-input-wrap" style="position:relative;">
-        <span class="search-icon" style="top:16px;transform:none;">🔍</span>
-        <textarea id="searchInput" rows="2"
-          style="padding-left:40px; font-size:13px; min-height:56px; font-family:var(--sans);"
-          placeholder="찾고 싶은 논문에 대해 자유롭게 서술하세요 (한글 OK)&#10;예: SWCNT를 리튬이온 배터리 음극 도전재로 사용할 때 분산 방법과 전극 특성에 관한 연구를 찾고 싶어"
-          onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); generateQueries(); }"></textarea>
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput"
+          placeholder="검색 주제 입력 (예: CNT 분산, 리튬이온 배터리 전극...)"
+          onkeydown="if(event.key==='Enter') generateQueries()" />
       </div>
-      <button class="btn btn-secondary" onclick="generateQueries()" id="genBtn" style="align-self:flex-start;margin-top:4px;">검색식 생성</button>
+      <button class="btn btn-secondary" onclick="generateQueries()" id="genBtn">검색식 생성</button>
     </div>
 
     <!-- Query chips -->
@@ -721,37 +717,38 @@
           max_tokens: 1000,
           messages: [{
             role: 'user',
-            content: `You are an expert at finding academic papers on Semantic Scholar.
+            content: `You are a Semantic Scholar search expert.
 
-The user wants to find papers about the following topic. They may describe it in Korean, English, or a mix:
+Topic (may be Korean or English): "${keyword}"
 
-"""
-${keyword}
-"""
+Generate exactly 5 English search queries for Semantic Scholar API.
 
-Your job: Generate 8 English search queries optimized for Semantic Scholar API.
+CRITICAL RULES:
+1. Each query MUST be 2-4 words only (Semantic Scholar works best with short queries)
+2. Use only English academic terms
+3. NO long phrases or sentences
+4. Mix broad and specific angles
+5. If the topic is in Korean, translate to precise English academic terms
 
-CRITICAL RULES FOR SEMANTIC SCHOLAR:
-1. Each query MUST be 2-4 words (the API returns 0 results for long queries)
-2. Generate queries at MULTIPLE levels of specificity:
-   - 2 broad queries (general field terms, e.g. "carbon nanotube electrode")
-   - 3 medium queries (specific topic, e.g. "SWCNT dispersion anode")
-   - 3 narrow queries (technique/material specific, e.g. "CNT slurry rheology")
-3. Use SYNONYMS and ALTERNATIVE TERMS:
-   - CNT / carbon nanotube / MWCNT / SWCNT
-   - dispersion / distribution / mixing
-   - electrode / anode / cathode
-   - battery / lithium-ion / LIB
-4. Translate Korean technical terms to precise English academic terms
-5. Do NOT use full sentences — only keyword combinations
+GOOD examples: "CNT electrode dispersion", "carbon nanotube binder", "MWCNT slurry rheology"
+BAD examples: "multi-walled carbon nanotube dispersant binder battery electrode composite" (too long, will return 0 results)
 
 Return ONLY a JSON array, no other text:
-["query1", "query2", "query3", "query4", "query5", "query6", "query7", "query8"]`
+["query1", "query2", "query3", "query4", "query5"]`
           }]
         })
       });
 
       const data = await response.json();
+      
+      // API 에러 체크
+      if (data.error) {
+        throw new Error(`API 에러: ${data.error.type} - ${data.error.message}`);
+      }
+      if (!data.content || !data.content[0]) {
+        throw new Error(`응답 형식 오류: ${JSON.stringify(data).slice(0, 200)}`);
+      }
+      
       const text = data.content[0].text.trim();
       const clean = text.replace(/```json|```/g, '').trim();
       queries = JSON.parse(clean);
@@ -997,6 +994,14 @@ Return ONLY a JSON array, no other text:
       });
 
       const data = await res.json();
+      
+      if (data.error) {
+        throw new Error(`API: ${data.error.type} - ${data.error.message}`);
+      }
+      if (!data.content || !data.content[0]) {
+        throw new Error(`응답 오류: ${JSON.stringify(data).slice(0, 200)}`);
+      }
+      
       const text = data.content[0].text.trim().replace(/```json|```/g, '');
       const result = JSON.parse(text);
 
@@ -1123,16 +1128,6 @@ Return ONLY a JSON array, no other text:
     URL.revokeObjectURL(url);
     log(`CSV 내보내기 완료 (${papers.length}편)`, 'success');
   }
-
-  // ── 저장된 설정 복원 ──────────────────────────────
-  (function loadSavedConfig() {
-    const k = localStorage.getItem('sf_claude_key');
-    const w = localStorage.getItem('sf_n8n_webhook');
-    const c = localStorage.getItem('sf_zotero_collection');
-    if (k) document.getElementById('claudeKey').value = k;
-    if (w) document.getElementById('n8nWebhook').value = w;
-    if (c) document.getElementById('zoteroCollection').value = c;
-  })();
 </script>
 </body>
 </html>
