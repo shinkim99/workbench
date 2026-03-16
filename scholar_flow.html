@@ -805,40 +805,49 @@ Return ONLY a JSON array, no other text:
     for (const q of activeQueries) {
       log(`검색 중: "${q}"`, 'info');
       try {
-        // Semantic Scholar 검색 (연도 필터 포함)
-        const yearFilter = `&year=${minYear}-`;
-        const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(q)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url${yearFilter}&sort=${sortBy === 'citationCount' ? 'citationCount' : sortBy === 'year' ? 'publicationDate' : 'relevance'}`;
+        // Semantic Scholar BULK search (더 많은 결과, 정렬 지원)
+        const url = `https://api.semanticscholar.org/graph/v1/paper/search/bulk?query=${encodeURIComponent(q)}&fields=title,authors,year,citationCount,abstract,externalIds,url&year=${minYear}-&minCitationCount=${minCit}`;
         const res = await fetch(url);
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+          const errText = await res.text();
+          log(`"${q}" HTTP ${res.status}: ${errText.slice(0, 100)}`, 'error');
+          // Fallback: 일반 search endpoint (sort/filter 없이)
+          const fallbackUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(q)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url`;
+          const fbRes = await fetch(fallbackUrl);
+          if (fbRes.ok) {
+            const fbData = await fbRes.json();
+            if (fbData.data) {
+              const filtered = fbData.data.filter(p => p.abstract && (p.year || 0) >= minYear);
+              papers.push(...filtered);
+              log(`"${q}" → ${filtered.length}편 (fallback search)`, 'success');
+            }
+          }
+          continue;
+        }
+
         const data = await res.json();
 
         if (data.data && data.data.length > 0) {
-          const filtered = data.data.filter(p =>
-            (p.citationCount || 0) >= minCit &&
-            (p.year || 0) >= minYear &&
-            p.abstract
-          );
+          // bulk search는 최대 1000개 반환 — limit만큼만 취함
+          const sliced = data.data.slice(0, limit);
+          const filtered = sliced.filter(p => p.abstract);
           papers.push(...filtered);
-          log(`"${q}" → ${filtered.length}편 수집`, 'success');
+          log(`"${q}" → ${filtered.length}편 수집 (총 ${data.total || '?'}편 중)`, 'success');
         } else {
-          // Fallback: 쿼리가 너무 길면 앞 3단어만으로 재시도
+          // Fallback: 쿼리 단어 줄여서 재시도
           const words = q.split(/\s+/);
-          if (words.length > 3) {
-            const shortQ = words.slice(0, 3).join(' ');
+          if (words.length > 2) {
+            const shortQ = words.slice(0, 2).join(' ');
             log(`"${q}" 결과 없음 → "${shortQ}"로 재시도`, 'warn');
-            const retryUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(shortQ)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url${yearFilter}&sort=${sortBy === 'citationCount' ? 'citationCount' : sortBy === 'year' ? 'publicationDate' : 'relevance'}`;
+            const retryUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(shortQ)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url`;
             const retryRes = await fetch(retryUrl);
             if (retryRes.ok) {
               const retryData = await retryRes.json();
               if (retryData.data) {
-                const filtered = retryData.data.filter(p =>
-                  (p.citationCount || 0) >= minCit &&
-                  (p.year || 0) >= minYear &&
-                  p.abstract
-                );
+                const filtered = retryData.data.filter(p => p.abstract && (p.year || 0) >= minYear);
                 papers.push(...filtered);
-                log(`"${shortQ}" → ${filtered.length}편 수집 (fallback)`, 'success');
+                log(`"${shortQ}" → ${filtered.length}편 (fallback)`, 'success');
               }
             }
           } else {
@@ -848,8 +857,8 @@ Return ONLY a JSON array, no other text:
       } catch (e) {
         log(`"${q}" 검색 실패: ${e.message}`, 'error');
       }
-      // API rate limit 방지 (1초 간격)
-      await new Promise(r => setTimeout(r, 1000));
+      // API rate limit 방지 (1.5초 간격 — bulk는 rate limit 더 엄격)
+      await new Promise(r => setTimeout(r, 1500));
     }
 
     // 중복 제거
