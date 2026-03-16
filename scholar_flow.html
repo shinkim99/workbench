@@ -626,6 +626,12 @@
       <button class="btn btn-primary" onclick="searchPapers()" id="searchBtn" style="align-self:flex-end;">
         논문 검색
       </button>
+      <div class="field-group" style="align-self:flex-end;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;">
+          <input type="checkbox" id="oaOnly" style="accent-color:var(--accent);width:14px;height:14px;cursor:pointer;" checked>
+          <span>📄 PDF 있는 논문만</span>
+        </label>
+      </div>
     </div>
 
     <div class="log-box" id="logBox">
@@ -794,6 +800,7 @@ Return ONLY a JSON array, no other text:
     const minYear = parseInt(document.getElementById('minYear').value) || 2018;
     const limit = parseInt(document.getElementById('paperLimit').value) || 10;
     const sortBy = document.getElementById('sortBy').value;
+    const oaOnly = document.getElementById('oaOnly').checked;
 
     const btn = document.getElementById('searchBtn');
     btn.disabled = true;
@@ -806,19 +813,19 @@ Return ONLY a JSON array, no other text:
       log(`검색 중: "${q}"`, 'info');
       try {
         // Semantic Scholar BULK search (더 많은 결과, 정렬 지원)
-        const url = `https://api.semanticscholar.org/graph/v1/paper/search/bulk?query=${encodeURIComponent(q)}&fields=title,authors,year,citationCount,abstract,externalIds,url&year=${minYear}-&minCitationCount=${minCit}`;
+        const url = `https://api.semanticscholar.org/graph/v1/paper/search/bulk?query=${encodeURIComponent(q)}&fields=title,authors,year,citationCount,abstract,externalIds,url,openAccessPdf&year=${minYear}-&minCitationCount=${minCit}&openAccessPdf`;
         const res = await fetch(url);
 
         if (!res.ok) {
           const errText = await res.text();
           log(`"${q}" HTTP ${res.status}: ${errText.slice(0, 100)}`, 'error');
           // Fallback: 일반 search endpoint (sort/filter 없이)
-          const fallbackUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(q)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url`;
+          const fallbackUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(q)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url,openAccessPdf`;
           const fbRes = await fetch(fallbackUrl);
           if (fbRes.ok) {
             const fbData = await fbRes.json();
             if (fbData.data) {
-              const filtered = fbData.data.filter(p => p.abstract && (p.year || 0) >= minYear);
+              const filtered = fbData.data.filter(p => p.abstract && (p.year || 0) >= minYear && (!oaOnly || p.openAccessPdf?.url));
               papers.push(...filtered);
               log(`"${q}" → ${filtered.length}편 (fallback search)`, 'success');
             }
@@ -831,7 +838,7 @@ Return ONLY a JSON array, no other text:
         if (data.data && data.data.length > 0) {
           // bulk search는 최대 1000개 반환 — limit만큼만 취함
           const sliced = data.data.slice(0, limit);
-          const filtered = sliced.filter(p => p.abstract);
+          const filtered = sliced.filter(p => p.abstract && (!oaOnly || p.openAccessPdf?.url));
           papers.push(...filtered);
           log(`"${q}" → ${filtered.length}편 수집 (총 ${data.total || '?'}편 중)`, 'success');
         } else {
@@ -840,12 +847,12 @@ Return ONLY a JSON array, no other text:
           if (words.length > 2) {
             const shortQ = words.slice(0, 2).join(' ');
             log(`"${q}" 결과 없음 → "${shortQ}"로 재시도`, 'warn');
-            const retryUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(shortQ)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url`;
+            const retryUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(shortQ)}&limit=${limit}&fields=title,authors,year,citationCount,abstract,externalIds,url,openAccessPdf`;
             const retryRes = await fetch(retryUrl);
             if (retryRes.ok) {
               const retryData = await retryRes.json();
               if (retryData.data) {
-                const filtered = retryData.data.filter(p => p.abstract && (p.year || 0) >= minYear);
+                const filtered = retryData.data.filter(p => p.abstract && (p.year || 0) >= minYear && (!oaOnly || p.openAccessPdf?.url));
                 papers.push(...filtered);
                 log(`"${shortQ}" → ${filtered.length}편 (fallback)`, 'success');
               }
@@ -896,6 +903,7 @@ Return ONLY a JSON array, no other text:
 
       const doi = p.externalIds?.DOI || '';
       const doiLink = doi ? `https://doi.org/${doi}` : (p.url || '#');
+      const pdfUrl = p.openAccessPdf?.url || '';
 
       card.innerHTML = `
         <div class="paper-header">
@@ -908,6 +916,7 @@ Return ONLY a JSON array, no other text:
               <span>📅 ${p.year || '-'}</span>
               <span>📊 인용 ${p.citationCount || 0}</span>
               ${doi ? `<span>🔗 <a href="${doiLink}" target="_blank" style="color:var(--accent); text-decoration:none;">DOI</a></span>` : ''}
+              ${pdfUrl ? `<span>📄 <a href="${pdfUrl}" target="_blank" style="color:var(--green); text-decoration:none; font-weight:600;">PDF</a></span>` : '<span style="color:var(--muted);font-size:10px;">📄 No PDF</span>'}
             </div>
             <div class="paper-actions">
               <span class="badge badge-mid" id="badge-${i}">관련도 미평가</span>
@@ -1075,6 +1084,7 @@ Return ONLY a JSON array, no other text:
         year: p.year,
         doi: p.externalIds?.DOI || '',
         url: p.url || '',
+        pdfUrl: p.openAccessPdf?.url || '',
         abstract: p.abstract || '',
         citationCount: p.citationCount || 0,
         summary: p._summary?.summary || '',
@@ -1113,13 +1123,14 @@ Return ONLY a JSON array, no other text:
   function exportCSV() {
     if (papers.length === 0) { alert('검색 결과가 없습니다'); return; }
 
-    const headers = ['제목','저자','연도','인용수','DOI','관련도','요약','핵심발견','키워드','검색일'];
+    const headers = ['제목','저자','연도','인용수','DOI','PDF_URL','관련도','요약','핵심발견','키워드','검색일'];
     const rows = papers.map(p => [
       `"${(p.title||'').replace(/"/g,'""')}"`,
       `"${(p.authors||[]).map(a=>a.name).join('; ').replace(/"/g,'""')}"`,
       p.year || '',
       p.citationCount || 0,
       p.externalIds?.DOI || '',
+      p.openAccessPdf?.url || '',
       p._summary?.relevance || '',
       `"${(p._summary?.summary||'').replace(/"/g,'""')}"`,
       `"${(p._summary?.keyFindings||'').replace(/"/g,'""')}"`,
