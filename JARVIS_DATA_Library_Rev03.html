@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS Data Library & Graph Studio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg-p:#0a0e17;--bg-s:#111827;--bg-c:#1a2235;--bg-ch:#1f2a40;--bg-i:#0d1525;--bd:#2a3550;--bdf:#3b82f6;--tp:#e2e8f0;--ts:#94a3b8;--tm:#64748b;--ac:#3b82f6;--ach:#2563eb;--ag:rgba(59,130,246,.15);--ok:#10b981;--wn:#f59e0b;--dg:#ef4444;--cat:#f97316;--ano:#06b6d4;--arc:#00d4ff}
+[data-theme="light"]{--bg-p:#f8fafc;--bg-s:#fff;--bg-c:#fff;--bg-ch:#f1f5f9;--bg-i:#f1f5f9;--bd:#e2e8f0;--tp:#1e293b;--ts:#475569;--tm:#94a3b8;--ag:rgba(59,130,246,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-p);color:var(--tp);height:100vh;overflow:hidden}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-s)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.hd{height:44px;background:var(--bg-s);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100}
+.hd-l{display:flex;align-items:center;gap:10px}
+.logo{width:24px;height:24px;background:radial-gradient(circle,var(--arc) 0%,transparent 70%);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.logo::after{content:'';width:7px;height:7px;background:var(--arc);border-radius:50%}
+.app-t{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:2px;color:var(--arc)}
+.hd-r{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--tm)}
+.st-bar{width:80px;height:3px;background:var(--bg-i);border-radius:2px;overflow:hidden}
+.st-fill{height:100%;background:var(--ac);border-radius:2px;transition:width .3s;width:0%}
+.thm-btn{background:none;border:none;color:var(--tm);cursor:pointer;font-size:14px;padding:2px}
+.main{display:flex;height:calc(100vh - 44px)}
+/* Sidebar */
+.sb{width:300px;min-width:200px;max-width:500px;background:var(--bg-s);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.sb-resize{position:absolute;top:0;right:0;width:4px;height:100%;cursor:col-resize;z-index:10;background:transparent;transition:background .2s}
+.sb-resize:hover,.sb-resize.dragging{background:var(--ac)}
+.sb-hd{padding:12px;border-bottom:1px solid var(--bd)}
+.el-tabs{display:flex;gap:3px;background:var(--bg-i);border-radius:6px;padding:2px}
+.el-tab{flex:1;padding:6px;text-align:center;border:none;background:transparent;color:var(--tm);font-size:11px;font-weight:600;border-radius:5px;cursor:pointer;transition:.2s;font-family:'Rajdhani',sans-serif;letter-spacing:1px}
+.el-tab.a-ano{background:var(--ano);color:#fff;box-shadow:0 2px 6px rgba(6,182,212,.3)}
+.el-tab.a-cat{background:var(--cat);color:#fff;box-shadow:0 2px 6px rgba(249,115,22,.3)}
+.ft-chips{display:flex;gap:3px;margin-top:6px}
+.ft-chip{padding:3px 8px;font-size:10px;border:1px solid var(--bd);background:transparent;color:var(--tm);border-radius:10px;cursor:pointer;transition:.2s}
+.ft-chip.on{border-color:var(--ac);background:var(--ag);color:var(--ac)}
+.sb-search{margin-top:6px;position:relative}
+.sb-search input{width:100%;padding:6px 10px 6px 28px;background:var(--bg-i);border:1px solid var(--bd);border-radius:5px;color:var(--tp);font-size:11px;outline:none;font-family:'Noto Sans KR',sans-serif}
+.sb-search::before{content:'🔍';position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:10px}
+.dl{flex:1;overflow-y:auto;padding:6px}
+.dc{padding:5px 8px;background:var(--bg-c);border:1px solid var(--bd);border-radius:5px;margin-bottom:2px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:6px}
+.dc:hover{background:var(--bg-ch);border-color:var(--bdf)}
+.dc.sel{border-color:var(--ac);background:var(--ag)}
+.dc-ck{width:12px;height:12px;border:2px solid var(--bd);border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.2s}
+.dc.sel .dc-ck{background:var(--ac);border-color:var(--ac)}
+.dc.sel .dc-ck::after{content:'✓';color:#fff;font-size:8px;font-weight:700}
+.dc-star{flex-shrink:0;cursor:pointer;font-size:12px;color:var(--tm);transition:.2s;line-height:1;user-select:none}
+.dc-star:hover{color:var(--wn);transform:scale(1.2)}.dc-star.fav{color:var(--wn)}
+.dc-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
+.dc-name{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.dc-meta{display:none}
+.dc-tags{display:none}
+.mt{font-size:8px;padding:1px 5px;background:var(--bg-i);border-radius:6px;color:var(--tm)}
+.dc-act{display:flex;gap:2px;flex-shrink:0}
+.ca-btn{width:18px;height:18px;border:none;background:transparent;color:var(--tm);cursor:pointer;border-radius:3px;font-size:10px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.ca-btn:hover{background:var(--bg-i);color:var(--dg)}
+.sb-ft{padding:8px 12px;border-top:1px solid var(--bd);display:flex;gap:6px}
+.sb-btn{flex:1;padding:6px;border:1px solid var(--bd);border-radius:5px;cursor:pointer;font-size:10px;font-weight:600;text-align:center;transition:.2s;font-family:'Noto Sans KR',sans-serif;background:transparent;color:var(--ts)}
+.sb-btn:hover{background:var(--bg-c)}
+.sb-btn.up{background:var(--ac);border-color:var(--ac);color:#fff}
+.sb-btn.up:hover{background:var(--ach)}
+/* Graph */
+.ga{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.gt{min-height:40px;background:var(--bg-s);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 12px;gap:6px;overflow-x:auto;flex-wrap:wrap}
+.gm-tabs{display:flex;gap:2px;background:var(--bg-i);border-radius:5px;padding:2px}
+.gm-tab{padding:4px 12px;font-size:10px;border:none;background:transparent;color:var(--tm);border-radius:3px;cursor:pointer;font-weight:500;transition:.2s;white-space:nowrap}
+.gm-tab.on{background:var(--ac);color:#fff}
+.tb-sep{width:1px;height:20px;background:var(--bd);flex-shrink:0}
+.tb-btn{padding:4px 10px;font-size:10px;border:1px solid var(--bd);background:transparent;color:var(--ts);border-radius:3px;cursor:pointer;transition:.15s;font-family:'Noto Sans KR',sans-serif;white-space:nowrap}
+.tb-btn:hover{background:var(--bg-c);border-color:var(--ac);color:var(--ac)}
+.tb-btn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.tb-sp{flex:1}
+.tb-sel{padding:4px 8px;font-size:10px;background:var(--bg-i);border:1px solid var(--bd);color:var(--tp);border-radius:3px;outline:none}
+.cc{flex:1;padding:12px;position:relative;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.cw{flex:1;position:relative;background:var(--bg-c);border:1px solid var(--bd);border-radius:6px;padding:10px;min-height:200px;overflow:hidden}
+.cw canvas{position:absolute;inset:10px;width:calc(100% - 20px)!important;height:calc(100% - 20px)!important}
+.cw .es{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tm);gap:8px;background:var(--bg-c);border-radius:6px;z-index:5;pointer-events:none}
+.es{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--tm);gap:8px}
+.es-i{font-size:36px;opacity:.3}.es-t{font-size:12px;text-align:center;line-height:1.5}
+/* Legend panel */
+.lp{margin-top:8px;padding:8px;background:var(--bg-c);border:1px solid var(--bd);border-radius:6px;max-height:130px;overflow-y:auto}
+.li{display:flex;align-items:center;gap:8px;padding:4px 3px;border-radius:3px;transition:background .15s}
+.li:hover{background:var(--bg-ch)}
+.lc-btn{width:16px;height:16px;border-radius:3px;border:2px solid transparent;cursor:pointer;flex-shrink:0;transition:transform .1s}
+.lc-btn:hover{transform:scale(1.2)}
+.ln{flex:1;font-size:11px;background:transparent;border:1px solid transparent;color:var(--tp);padding:2px 4px;border-radius:3px;outline:none;font-family:'Noto Sans KR',sans-serif}
+.ln:focus{border-color:var(--bdf);background:var(--bg-i)}
+.lv{width:18px;height:18px;border:none;background:transparent;color:var(--tm);cursor:pointer;font-size:12px;border-radius:3px;display:flex;align-items:center;justify-content:center}
+.lv:hover{background:var(--bg-i)}.lv.off{opacity:.3}
+/* Analysis table */
+.at-wrap{margin-top:8px;max-height:200px;overflow:auto;border:1px solid var(--bd);border-radius:6px;display:none}
+.at{width:100%;border-collapse:collapse;font-size:10px;font-family:'JetBrains Mono',monospace;user-select:text}
+.at th{background:var(--bg-s);position:sticky;top:0;padding:5px 6px;border-bottom:1px solid var(--bd);color:var(--ts);font-weight:600;white-space:nowrap;text-align:center}
+.at td{padding:4px 6px;border-bottom:1px solid var(--bd);text-align:center;white-space:nowrap}
+.at tr:hover td{background:var(--bg-ch)}
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center}
+.mo.on{display:flex}
+.md{background:var(--bg-s);border:1px solid var(--bd);border-radius:10px;width:540px;max-width:90vw;max-height:85vh;overflow-y:auto;box-shadow:0 16px 50px rgba(0,0,0,.4)}
+.md-h{padding:16px 20px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.md-t{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px}
+.md-x{background:none;border:none;color:var(--tm);cursor:pointer;font-size:18px;padding:3px}
+.md-b{padding:16px 20px}
+.fg{margin-bottom:12px}
+.fl{font-size:11px;font-weight:600;color:var(--ts);margin-bottom:4px;display:block}
+.fi,.fs{width:100%;padding:8px 10px;background:var(--bg-i);border:1px solid var(--bd);border-radius:5px;color:var(--tp);font-size:12px;outline:none;font-family:'Noto Sans KR',sans-serif}
+.fi:focus,.fs:focus{border-color:var(--bdf)}
+.fr{display:flex;gap:10px}
+.fr>.fg{flex:1}
+.frg{display:flex;gap:10px}
+.frg label{font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.frg input{accent-color:var(--ac)}
+.tic{display:flex;flex-wrap:wrap;gap:4px;padding:6px;background:var(--bg-i);border:1px solid var(--bd);border-radius:5px;min-height:32px}
+.ti-t{display:flex;align-items:center;gap:3px;padding:1px 6px;background:var(--ag);border:1px solid var(--ac);border-radius:10px;font-size:10px;color:var(--ac)}
+.ti-r{cursor:pointer;font-size:12px;opacity:.7}.ti-r:hover{opacity:1}
+.ti-i{border:none;background:transparent;color:var(--tp);font-size:11px;outline:none;flex:1;min-width:60px;font-family:'Noto Sans KR',sans-serif}
+.dz{border:2px dashed var(--bd);border-radius:6px;padding:24px;text-align:center;cursor:pointer;transition:.2s}
+.dz:hover,.dz.dov{border-color:var(--ac);background:var(--ag)}
+.dz-i{font-size:28px;margin-bottom:6px}.dz-t{font-size:12px;color:var(--ts)}.dz-h{font-size:10px;color:var(--tm);margin-top:3px}
+.ufl{margin-top:8px;max-height:160px;overflow-y:auto}
+.ufi{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--bg-c);border:1px solid var(--bd);border-radius:5px;margin-bottom:3px;font-size:11px}
+.ufi .fn{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ufi .fz{color:var(--tm);font-family:'JetBrains Mono',monospace;font-size:9px;flex-shrink:0}
+.ufi .fst{flex-shrink:0;font-size:10px}
+.ufi .frmv{border:none;background:none;color:var(--tm);cursor:pointer;font-size:13px;padding:1px}
+.ufi .frmv:hover{color:var(--dg)}
+.ufi.proc{border-color:var(--wn)}.ufi.ok{border-color:var(--ok)}.ufi.err{border-color:var(--dg)}
+.up-pg{margin-top:8px;display:none}
+.pg-trk{width:100%;height:5px;background:var(--bg-i);border-radius:3px;overflow:hidden}
+.pg-fill{height:100%;background:var(--ok);border-radius:3px;transition:width .3s;width:0}
+.pg-txt{font-size:10px;color:var(--tm);margin-top:3px;text-align:center}
+.md-f{padding:12px 20px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:6px}
+.mb{padding:6px 16px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bd);transition:.2s;font-family:'Noto Sans KR',sans-serif}
+.mb-p{background:var(--ac);border-color:var(--ac);color:#fff}.mb-p:hover{background:var(--ach)}
+.mb-s{background:transparent;color:var(--ts)}.mb-s:hover{background:var(--bg-c)}
+/* Color picker modal */
+.cp-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:none;align-items:center;justify-content:center}
+.cp-modal.on{display:flex}
+.cp-box{background:var(--bg-s);border:1px solid var(--bd);border-radius:10px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.cp-title{font-size:13px;font-weight:700;margin-bottom:10px;text-align:center}
+.cp-grid{display:grid;grid-template-columns:repeat(3,50px);gap:6px;justify-content:center}
+.cp-label{font-size:10px;color:var(--tm);text-align:center;margin-top:8px;margin-bottom:2px;grid-column:span 3}
+.cp-sw{width:50px;height:50px;border-radius:8px;border:3px solid transparent;cursor:pointer;transition:transform .1s}
+.cp-sw:hover{transform:scale(1.1)}.cp-sw.on{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.3)}
+.cp-close{margin-top:12px;text-align:center}
+.cp-close button{padding:6px 24px;background:var(--ac);color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600}
+/* Toast */
+.tc{position:fixed;bottom:16px;right:16px;z-index:3000;display:flex;flex-direction:column;gap:6px}
+.toast{padding:8px 14px;background:var(--bg-c);border:1px solid var(--bd);border-radius:6px;font-size:11px;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:sI .3s ease;display:flex;align-items:center;gap:6px}
+.toast.ok{border-left:3px solid var(--ok)}.toast.err{border-left:3px solid var(--dg)}.toast.inf{border-left:3px solid var(--ac)}
+@keyframes sI{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.sbar{height:24px;background:var(--bg-s);border-top:1px solid var(--bd);display:flex;align-items:center;padding:0 12px;font-size:10px;color:var(--tm);gap:12px}
+.sd{width:5px;height:5px;border-radius:50%;background:var(--ok)}
+body.drag-json::after{content:'📥 JSON 파일을 놓으면 데이터 불러오기';position:fixed;inset:0;background:rgba(59,130,246,.15);backdrop-filter:blur(2px);z-index:9999;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--ac);border:3px dashed var(--ac);pointer-events:none}
+</style>
+</head>
+<body>
+<div class="hd">
+  <div class="hd-l"><div class="logo"></div><div class="app-t">JARVIS DATA LIBRARY</div></div>
+  <div class="hd-r">
+    <span id="stTxt">0 / 1GB</span>
+    <div class="st-bar"><div class="st-fill" id="stFill"></div></div>
+    <button class="thm-btn" onclick="togTheme()" title="Theme">🌓</button>
+  </div>
+</div>
+<div class="main">
+  <div class="sb" id="sidebar">
+    <div class="sb-resize" id="sbResize"></div>
+    <div class="sb-hd">
+      <div class="el-tabs">
+        <button class="el-tab a-ano" id="tAno" onclick="setEl('anode')">ANODE</button>
+        <button class="el-tab" id="tCat" onclick="setEl('cathode')">CATHODE</button>
+        <button class="el-tab" id="tAll" onclick="setEl('all')">ALL</button>
+      </div>
+      <div class="ft-chips">
+        <button class="ft-chip on" data-t="all" onclick="setTT('all')">All</button>
+        <button class="ft-chip" data-t="half-cell" onclick="setTT('half-cell')">Half-Cell</button>
+        <button class="ft-chip" data-t="full-cell" onclick="setTT('full-cell')">Full-Cell</button>
+        <button class="ft-chip" data-t="rate" onclick="setTT('rate')">Rate</button>
+      </div>
+      <div class="sb-search"><input type="text" placeholder="Search..." id="sInp" oninput="renderDL()"></div>
+    </div>
+    <div class="dl" id="dList"></div>
+    <div class="sb-ft" style="flex-wrap:wrap">
+      <button class="sb-btn up" onclick="openUpload()">⬆ Upload</button>
+      <button class="sb-btn" onclick="exportLib()" title="팀 공유용 JSON 내보내기">💾 Share</button>
+      <button class="sb-btn" onclick="importLib()" title="동료의 JSON 데이터 불러오기">📥 Load</button>
+      <button class="sb-btn" onclick="clearDB()" style="color:var(--dg)">🗑</button>
+    </div>
+  </div>
+  <div class="ga">
+    <div class="gt">
+      <div class="gm-tabs">
+        <button class="gm-tab on" data-m="cycle" onclick="setGM('cycle')">Cycle Life</button>
+        <button class="gm-tab" data-m="voltage" onclick="setGM('voltage')">Voltage Profile</button>
+        <button class="gm-tab" data-m="efficiency" onclick="setGM('efficiency')">Efficiency</button>
+        <button class="gm-tab" data-m="rate" onclick="setGM('rate')">Rate</button>
+      </div>
+      <div class="tb-sep"></div>
+      <button class="tb-btn on" id="rsAll" style="display:none" data-rm="all" onclick="setRM('all')">All Steps</button>
+      <button class="tb-btn" id="rsCr" style="display:none" data-rm="crate" onclick="setRM('crate')">C-rate Summary</button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn" onclick="resetZm()">⟲ Reset</button>
+      <button class="tb-btn" onclick="togBL()" id="blBtn">Baseline: 5th</button>
+      <button class="tb-btn" onclick="togTable()" id="tblBtn">📊 Table</button>
+      <button class="tb-btn" onclick="exportCSV()" id="csvBtn" style="display:none">💾 CSV</button>
+      <button class="tb-btn" onclick="copyTable()" id="cpyBtn" style="display:none">📋 Copy</button>
+      <button class="tb-btn" onclick="clearSel()" style="color:var(--dg)">✕ Clear</button>
+      <div class="tb-sp"></div>
+      <select class="tb-sel" id="ySel" onchange="updChart()">
+        <option value="cap_mahg">mAh/g (절대값)</option>
+        <option value="cap_mah">mAh (절대값)</option>
+        <option value="retention">Capacity Retention (%)</option>
+      </select>
+      <button class="tb-btn" onclick="dlChart()">📷 PNG</button>
+      <button class="tb-btn" onclick="openRP()" style="background:var(--ag);border-color:var(--ac);color:var(--ac)">📄 Report</button>
+    </div>
+    <div class="cc">
+      <div class="cw">
+        <canvas id="mChart"></canvas>
+        <div class="es" id="emCh"><div class="es-i">📊</div><div class="es-t">Select datasets to generate charts</div></div>
+      </div>
+      <div class="lp" id="legP" style="display:none"></div>
+      <div class="at-wrap" id="atWrap"><table class="at" id="aTbl"></table></div>
+    </div>
+  </div>
+</div>
+<div class="sbar"><div class="sd"></div><span>JARVIS Data Library v2.1</span><span id="dsCnt">0 datasets</span><span id="selCnt">0 selected</span><div style="flex:1"></div><span>Phase 1+2</span></div>
+
+<!-- Upload Modal -->
+<div class="mo" id="upMod">
+  <div class="md">
+    <div class="md-h"><div class="md-t">📤 UPLOAD DATASETS</div><button class="md-x" onclick="closeUp()">✕</button></div>
+    <div class="md-b">
+      <div class="fg"><label class="fl">Electrode Type</label>
+        <div class="frg">
+          <label><input type="radio" name="elR" id="elRA" value="anode"> <span style="color:var(--ano)">Anode (음극)</span></label>
+          <label><input type="radio" name="elR" id="elRC" value="cathode" checked> <span style="color:var(--cat)">Cathode (양극)</span></label>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Test Type</label><select class="fs" id="upTT"><option value="half-cell">Half-Cell</option><option value="full-cell">Full-Cell</option><option value="rate">Rate</option></select></div>
+        <div class="fg"><label class="fl">Equipment</label><select class="fs" id="upEq"><option value="wonatech" selected>Won-A Tech</option><option value="auto">Auto-detect</option><option value="neware">Neware</option><option value="biologic">Biologic</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Tags</label><div class="tic" id="tagC"><input type="text" class="ti-i" id="tagI" placeholder="Tag + Enter"></div></div>
+      <div class="fg"><label class="fl">CSV Files <span style="color:var(--ac)">(multiple)</span></label>
+        <div class="dz" id="dZone"><div class="dz-i">📄</div><div class="dz-t">Drop CSV files or click to browse</div><div class="dz-h">Max 100MB · Multiple files OK</div></div>
+        <input type="file" id="fInp" accept=".csv,.txt,.mpt" multiple style="display:none">
+        <div class="ufl" id="ufList"></div>
+        <div class="up-pg" id="upPg"><div class="pg-trk"><div class="pg-fill" id="pgFill"></div></div><div class="pg-txt" id="pgTxt"></div></div>
+      </div>
+    </div>
+    <div class="md-f"><button class="mb mb-s" onclick="closeUp()">Cancel</button><button class="mb mb-p" id="upBtn" onclick="procUploads()">Upload & Save</button></div>
+  </div>
+</div>
+
+<!-- Color Picker Modal -->
+<div class="cp-modal" id="cpMod">
+  <div class="cp-box">
+    <div class="cp-title">색상 선택</div>
+    <div class="cp-grid" id="cpGrid"></div>
+    <div class="cp-close"><button onclick="closeCP()">닫기</button></div>
+  </div>
+</div>
+
+<div class="tc" id="toastC"></div>
+
+<!-- Report Builder Modal -->
+<div class="mo" id="rpMod">
+  <div class="md" style="width:780px;max-width:95vw;max-height:90vh">
+    <div class="md-h">
+      <div class="md-t">📄 REPORT BUILDER</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--tm)" id="rpStep">Step 1/2</span>
+        <button class="md-x" onclick="closeRP()">✕</button>
+      </div>
+    </div>
+    <div class="md-b" style="max-height:calc(90vh - 120px);overflow-y:auto">
+      <!-- Step 1: Config -->
+      <div id="rpS1">
+        <div class="fg"><label class="fl">보고서 제목</label><input class="fi" id="rpTitle" value="MWCNT 함량별 효과 검토" placeholder="보고서 제목"></div>
+        <div class="fr">
+          <div class="fg"><label class="fl">작성자</label><input class="fi" id="rpAuthor" value=""></div>
+          <div class="fg"><label class="fl">작성일</label><input class="fi" type="date" id="rpDate"></div>
+        </div>
+        <div class="fg"><label class="fl">1. 목적</label><textarea class="fi" id="rpPurpose" rows="3" placeholder="본 실험은 MWCNT 함량 변화에 따른 음극 반쪽전지의 수명 특성 및 율특성 변화를 평가하기 위함이다." style="resize:vertical"></textarea></div>
+        <div class="fg"><label class="fl">2. 실험 조건 (표에 추가할 항목)</label>
+          <div class="fr">
+            <div class="fg"><label class="fl">셀 타입</label>
+              <select class="fs" id="rpCell"><option>Half-cell (Anode)</option><option>Half-cell (Cathode)</option><option>Full-cell</option><option>Pouch cell</option></select>
+            </div>
+            <div class="fg"><label class="fl">장비</label>
+              <select class="fs" id="rpEquip"><option value="auto">자동 감지</option><option>Won-A Tech</option><option>Neware</option><option>Biologic</option></select>
+            </div>
+          </div>
+          <div class="fg"><label class="fl">테스트 조건</label><input class="fi" id="rpCond" placeholder="예: 25°C, 0.1C/0.5C charge-discharge, 2.5~4.2V"></div>
+        </div>
+        <div class="fg"><label class="fl">3. 결과 — 그래프</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="rpGcyc" checked> Cycle Life</label>
+            <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="rpGeff" checked> Efficiency</label>
+            <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="rpGvol"> Voltage Profile</label>
+            <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="rpGrate"> Rate</label>
+          </div>
+          <div class="fr">
+            <div class="fg"><label class="fl">그래프 배치</label>
+              <select class="fs" id="rpChartLayout">
+                <option value="2up">2-up (한 줄에 2개, 소형)</option>
+                <option value="1up">1-up (한 줄에 1개, 대형)</option>
+              </select>
+            </div>
+            <div class="fg"><label class="fl">Baseline Cycle</label><input type="number" class="fi" id="rpBL" value="5" min="1"></div>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">3. 결과 — 비교 테이블</label>
+          <div class="fg"><label class="fl">비교 Cycle (쉼표 구분)</label><input class="fi" id="rpCycs" value="50,100,200" placeholder="50,100,200"></div>
+        </div>
+        <div class="fg"><label class="fl">4. 결론 — AI 자동 작성 (Claude API)</label>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="rpAI" checked> AI 결론 작성</label>
+            <select class="fs" id="rpAImode" style="width:auto;flex:1">
+              <option value="general">일반 성능 분석</option>
+              <option value="degradation">열화 메커니즘</option>
+              <option value="comparison">샘플 간 비교</option>
+              <option value="optimization">공정 최적화 제안</option>
+            </select>
+          </div>
+          <input type="password" class="fi" id="rpAIKey" placeholder="Claude API Key (sk-ant-...)" style="font-size:10px">
+          <textarea class="fi" id="rpAICustom" rows="2" placeholder="추가 지시사항 (선택)" style="resize:vertical;margin-top:6px"></textarea>
+        </div>
+      </div>
+      <!-- Step 2: Preview -->
+      <div id="rpS2" style="display:none">
+        <div style="background:#fff;border-radius:6px;padding:32px 36px;color:#222;font-family:Arial,'Malgun Gothic','맑은 고딕',sans-serif;font-size:11pt;line-height:1.8" id="rpPreview"></div>
+      </div>
+    </div>
+    <div class="md-f" id="rpFooter">
+      <button class="mb mb-s" onclick="closeRP()">Cancel</button>
+      <button class="mb mb-s" id="rpBackBtn" onclick="rpBack()" style="display:none">← Back</button>
+      <button class="mb mb-p" id="rpNextBtn" onclick="rpNext()">미리보기 생성 →</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="impInp" accept=".json" style="display:none">
+
+<script>
+// ===== CONSTANTS =====
+const DB='jarvis_data_library',VER=1,ST='datasets',MFS=100*1024*1024,MST=1024*1024*1024;
+const COLORS_MAP = [
+  {group:'', colors:[{n:'검정',c:'#1a1a1a'},{n:'빨강',c:'#dc2626'},{n:'파랑',c:'#2563eb'}]},
+  {group:'', colors:[{n:'',c:'#6b7280'},{n:'',c:'#f87171'},{n:'',c:'#60a5fa'}]},
+  {group:'', colors:[{n:'',c:'#ec4899'},{n:'',c:'#fbbf24'},{n:'',c:'#93c5fd'}]},
+  {group:'녹색|보라|자주', colors:[{n:'녹색',c:'#16a34a'},{n:'보라',c:'#7c3aed'},{n:'자주',c:'#be185d'}]},
+  {group:'', colors:[{n:'',c:'#4ade80'},{n:'',c:'#a78bfa'},{n:'',c:'#f472b6'}]},
+  {group:'', colors:[{n:'',c:'#15803d'},{n:'',c:'#5b21b6'},{n:'',c:'#9d174d'}]},
+  {group:'Magenta|Cyan|회색', colors:[{n:'Magenta',c:'#d946ef'},{n:'Cyan',c:'#06b6d4'},{n:'회색',c:'#6b7280'}]},
+  {group:'', colors:[{n:'',c:'#e879f9'},{n:'',c:'#22d3ee'},{n:'',c:'#9ca3af'}]},
+  {group:'', colors:[{n:'',c:'#a21caf'},{n:'',c:'#0891b2'},{n:'',c:'#4b5563'}]},
+];
+const COLORS_ARR = COLORS_MAP.flatMap(g=>g.colors.map(c=>c.c));
+
+// ===== STATE =====
+let db=null,allDS=[],selIds=new Set(),curEl='cathode',curTT='all',curGM='cycle',chart=null;
+let upTags=[],upFiles=[],blOn=true,cpTarget=null,dsColors={},dsNames={};
+let rateMode='all',tblVisible=false;
+
+// ===== INDEXEDDB =====
+function openDB(){return new Promise((ok,no)=>{const r=indexedDB.open(DB,VER);r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(ST)){const s=d.createObjectStore(ST,{keyPath:'id'});s.createIndex('electrode','electrode');s.createIndex('testType','testType')}};r.onsuccess=e=>{db=e.target.result;ok(db)};r.onerror=e=>no(e.target.error)})}
+function dbPut(d){return new Promise((ok,no)=>{const tx=db.transaction(ST,'readwrite');tx.objectStore(ST).put(d);tx.oncomplete=()=>ok();tx.onerror=e=>no(e.target.error)})}
+function dbAll(){return new Promise((ok,no)=>{const tx=db.transaction(ST,'readonly');const r=tx.objectStore(ST).getAll();r.onsuccess=()=>ok(r.result);r.onerror=e=>no(e.target.error)})}
+function dbDel(id){return new Promise((ok,no)=>{const tx=db.transaction(ST,'readwrite');tx.objectStore(ST).delete(id);tx.oncomplete=()=>ok();tx.onerror=e=>no(e.target.error)})}
+
+// ===== CSV PARSING — From HalfCell Rev13 =====
+function detectEquipment(t){const h=t.substring(0,3000).toLowerCase();if(h.includes('neware')||(h.includes('cycle id')&&h.includes('cap_chg')))return'neware';if(h.includes('won-a')||h.includes('wonatech')||h.includes('wbcs'))return'wonatech';if(h.includes('biologic')||h.includes('ec-lab'))return'biologic';if(h.includes('cycle_index')||h.includes('chg_cap'))return'neware';return'wonatech'}
+function fixQuotedNL(c){let r='',q=false;for(let i=0;i<c.length;i++){const ch=c[i],nx=c[i+1];if(ch==='"'){if(q&&nx==='"'){r+='""';i++}else{q=!q;r+=ch}}else if(q&&(ch==='\n'||ch==='\r')){if(ch==='\r'&&nx==='\n'){r+=' ';i++}else r+=' '}else r+=ch}return r}
+function csvLine(line,d=','){const r=[];let c='',q=false;for(let i=0;i<line.length;i++){const ch=line[i],nx=line[i+1];if(ch==='"'){if(q&&nx==='"'){c+='"';i++}else q=!q}else if(ch===d&&!q){r.push(c.trim());c=''}else c+=ch}r.push(c.trim());return r}
+function detectFT(fn,content){
+  // Use last segment of filename (before .csv): _Capacity → capacity, _Cycle → cycle
+  const base=(fn||'').replace(/\.[^.]+$/,'').toLowerCase();
+  const lastSeg=base.split(/[_\s]/).pop();
+  if(lastSeg==='capacity')return'capacity';
+  if(lastSeg==='cycle'){
+    // Double check: if header has Q_Charge columns, it's actually capacity format
+    if(content&&/q_charge|q_discharge|q_ch\/m|q_dis\/m/i.test(content.split('\n')[0]||''))return'capacity';
+    return'cycle';
+  }
+  // Fallback: content-based
+  if(content){const fl=(content.split('\n')[0]||'').toLowerCase();if(/q_charge|q_discharge|q_ch\/m|q_dis\/m/i.test(fl))return'capacity';if(/1st\s*ch|1st\s*dis/i.test(fl))return'cycle'}
+  return'capacity';
+}
+
+function parseCSV(text,eq,fn){
+  const c=fixQuotedNL(text),lines=c.split('\n').filter(l=>l.trim());
+  if(lines.length<2)throw new Error('File too short');
+  return detectFT(fn,c)==='capacity'?parseCapCSV(lines):parseCycCSV(lines);
+}
+
+function parseCapCSV(lines){
+  const hdr=csvLine(lines[0]).map(h=>h.toLowerCase().trim());
+  const ci=hdr.findIndex(h=>h.includes('cycle')||h.includes('cyc'));
+  let chi=hdr.findIndex(h=>h.includes('q_ch/m')||(h.includes('charge')&&h.includes('mah/g')));
+  let dci=hdr.findIndex(h=>h.includes('q_dis/m')||(h.includes('discharge')&&h.includes('mah/g')));
+  const usSpec=chi!==-1&&dci!==-1;
+  if(chi===-1)chi=hdr.findIndex(h=>h.includes('q_charge')||h.includes('charge'));
+  if(dci===-1)dci=hdr.findIndex(h=>h.includes('q_discharge')||h.includes('discharge'));
+  if(ci===-1||chi===-1||dci===-1)throw new Error('Columns not found: '+hdr.slice(0,8).join(', '));
+  let cri=-1,dri=-1;
+  if(usSpec){cri=hdr.findIndex(h=>(h.includes('q_charge')||h.includes('q_ch'))&&h.includes('mah')&&!h.includes('mah/g')&&!h.includes('/m'));dri=hdr.findIndex(h=>(h.includes('q_discharge')||h.includes('q_dis'))&&h.includes('mah')&&!h.includes('mah/g')&&!h.includes('/m'))}
+  const cd={};
+  for(let i=1;i<lines.length;i++){const p=csvLine(lines[i]);if(p.length<3)continue;const cyc=parseInt(p[ci]),ch=Math.abs(parseFloat(p[chi])),dc=Math.abs(parseFloat(p[dci]));if(isNaN(cyc)||isNaN(ch)||isNaN(dc))continue;if(!cd[cyc])cd[cyc]={c:0,d:0,cr:0,dr:0};cd[cyc].c=Math.max(cd[cyc].c,ch);cd[cyc].d=Math.max(cd[cyc].d,dc);if(cri>=0){const v=Math.abs(parseFloat(p[cri]));if(!isNaN(v))cd[cyc].cr=Math.max(cd[cyc].cr,v)}if(dri>=0){const v=Math.abs(parseFloat(p[dri]));if(!isNaN(v))cd[cyc].dr=Math.max(cd[cyc].dr,v)}}
+  const fc=cd[1]||cd[Object.keys(cd)[0]];let swap=false;if(fc&&fc.c>0.01&&fc.d>0.01&&fc.d>fc.c)swap=true;
+  const keys=Object.keys(cd).map(Number).sort((a,b)=>a-b);if(keys.length>1)keys.pop();
+  const cycles=[];
+  keys.forEach(k=>{const d=cd[k];if(d.c<0.01||d.d<0.01)return;const ac=swap?d.d:d.c,ad=swap?d.c:d.d;cycles.push({cycle:k,chgCap:ac,dchgCap:ad,chgRaw:swap?d.dr:d.cr,dchgRaw:swap?d.cr:d.dr,eff:(ad/ac)*100,vd:[]})});
+  return{cycles,totalCycles:cycles.length,format:'capacity'};
+}
+
+function parseCycCSV(lines){
+  const pl=lines.map(l=>csvLine(l));if(pl.length<2)throw new Error('Not enough data');
+  const hr=pl[0].map(h=>(h||'').replace(/[\r\n]+/g,' ').replace(/\s+/g,' ').trim()),dr=pl.slice(1);
+  const dc=new Set();hr.forEach(h=>{const m=h.match(/(\d+)(st|nd|rd|th)/i);if(m)dc.add(parseInt(m[1]))});
+  let cp=Array.from(dc).sort((a,b)=>a-b);if(cp.length>1)cp.pop();
+  const cycles=[];
+  cp.forEach(cyc=>{
+    const cs=cyc===1?'1st':cyc===2?'2nd':cyc===3?'3rd':`${cyc}th`;
+    let cvi=-1,cqi=-1,dvi=-1,dqi=-1,cqri=-1,dqri=-1;
+    for(let i=0;i<hr.length;i++){const h=hr[i].toLowerCase();if(!hr[i].includes(cs))continue;
+      if(cvi===-1&&(h.includes('ch')||h.includes('charge'))&&(h.includes('v')||h.includes('voltage'))&&!h.includes('dis')&&!h.includes('dch'))cvi=i;
+      if(cqi===-1&&(h.includes('ch')||h.includes('charge'))&&h.includes('mah/g')&&!h.includes('dis')&&!h.includes('dch'))cqi=i;
+      if(cqri===-1&&(h.includes('ch')||h.includes('charge'))&&h.includes('mah')&&!h.includes('mah/g')&&!h.includes('dis')&&!h.includes('dch'))cqri=i;
+      if(dvi===-1&&(h.includes('dis')||h.includes('dch'))&&(h.includes('v')||h.includes('voltage')))dvi=i;
+      if(dqi===-1&&(h.includes('dis')||h.includes('dch'))&&h.includes('mah/g'))dqi=i;
+      if(dqri===-1&&(h.includes('dis')||h.includes('dch'))&&h.includes('mah')&&!h.includes('mah/g'))dqri=i;
+    }
+    if(cqi===-1){for(let i=0;i<hr.length;i++){const h=hr[i].toLowerCase();if(!hr[i].includes(cs))continue;if(cqi===-1&&(h.includes('ch'))&&(h.includes('q')||h.includes('mah'))&&!h.includes('dis'))cqi=i;if(dqi===-1&&(h.includes('dis'))&&(h.includes('q')||h.includes('mah')))dqi=i}}
+    if(cvi===-1||cqi===-1||dvi===-1||dqi===-1)return;
+    let mc=0,md=0,mcr=0,mdr=0;const vd=[];
+    dr.forEach(row=>{const cv=parseFloat(row[cvi]),cq=parseFloat(row[cqi]),dvl=parseFloat(row[dvi]),dq=parseFloat(row[dqi]);if(!isNaN(cq)&&cq>mc)mc=cq;if(!isNaN(dq)&&dq>md)md=dq;if(cqri>=0){const v=parseFloat(row[cqri]);if(!isNaN(v)&&v>mcr)mcr=v}if(dqri>=0){const v=parseFloat(row[dqri]);if(!isNaN(v)&&v>mdr)mdr=v}if(!isNaN(cv)&&!isNaN(cq)&&cv>0&&cq>0)vd.push({voltage:cv,capacity:cq,type:'charge'});if(!isNaN(dvl)&&!isNaN(dq)&&dvl>0&&dq>0)vd.push({voltage:dvl,capacity:dq,type:'discharge'})});
+    if(md>0||mc>0)cycles.push({cycle:cyc,chgCap:mc,dchgCap:md,chgRaw:mcr,dchgRaw:mdr,eff:mc>0?(md/mc)*100:0,vd});
+  });
+  return{cycles,totalCycles:cycles.length,format:'cycle'};
+}
+
+// ===== C-RATE FIXED RECIPE =====
+// 0.1C: cyc 1-2, 0.33C: 3-5, 1C: 6-8, 2C: 9-11, 3C: 12-14, 4C: 15-17, 5C: 18-20, 0.33C recovery: 21-22
+const CRATE_RECIPE = [
+  {label:'0.1C', start:1, end:2},
+  {label:'0.33C', start:3, end:5},
+  {label:'1C', start:6, end:8},
+  {label:'2C', start:9, end:11},
+  {label:'3C', start:12, end:14},
+  {label:'4C', start:15, end:17},
+  {label:'5C', start:18, end:20},
+  {label:'0.33C recovery', start:21, end:22}
+];
+const CRATE_CHART = CRATE_RECIPE.slice(0,7); // Chart: 0.1C~5C only (no recovery)
+
+function getCRateSummary(cycs){
+  // cycs = array of {cycle, dchgCap, ...}
+  // Use max 22 cycles only
+  const limited = cycs.filter(c=>c.cycle<=22);
+  const summary = [];
+  CRATE_RECIPE.forEach(r=>{
+    // Get the last cycle in range
+    const inRange = limited.filter(c=>c.cycle>=r.start&&c.cycle<=r.end);
+    if(inRange.length>0){
+      const last = inRange[inRange.length-1];
+      summary.push({label:r.label, cycle:last.cycle, dchgCap:last.dchgCap, chgCap:last.chgCap});
+    }
+  });
+  return summary;
+}
+
+// For chart points (C-rate summary mode) — up to 5C only
+function getCRateChartPoints(cycs, baseCap, isRet, useMah){
+  const limited = cycs.filter(c=>c.cycle<=22);
+  const points = [];
+  CRATE_CHART.forEach((r,i)=>{
+    const inRange = limited.filter(c=>c.cycle>=r.start&&c.cycle<=r.end);
+    if(inRange.length>0){
+      const last = inRange[inRange.length-1];
+      let y;
+      if(isRet) y = last.dchgCap / baseCap * 100;
+      else y = last.dchgCap;
+      points.push({x: i+1, y, label: r.label});
+    }
+  });
+  return points;
+}
+
+// ===== RETENTION INTERVAL CALCULATION =====
+function calcRetIntervals(datasets){
+  // Find max 80% retention cycle across all datasets
+  let max80=0;
+  datasets.forEach(ds=>{
+    if(!ds?.data?.cycles)return;
+    const cycs=ds.data.cycles;
+    const blIdx=cycs.length>=4?3:0;
+    const blCap=cycs[blIdx]?.dchgCap||0;if(blCap<=0)return;
+    for(let i=blIdx+1;i<cycs.length;i++){
+      if(cycs[i].dchgCap/blCap*100<=80){max80=Math.max(max80,cycs[i].cycle);break}
+    }
+  });
+  if(max80===0)max80=50;
+  
+  // Determine step based on max80
+  let step;
+  if(max80<=100)step=20;
+  else if(max80<=200)step=40;
+  else if(max80<=300)step=60;
+  else step=80;
+  
+  // Generate intervals: step, 2*step, 3*step... up to reasonable range
+  const intervals=[];
+  for(let c=step;c<=step*8;c+=step)intervals.push(c);
+  
+  return{intervals,step};
+}
+
+// ===== DATA MANAGEMENT =====
+async function loadAll(){allDS=await dbAll();updStorage();renderDL()}
+function updStorage(){
+  let sz=0;allDS.forEach(d=>{sz+=new Blob([JSON.stringify(d)]).size});
+  const p=Math.min(sz/MST*100,100).toFixed(1),mb=(sz/1024/1024).toFixed(1);
+  const t=document.getElementById('stTxt'),f=document.getElementById('stFill');
+  if(t)t.textContent=`${mb} / 1GB (${allDS.length})`;
+  if(f){f.style.width=p+'%';f.style.background=p>80?'var(--wn)':'var(--ac)'}
+  const dc=document.getElementById('dsCnt');if(dc)dc.textContent=`${allDS.length} datasets`;
+}
+
+// ===== FILENAME PARSING =====
+function parseFileName(name){
+  const base=name.replace(/\.[^.]+$/,'');
+  // Date: 8-digit YYYYMMDD
+  let date='';
+  const d8=base.match(/(\d{8})/);
+  if(d8)date=`${d8[1].slice(0,4)}-${d8[1].slice(4,6)}-${d8[1].slice(6,8)}`;
+  if(!date)date=new Date().toISOString().slice(0,10);
+  
+  // Solid content: 5p→5%, 4d5p→4.5%, 7d5p→7.5%, 4d2p→4.2%
+  let solidContent='';
+  const scMatch=base.match(/(\d+)d(\d+)p/i);
+  const scMatch2=base.match(/(\d+)p/i);
+  if(scMatch)solidContent=`${scMatch[1]}.${scMatch[2]}%`;
+  else if(scMatch2)solidContent=`${scMatch2[1]}%`;
+  
+  // Clean sample name
+  let sn=base.replace(/\d{8}/,'').replace(/[-_]+/g,'_').replace(/^_|_$/g,'')||base;
+  
+  return{date,solidContent,sampleName:sn};
+}
+
+// ===== RENDER =====
+function renderDL(){
+  const list=document.getElementById('dList');
+  let f=allDS.filter(d=>{
+    if(curEl!=='all'&&d.electrode!==curEl)return false;
+    if(curTT!=='all'&&d.testType!==curTT)return false;
+    const nm=(d.name||'').toLowerCase();
+    const isRate=/rate/i.test(nm);
+    const lastSeg=nm.split(/[_\s]/).pop();
+    const isCycleFile=lastSeg==='cycle'&&!isRate;
+    const isCapFile=!isCycleFile&&!isRate;
+    
+    if(curGM==='rate'){if(!isRate)return false}
+    else if(curGM==='voltage'){if(!isCycleFile)return false}
+    else if(curGM==='cycle'||curGM==='efficiency'){if(!isCapFile)return false}
+    const s=document.getElementById('sInp').value.toLowerCase();
+    if(s){const h=`${d.name} ${d.tags?.join(' ')||''} ${d.equipment}`.toLowerCase();if(!h.includes(s))return false}
+    return true;
+  });
+  // Sort: favorites first, then by date
+  f.sort((a,b)=>{
+    const fa=favIds.has(a.id)?1:0, fb=favIds.has(b.id)?1:0;
+    if(fa!==fb)return fb-fa;
+    return new Date(b.date||0)-new Date(a.date||0);
+  });
+  if(!f.length){list.innerHTML='<div class="es"><div class="es-i">📂</div><div class="es-t">No datasets found<br><span style="font-size:10px;color:var(--ac);cursor:pointer" onclick="importLib()">📥 동료 JSON 파일 불러오기</span><br><span style="font-size:9px;opacity:.6">또는 화면에 JSON 파일을 드래그하세요</span></div></div>';return}
+  list.innerHTML=f.map(d=>{
+    const s=selIds.has(d.id),tc=d.electrode==='cathode'?'var(--cat)':'var(--ano)';
+    const isFav=favIds.has(d.id);
+    const cyc=d.data?.totalCycles||0;
+    const tip=`${d.name}\n${d.electrode.toUpperCase()} · ${d.testType} · ${d.equipment}\n${cyc} cycles · ${d.date||''}${d.solidContent?' · '+d.solidContent:''}`;
+    return`<div class="dc ${s?'sel':''}" onclick="togSel('${d.id}')" title="${tip.replace(/"/g,'&quot;')}">
+      <div class="dc-ck"></div>
+      <span class="dc-star ${isFav?'fav':''}" onclick="event.stopPropagation();togFav('${d.id}')">${isFav?'★':'☆'}</span>
+      <div class="dc-info"><div class="dc-name" style="border-left:3px solid ${tc};padding-left:6px">${dsNames[d.id]||d.name}</div></div>
+      <div class="dc-act"><button class="ca-btn" onclick="event.stopPropagation();delDS('${d.id}')">🗑</button></div></div>`;
+  }).join('');
+}
+
+// ===== SELECTION =====
+function setEl(t){curEl=t;document.querySelectorAll('.el-tab').forEach(e=>e.className='el-tab');const el=document.getElementById(t==='anode'?'tAno':t==='cathode'?'tCat':'tAll');if(el)el.classList.add(t==='cathode'?'a-cat':'a-ano');renderDL()}
+function setTT(t){curTT=t;document.querySelectorAll('.ft-chip').forEach(c=>c.classList.remove('on'));const ch=document.querySelector(`.ft-chip[data-t="${t}"]`);if(ch)ch.classList.add('on');renderDL()}
+function togSel(id){
+  if(selIds.has(id)){selIds.delete(id);delete dsColors[id]}
+  else{
+    selIds.add(id);
+    if(!dsColors[id]){
+      // Check if same-name group already has a color
+      const srcDS=allDS.find(d=>d.id===id);
+      const baseName=srcDS?.name?.replace(/_?(Capacity|Cycle)$/i,'')||'';
+      let groupColor=null;
+      selIds.forEach(sid=>{
+        const sd=allDS.find(d=>d.id===sid);
+        if(sd&&sd.name.replace(/_?(Capacity|Cycle)$/i,'')===baseName&&dsColors[sid])groupColor=dsColors[sid];
+      });
+      dsColors[id]=groupColor||COLORS_ARR[selIds.size%COLORS_ARR.length];
+    }
+  }
+  const sc=document.getElementById('selCnt');if(sc)sc.textContent=`${selIds.size} selected`;
+  renderDL();updChart();
+}
+async function delDS(id){if(!confirm('Delete?'))return;await dbDel(id);selIds.delete(id);await loadAll();updChart();toast('Deleted','inf')}
+
+// ===== GRAPH MODE =====
+function setGM(m){
+  curGM=m;document.querySelectorAll('.gm-tab').forEach(t=>t.classList.remove('on'));
+  const tab=document.querySelector(`.gm-tab[data-m="${m}"]`);if(tab)tab.classList.add('on');
+  document.getElementById('rsAll').style.display=m==='rate'?'':'none';
+  document.getElementById('rsCr').style.display=m==='rate'?'':'none';
+  // Keep selections - just re-render list for current mode filter
+  renderDL();updChart();
+}
+function clearSel(){selIds.clear();dsColors={};const sc=document.getElementById('selCnt');if(sc)sc.textContent='0 selected';renderDL();updChart()}
+function setRM(m){rateMode=m;document.querySelectorAll('[data-rm]').forEach(b=>b.classList.remove('on'));const btn=document.querySelector(`[data-rm="${m}"]`);if(btn)btn.classList.add('on');updChart()}
+function togBL(){blOn=!blOn;const b=document.getElementById('blBtn');if(b)b.textContent=blOn?'Baseline: 5th':'Baseline: 1st';updChart()}
+function togTable(){tblVisible=!tblVisible;const w=document.getElementById('atWrap');if(w)w.style.display=tblVisible?'block':'none';document.getElementById('csvBtn').style.display=tblVisible?'':'none';document.getElementById('cpyBtn').style.display=tblVisible?'':'none';if(tblVisible)updTable()}
+
+// ===== FAVORITES =====
+let favIds=new Set(JSON.parse(localStorage.getItem('jdl_favs')||'[]'));
+function togFav(id){if(favIds.has(id))favIds.delete(id);else favIds.add(id);localStorage.setItem('jdl_favs',JSON.stringify([...favIds]));renderDL()}
+
+// ===== SIDEBAR RESIZE =====
+(function(){
+  const sb=document.getElementById('sidebar'),handle=document.getElementById('sbResize');
+  let dragging=false,startX,startW;
+  handle.addEventListener('mousedown',e=>{dragging=true;startX=e.clientX;startW=sb.offsetWidth;handle.classList.add('dragging');document.body.style.cursor='col-resize';document.body.style.userSelect='none';e.preventDefault()});
+  document.addEventListener('mousemove',e=>{if(!dragging)return;const w=Math.max(200,Math.min(500,startW+(e.clientX-startX)));sb.style.width=w+'px'});
+  document.addEventListener('mouseup',()=>{if(!dragging)return;dragging=false;handle.classList.remove('dragging');document.body.style.cursor='';document.body.style.userSelect=''});
+})();
+
+// ===== TABLE CSV EXPORT =====
+function exportCSV(){
+  const tbl=document.getElementById('aTbl');if(!tbl)return;
+  const rows=[...tbl.querySelectorAll('tr')];
+  const csv=rows.map(r=>[...r.querySelectorAll('th,td')].map(c=>'"'+c.innerText.replace(/\n/g,' ').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const bom='\uFEFF';
+  const b=new Blob([bom+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.download=`jarvis_table_${curGM}_${new Date().toISOString().slice(0,10)}.csv`;a.href=URL.createObjectURL(b);a.click();
+  toast('CSV saved','ok');
+}
+
+// ===== TABLE COPY (Excel compatible) =====
+function copyTable(){
+  const tbl=document.getElementById('aTbl');if(!tbl)return;
+  const rows=[...tbl.querySelectorAll('tr')];
+  const tsv=rows.map(r=>[...r.querySelectorAll('th,td')].map(c=>c.innerText.replace(/\n/g,' ')).join('\t')).join('\n');
+  navigator.clipboard.writeText(tsv).then(()=>toast('Copied! Ctrl+V in Excel','ok')).catch(()=>{
+    // Fallback
+    const ta=document.createElement('textarea');ta.value=tsv;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copied!','ok');
+  });
+}
+
+// ===== CHART =====
+function initChart(){
+  const ctx=document.getElementById('mChart');if(!ctx)return;
+  chart=new Chart(ctx.getContext('2d'),{
+    type:'line',data:{datasets:[]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:200},
+      interaction:{mode:'nearest',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'rgba(17,24,39,.95)',titleFont:{family:'JetBrains Mono',size:11},bodyFont:{family:'JetBrains Mono',size:10},padding:8,cornerRadius:5,
+          callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y?.toFixed(2)}`}},
+        zoom:{pan:{enabled:false,mode:'xy'},zoom:{wheel:{enabled:true},pinch:{enabled:true},drag:{enabled:true,backgroundColor:'rgba(59,130,246,0.15)',borderColor:'rgba(59,130,246,0.5)',borderWidth:1},mode:'xy'}}
+      },
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Cycle Number',font:{size:13,weight:'bold',family:'Noto Sans KR'},color:'#94a3b8'},ticks:{font:{size:11,weight:'bold',family:'JetBrains Mono'},color:'#94a3b8'},grid:{color:'rgba(148,163,184,.1)'}},
+        y:{type:'linear',title:{display:true,text:'Discharge Capacity (mAh/g)',font:{size:13,weight:'bold',family:'Noto Sans KR'},color:'#94a3b8'},ticks:{font:{size:11,weight:'bold',family:'JetBrains Mono'},color:'#94a3b8'},grid:{color:'rgba(148,163,184,.1)'}}
+      }
+    }
+  });
+}
+
+function updChart(){
+  if(!chart)return;
+  const ec=document.getElementById('emCh'),lp=document.getElementById('legP');
+  if(!selIds.size){chart.data.datasets=[];chart.update();if(ec)ec.style.display='flex';if(lp)lp.style.display='none';return}
+  if(ec)ec.style.display='none';if(lp)lp.style.display='block';
+  
+  const yMode=document.getElementById('ySel')?.value||'cap_mahg';
+  const isRet=yMode==='retention';
+  const useMah=yMode==='cap_mah';
+  const datasets=[];let ci=0;
+  
+  selIds.forEach(id=>{
+    const ds=allDS.find(d=>d.id===id);if(!ds?.data?.cycles)return;
+    
+    // Filter: only plot datasets that match current graph mode
+    const nm=(ds.name||'').toLowerCase();
+    const isRate=/rate/i.test(nm);
+    const lastSeg=nm.split(/[_\s]/).pop();
+    const isCycleFile=lastSeg==='cycle'&&!isRate;
+    const isCapFile=!isCycleFile&&!isRate;
+    if(curGM==='rate'&&!isRate)return;
+    if(curGM==='voltage'&&!isCycleFile)return;
+    if((curGM==='cycle'||curGM==='efficiency')&&!isCapFile)return;
+    
+    const color=dsColors[id]||COLORS_ARR[ci%COLORS_ARR.length];dsColors[id]=color;ci++;
+    const cycs=ds.data.cycles;
+    const blIdx=blOn&&cycs.length>=5?4:0;
+    const blCap=cycs[blIdx]?.dchgCap||1;
+    const label=dsNames[id]||ds.name;
+    
+    if(curGM==='cycle'){
+      const pts=cycs.map(c=>{let y;if(isRet)y=c.dchgCap/blCap*100;else if(useMah)y=c.dchgRaw||c.dchgCap;else y=c.dchgCap||c.dchgRaw;return{x:c.cycle,y}}).filter(p=>p.y>0);
+      datasets.push({label,data:pts,borderColor:color,backgroundColor:color+'20',borderWidth:2,pointRadius:pts.length>200?0:2,pointHoverRadius:4,tension:.1,fill:false,_did:id});
+    }else if(curGM==='rate'){
+      if(rateMode==='all'){
+        const pts=cycs.filter(c=>c.cycle<=22).map(c=>{let y;if(isRet)y=c.dchgCap/blCap*100;else if(useMah)y=c.dchgRaw||c.dchgCap;else y=c.dchgCap||c.dchgRaw;return{x:c.cycle,y}}).filter(p=>p.y>0);
+        datasets.push({label:label+' (All)',data:pts,borderColor:color,backgroundColor:color+'20',borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:.1,fill:false,_did:id});
+      } else {
+        // Fixed recipe C-rate summary
+        const crPts=getCRateChartPoints(cycs,blCap,isRet,useMah);
+        datasets.push({label:label+' (C-rate)',data:crPts,borderColor:color,backgroundColor:color+'40',borderWidth:2,pointRadius:6,pointStyle:'rectRot',pointHoverRadius:8,tension:0,fill:false,showLine:true,_did:id});
+      }
+    }else if(curGM==='efficiency'){
+      const pts=cycs.map(c=>({x:c.cycle,y:c.eff})).filter(p=>p.y>0&&p.y<=110);
+      datasets.push({label,data:pts,borderColor:color,backgroundColor:color+'20',borderWidth:2,pointRadius:pts.length>200?0:2,pointHoverRadius:4,tension:.1,fill:false,_did:id});
+    }else if(curGM==='voltage'){
+      const vCycs = cycs.filter(c=>c.vd?.length>0);
+      if(!vCycs.length){
+        const pts=cycs.map(c=>({x:c.cycle,y:c.dchgCap})).filter(p=>p.y>0);
+        datasets.push({label,data:pts,borderColor:color,borderWidth:2,pointRadius:0,tension:.1,fill:false,_did:id});
+      } else {
+        // Detect C-rate start
+        let crateStart = 4;
+        for(let i=1;i<Math.min(vCycs.length,6);i++){
+          const prev=vCycs[i-1].dchgCap, cur=vCycs[i].dchgCap;
+          if(prev>0 && (prev-cur)/prev > 0.05 && vCycs[i].cycle>=3 && vCycs[i].cycle<=6){
+            crateStart=vCycs[i].cycle; break;
+          }
+        }
+        const showSet = new Set([1, crateStart]);
+        const maxCyc = vCycs[vCycs.length-1].cycle;
+        for(let c=20;c<=maxCyc;c+=20) showSet.add(c);
+        showSet.add(maxCyc);
+        
+        // Distinct colors per cycle
+        const cycColors=['#dc2626','#2563eb','#16a34a','#f59e0b','#06b6d4','#7c3aed','#ec4899','#15803d','#d946ef','#1a1a1a','#6366f1','#0891b2'];
+        const sorted = Array.from(showSet).sort((a,b)=>a-b);
+        
+        sorted.forEach((cn,i)=>{
+          const cyc=vCycs.find(v=>v.cycle===cn);
+          if(!cyc?.vd?.length)return;
+          const cc=cycColors[i%cycColors.length];
+          
+          const chgPts=cyc.vd.filter(v=>v.type==='charge').map(v=>({x:v.capacity,y:v.voltage}));
+          const dchgPts=cyc.vd.filter(v=>v.type==='discharge').map(v=>({x:v.capacity,y:v.voltage}));
+          
+          if(!chgPts.length&&!dchgPts.length){
+            datasets.push({label:`${cn}th`,data:cyc.vd.map(v=>({x:v.capacity,y:v.voltage})),borderColor:cc,borderWidth:1.5,pointRadius:0,tension:.05,fill:false,_did:id});
+          } else {
+            if(chgPts.length) datasets.push({label:`${cn===1?'1st':cn}th (charge)`,data:chgPts,borderColor:cc,borderWidth:1.2,pointRadius:0,tension:.05,fill:false,borderDash:[5,3],_did:id});
+            if(dchgPts.length) datasets.push({label:`${cn===1?'1st':cn}th`,data:dchgPts,borderColor:cc,borderWidth:1.8,pointRadius:0,tension:.05,fill:false,_did:id});
+          }
+        });
+      }
+    }
+  });
+  
+  chart.data.datasets=datasets;
+  const xT=chart.options.scales.x.title,yT=chart.options.scales.y.title;
+  const xTicks=chart.options.scales.x.ticks;
+  // Reset x-axis callback
+  delete xTicks.callback;
+  
+  switch(curGM){
+    case'cycle':xT.text='Cycle Number';yT.text=isRet?'Capacity Retention (%)':useMah?'Discharge Capacity (mAh)':'Discharge Capacity (mAh/g)';break;
+    case'rate':
+      if(rateMode==='crate'){
+        xT.text='C-rate';
+        const labels=CRATE_CHART.map(r=>r.label);
+        xTicks.callback=function(v){return labels[v-1]||v};
+        chart.options.scales.x.min=0.5;
+        chart.options.scales.x.max=CRATE_CHART.length+0.5;
+      }else{
+        xT.text='Cycle Number';
+        delete chart.options.scales.x.min;
+        delete chart.options.scales.x.max;
+      }
+      yT.text=isRet?'Capacity Retention (%)':useMah?'Discharge Capacity (mAh)':'Discharge Capacity (mAh/g)';
+      break;
+    case'efficiency':xT.text='Cycle Number';yT.text='Coulombic Efficiency (%)';break;
+    case'voltage':xT.text='Capacity (mAh/g)';yT.text='Voltage (V)';break;
+  }
+  if(curGM!=='rate'||rateMode!=='crate'){delete chart.options.scales.x.min;delete chart.options.scales.x.max}
+  chart.update();renderLeg(datasets);if(tblVisible)updTable();
+}
+
+function renderLeg(datasets){
+  const p=document.getElementById('legP');if(!p)return;
+  if(curGM==='voltage'){
+    // Voltage: show each cycle as separate legend item with its color
+    p.innerHTML=datasets.map((d,i)=>{
+      const isChg=d.label?.includes('charge');
+      return`<div class="li" style="display:inline-flex;margin-right:12px">
+        <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:${d.borderColor};flex-shrink:0;margin-top:2px;${isChg?'border:1px dashed #fff':''}"></span>
+        <span style="font-size:10px;margin-left:4px;color:var(--tp)">${d.label}</span></div>`;
+    }).join('');
+  } else {
+    const u=new Map();datasets.forEach(d=>{if(!u.has(d._did))u.set(d._did,{color:d.borderColor,label:d.label,id:d._did})});
+    p.innerHTML=Array.from(u.values()).map(d=>`<div class="li">
+      <button class="lc-btn" style="background:${d.color}" onclick="openCP('${d.id}')" title="색상"></button>
+      <input class="ln" value="${d.label}" onchange="renDS('${d.id}',this.value)">
+      <button class="lv" onclick="togVis('${d.id}')" title="표시/숨김">👁</button></div>`).join('');
+  }
+}
+function togVis(id){chart.data.datasets.forEach((d,i)=>{if(d._did===id){const m=chart.getDatasetMeta(i);m.hidden=!m.hidden}});chart.update()}
+function renDS(id,n){dsNames[id]=n;chart.data.datasets.forEach(d=>{if(d._did===id)d.label=n});chart.update()}
+function resetZm(){if(chart)chart.resetZoom()}
+function dlChart(){if(!chart)return;const a=document.createElement('a');a.download=`jarvis_${curGM}_${new Date().toISOString().slice(0,10)}.png`;a.href=chart.toBase64Image('image/png',1);a.click();toast('PNG saved','ok')}
+
+// ===== ANALYSIS TABLE =====
+function updTable(){
+  const tbl=document.getElementById('aTbl');if(!tbl)return;
+  // Filter to only datasets visible in current mode
+  const selDS=allDS.filter(d=>{
+    if(!selIds.has(d.id))return false;
+    const nm=(d.name||'').toLowerCase();
+    const isRate=/rate/i.test(nm);
+    const lastSeg=nm.split(/[_\s]/).pop();
+    const isCycleFile=lastSeg==='cycle'&&!isRate;
+    const isCapFile=!isCycleFile&&!isRate;
+    if(curGM==='rate')return isRate;
+    if(curGM==='voltage')return isCycleFile;
+    if(curGM==='cycle'||curGM==='efficiency')return isCapFile;
+    return true;
+  });
+  if(!selDS.length){tbl.innerHTML='<tr><td>No data for current mode</td></tr>';return}
+  
+  if(curGM==='rate'){
+    // Rate table: fixed recipe C-rate columns
+    let hdr='<tr><th>샘플명</th><th>1st Chg<br>(mAh/g)</th><th>1st Dchg<br>(mAh/g)</th><th>ICE<br>(%)</th>';
+    CRATE_RECIPE.forEach(r=>hdr+=`<th>${r.label}<br>(%)</th>`);
+    hdr+='</tr>';
+    
+    let body='';
+    selDS.forEach(ds=>{
+      const cycs=ds.data?.cycles;if(!cycs?.length)return;
+      const c1=cycs[0],name=dsNames[ds.id]||ds.name;
+      const sm=getCRateSummary(cycs);
+      // Base = 0.33C (index 1, cycle 3-5 last)
+      const base33=sm.length>1?sm[1].dchgCap:c1?.dchgCap||1;
+      
+      let row=`<tr><td style="text-align:left;max-width:240px;overflow:hidden;text-overflow:ellipsis">${name}</td>`;
+      row+=`<td>${c1?.chgCap?.toFixed(2)||'-'}</td><td>${c1?.dchgCap?.toFixed(2)||'-'}</td>`;
+      row+=`<td>${c1?.eff?.toFixed(2)||'-'}</td>`;
+      
+      CRATE_RECIPE.forEach((r,i)=>{
+        if(i<sm.length){
+          const ret=(sm[i].dchgCap/base33*100).toFixed(2);
+          row+=`<td>${ret}</td>`;
+        }else row+='<td>-</td>';
+      });
+      row+='</tr>';body+=row;
+    });
+    tbl.innerHTML=hdr+body;
+  } else {
+    // Cycle Life / Efficiency table
+    const{intervals}=calcRetIntervals(selDS);
+    
+    let hdr='<tr><th>샘플명</th><th>1st Chg<br>(mAh/g)</th><th>1st Dchg<br>(mAh/g)</th><th>ICE<br>(%)</th><th>90% 도달<br>(4th 기준)</th><th>80% 도달<br>(4th 기준)</th>';
+    intervals.forEach(c=>hdr+=`<th>${c}th Ret<br>(%)</th>`);
+    hdr+='</tr>';
+    
+    let body='';
+    selDS.forEach(ds=>{
+      const cycs=ds.data?.cycles;if(!cycs?.length)return;
+      const bl=cycs.length>=5?cycs[4]:cycs[0];
+      const blCap=bl?.dchgCap||1;
+      const c1=cycs[0],name=dsNames[ds.id]||ds.name;
+      
+      const blRef=cycs.length>=4?cycs[3]:cycs[0];
+      const blRefCap=blRef?.dchgCap||1;
+      let r90='-',r80='-';
+      for(let i=0;i<cycs.length;i++){
+        const ret=cycs[i].dchgCap/blRefCap*100;
+        if(ret<=90&&r90==='-')r90=cycs[i].cycle;
+        if(ret<=80&&r80==='-')r80=cycs[i].cycle;
+      }
+      
+      let row=`<tr><td style="text-align:left;max-width:240px;overflow:hidden;text-overflow:ellipsis">${name}</td>`;
+      row+=`<td>${c1?.chgCap?.toFixed(2)||'-'}</td><td>${c1?.dchgCap?.toFixed(2)||'-'}</td>`;
+      row+=`<td>${c1?.eff?.toFixed(2)||'-'}</td>`;
+      row+=`<td>${r90}</td><td style="font-weight:700">${r80}</td>`;
+      
+      intervals.forEach(c=>{
+        const cyc=cycs.find(x=>x.cycle===c);
+        if(cyc)row+=`<td>${(cyc.dchgCap/blCap*100).toFixed(2)}</td>`;
+        else row+='<td>-</td>';
+      });
+      row+='</tr>';body+=row;
+    });
+    tbl.innerHTML=hdr+body;
+  }
+}
+
+// ===== COLOR PICKER =====
+function openCP(id){
+  cpTarget=id;
+  const grid=document.getElementById('cpGrid');
+  let html='';
+  COLORS_MAP.forEach(g=>{
+    if(g.group){
+      const labels=g.group.split('|');
+      html+=`<div class="cp-label">${labels.map(l=>`<span style="display:inline-block;width:44px;text-align:center">${l}</span>`).join('')}</div>`;
+    }
+    g.colors.forEach(({n,c})=>{
+      const sel=dsColors[id]===c?'on':'';
+      html+=`<div class="cp-sw ${sel}" style="background:${c}" onclick="pickClr('${c}')" title="${n||c}"></div>`;
+    });
+  });
+  grid.innerHTML=html;
+  document.getElementById('cpMod').classList.add('on');
+}
+function pickClr(c){
+  if(cpTarget){
+    dsColors[cpTarget]=c;
+    // Sync color to same-name datasets across modes
+    const srcDS=allDS.find(d=>d.id===cpTarget);
+    if(srcDS){
+      const baseName=srcDS.name.replace(/_?(Capacity|Cycle)$/i,'');
+      allDS.forEach(d=>{
+        const dn=d.name.replace(/_?(Capacity|Cycle)$/i,'');
+        if(dn===baseName&&selIds.has(d.id))dsColors[d.id]=c;
+      });
+    }
+    updChart();
+  }
+  closeCP();
+}
+function closeCP(){document.getElementById('cpMod').classList.remove('on')}
+
+// ===== UPLOAD =====
+function openUpload(){
+  document.getElementById('upMod').classList.add('on');
+  upTags=[];upFiles=[];renderUFL();renderTags();
+  document.getElementById('upPg').style.display='none';
+  document.getElementById('upBtn').disabled=false;
+  if(curEl==='cathode')document.getElementById('elRC').checked=true;
+  else document.getElementById('elRA').checked=true;
+}
+function closeUp(){document.getElementById('upMod').classList.remove('on')}
+
+document.getElementById('tagI').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.value.trim()){e.preventDefault();upTags.push(e.target.value.trim());e.target.value='';renderTags()}});
+function renderTags(){const c=document.getElementById('tagC'),i=document.getElementById('tagI');c.querySelectorAll('.ti-t').forEach(t=>t.remove());upTags.forEach((t,n)=>{const el=document.createElement('span');el.className='ti-t';el.innerHTML=`${t} <span class="ti-r" onclick="rmTag(${n})">✕</span>`;c.insertBefore(el,i)})}
+function rmTag(i){upTags.splice(i,1);renderTags()}
+
+const dz=document.getElementById('dZone'),fI=document.getElementById('fInp');
+dz.addEventListener('click',()=>fI.click());
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dov')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('dov'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dov');addFiles(e.dataTransfer.files)});
+fI.addEventListener('change',e=>{addFiles(e.target.files);e.target.value=''});
+
+function addFiles(fl){for(const f of fl){if(f.size>MFS){toast(`${f.name}: too large`,'err');continue}if(upFiles.some(u=>u.name===f.name&&u.size===f.size))continue;upFiles.push(f)}renderUFL()}
+function rmUF(i){upFiles.splice(i,1);renderUFL()}
+function renderUFL(){const l=document.getElementById('ufList');if(!upFiles.length){l.innerHTML='';return}l.innerHTML=upFiles.map((f,i)=>{const sz=f.size>1048576?(f.size/1048576).toFixed(1)+'MB':(f.size/1024).toFixed(1)+'KB';return`<div class="ufi" id="uf${i}"><span>📄</span><span class="fn">${f.name}</span><span class="fz">${sz}</span><span class="fst" id="ufs${i}">ready</span><button class="frmv" onclick="rmUF(${i})">✕</button></div>`}).join('')}
+
+async function procUploads(){
+  if(!upFiles.length){toast('Add files','err');return}
+  const el=document.querySelector('input[name="elR"]:checked').value;
+  const tt=document.getElementById('upTT').value;
+  let eqS=document.getElementById('upEq').value;
+  const pg=document.getElementById('upPg'),fill=document.getElementById('pgFill'),pt=document.getElementById('pgTxt');
+  pg.style.display='block';document.getElementById('upBtn').disabled=true;
+  let ok=0,er=0;
+  for(let i=0;i<upFiles.length;i++){
+    const file=upFiles[i],iel=document.getElementById(`uf${i}`),isl=document.getElementById(`ufs${i}`);
+    if(iel)iel.classList.add('proc');if(isl)isl.textContent='⏳';
+    if(fill)fill.style.width=((i+1)/upFiles.length*100).toFixed(0)+'%';
+    if(pt)pt.textContent=`${i+1} / ${upFiles.length}`;
+    try{
+      const text=await file.text();
+      let eq=eqS==='auto'?detectEquipment(text):eqS;
+      const parsed=parseCSV(text,eq,file.name);
+      if(!parsed.cycles?.length)throw new Error('No cycle data');
+      const{date,solidContent,sampleName}=parseFileName(file.name);
+      const ds={id:`ds_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,name:sampleName,electrode:el,testType:tt,equipment:eq,date,solidContent,tags:[...upTags],data:parsed,uploadedAt:new Date().toISOString(),fileSize:file.size};
+      await dbPut(ds);ok++;
+      if(iel){iel.classList.remove('proc');iel.classList.add('ok')}if(isl)isl.textContent=`✓ ${parsed.totalCycles} cyc`;
+    }catch(e){console.error(file.name,e);er++;if(iel){iel.classList.remove('proc');iel.classList.add('err')}if(isl)isl.textContent=`✕ ${e.message}`}
+    await new Promise(r=>setTimeout(r,80));
+  }
+  if(fill)fill.style.width='100%';if(pt)pt.textContent=`Done! ${ok} ok, ${er} fail`;
+  await loadAll();if(ok)toast(`${ok} uploaded — 💾 Share 버튼으로 동료에게 공유 가능`,'ok');if(er)toast(`${er} failed`,'err');
+  document.getElementById('upBtn').disabled=false;
+  if(!er)setTimeout(closeUp,1200);
+}
+
+// ===== EXPORT/IMPORT/CLEAR =====
+async function exportLib(){
+  const d=await dbAll();
+  if(!d.length){toast('내보낼 데이터가 없습니다','err');return}
+  toast('JSON 생성 중... (대용량 데이터)','inf');
+  try{
+    // Build JSON in chunks to avoid string length limit
+    const chunks=['[\n'];
+    for(let i=0;i<d.length;i++){
+      if(i>0)chunks.push(',\n');
+      chunks.push(JSON.stringify(d[i]));
+    }
+    chunks.push('\n]');
+    const blob=new Blob(chunks,{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    // Try normal download
+    const a=document.createElement('a');
+    a.href=url;a.download=`jarvis_lib_${new Date().toISOString().slice(0,10)}.json`;
+    a.style.display='none';document.body.appendChild(a);a.click();document.body.removeChild(a);
+    // file:// fallback: if click didn't trigger, open in new tab
+    setTimeout(()=>{
+      toast(`${d.length}개 (${(blob.size/1024/1024).toFixed(0)}MB) 저장 완료`,'ok');
+      setTimeout(()=>URL.revokeObjectURL(url),5000);
+    },500);
+  }catch(e){
+    toast('Export 실패: '+e.message,'err');
+    console.error('Export error:',e);
+  }
+}
+function importLib(){document.getElementById('impInp').click()}
+document.getElementById('impInp').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;await doImport(f);e.target.value=''});
+async function doImport(f){
+  try{
+    toast(`${f.name} 불러오는 중...`,'inf');
+    const t=await f.text(),d=JSON.parse(t);
+    if(!Array.isArray(d)){toast('Invalid JSON format','err');return}
+    let n=0,skip=0;
+    const existing=await dbAll();const existIds=new Set(existing.map(x=>x.id));
+    for(const ds of d){
+      if(ds.id&&ds.name&&ds.data){
+        if(existIds.has(ds.id)){skip++;continue}
+        await dbPut(ds);n++;
+      }
+    }
+    await loadAll();
+    if(n)toast(`${n}개 데이터셋 불러오기 완료${skip?' ('+skip+'개 중복 스킵)':''}`,'ok');
+    else if(skip)toast(`${skip}개 모두 이미 존재 — 새 데이터 없음`,'inf');
+    else toast('유효한 데이터셋이 없습니다','err');
+  }catch(e){toast('Import 실패: '+e.message,'err')}
+}
+async function clearDB(){if(!confirm('모든 데이터 삭제?'))return;const tx=db.transaction(ST,'readwrite');tx.objectStore(ST).clear();await new Promise(r=>{tx.oncomplete=r});selIds.clear();dsColors={};dsNames={};await loadAll();updChart();toast('Cleared','inf')}
+
+// ===== GLOBAL DRAG & DROP JSON IMPORT =====
+document.body.addEventListener('dragover',e=>{
+  if([...e.dataTransfer.types].includes('Files')){e.preventDefault();document.body.classList.add('drag-json')}
+});
+document.body.addEventListener('dragleave',e=>{if(e.target===document.body||!document.body.contains(e.relatedTarget))document.body.classList.remove('drag-json')});
+document.body.addEventListener('drop',async e=>{
+  document.body.classList.remove('drag-json');
+  const files=[...e.dataTransfer.files];
+  const jsonFile=files.find(f=>f.name.endsWith('.json'));
+  if(jsonFile){e.preventDefault();await doImport(jsonFile)}
+});
+
+// ===== REPORT BUILDER =====
+const RP_FONT='Arial, "Malgun Gothic", "맑은 고딕", sans-serif';
+const RP_SZ={title:'16pt',h1:'13pt',h2:'12pt',body:'11pt',caption:'9pt',table:'9pt'};
+let rpStage=1;
+
+function openRP(){
+  if(!selIds.size){toast('보고서에 포함할 데이터셋을 먼저 선택하세요','err');return}
+  document.getElementById('rpMod').classList.add('on');
+  rpStage=1;rpShowStage();
+  const k=localStorage.getItem('jarvis_report_api_key');
+  if(k)document.getElementById('rpAIKey').value=k;
+  if(!document.getElementById('rpDate').value)document.getElementById('rpDate').value=new Date().toISOString().slice(0,10);
+}
+function closeRP(){document.getElementById('rpMod').classList.remove('on')}
+function rpShowStage(){
+  document.getElementById('rpS1').style.display=rpStage===1?'block':'none';
+  document.getElementById('rpS2').style.display=rpStage===2?'block':'none';
+  document.getElementById('rpBackBtn').style.display=rpStage>1?'':'none';
+  document.getElementById('rpStep').textContent=`Step ${rpStage}/2`;
+  document.getElementById('rpNextBtn').textContent=rpStage===1?'미리보기 생성 →':'🖨️ 인쇄(PDF) / 📄 Word';
+}
+function rpBack(){if(rpStage>1){rpStage--;rpShowStage();rpRestoreFooter()}}
+async function rpNext(){
+  if(rpStage===1){await rpGenPreview();rpStage=2;rpShowStage()}
+  else rpExportMenu();
+}
+function rpExportMenu(){
+  document.getElementById('rpFooter').innerHTML=`<button class="mb mb-s" onclick="closeRP()">닫기</button>
+    <button class="mb mb-s" onclick="rpStage=1;rpShowStage();rpRestoreFooter()">← 수정</button>
+    <button class="mb mb-p" onclick="rpPrint()">🖨️ 인쇄 / PDF</button>
+    <button class="mb mb-p" style="background:var(--cat)" onclick="rpDocx()">📄 Word 다운로드</button>`;
+}
+function rpRestoreFooter(){
+  document.getElementById('rpFooter').innerHTML=`<button class="mb mb-s" onclick="closeRP()">Cancel</button>
+    <button class="mb mb-s" id="rpBackBtn" onclick="rpBack()" style="${rpStage>1?'':'display:none'}">← Back</button>
+    <button class="mb mb-p" id="rpNextBtn" onclick="rpNext()">${rpStage===1?'미리보기 생성 →':'🖨️ 인쇄(PDF) / 📄 Word'}</button>`;
+}
+
+// ── Chart rendering ──
+async function rpRenderChart(type,datasets,width,height){
+  const area=document.createElement('div');area.style.cssText='position:absolute;left:-9999px;top:0';document.body.appendChild(area);
+  const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;canvas.style.background='#fff';area.appendChild(canvas);
+  const colors=datasets.map((ds,i)=>dsColors[ds.id]||COLORS_ARR[i%COLORS_ARR.length]);
+  const mkOpts=(xL,yL,yMin,yMax)=>({responsive:false,animation:false,
+    plugins:{legend:{position:'top',labels:{font:{size:10,weight:'bold',family:'Arial'},color:'#333',boxWidth:10,padding:6}}},
+    scales:{x:{type:'linear',title:{display:true,text:xL,font:{size:12,weight:'bold',family:'Arial'},color:'#333'},ticks:{font:{size:10,weight:'bold'},color:'#333'},grid:{color:'rgba(0,0,0,.08)'}},
+            y:{title:{display:true,text:yL,font:{size:12,weight:'bold',family:'Arial'},color:'#333'},ticks:{font:{size:10,weight:'bold'},color:'#333'},grid:{color:'rgba(0,0,0,.08)'},min:yMin,max:yMax}}});
+  let cfg;
+  if(type==='cycle'){
+    cfg={type:'line',data:{datasets:datasets.map((ds,i)=>{
+      const pts=ds.data.cycles.map(c=>({x:c.cycle,y:c.dchgCap})).filter(p=>p.y>0);
+      return{label:dsNames[ds.id]||ds.name,data:pts,borderColor:colors[i],borderWidth:2,pointRadius:pts.length>200?0:1.5,tension:.1,fill:false}})},
+      options:mkOpts('Cycle Number','Discharge Capacity (mAh/g)')};
+  }else if(type==='efficiency'){
+    cfg={type:'line',data:{datasets:datasets.map((ds,i)=>{
+      const pts=ds.data.cycles.map(c=>({x:c.cycle,y:c.eff})).filter(p=>p.y>0&&p.y<=110);
+      return{label:dsNames[ds.id]||ds.name,data:pts,borderColor:colors[i],borderWidth:2,pointRadius:pts.length>200?0:1.5,tension:.1,fill:false}})},
+      options:mkOpts('Cycle Number','Coulombic Efficiency (%)',95,101)};
+  }else if(type==='rate'){
+    // Rate: use all cycle data (rate files typically have ~22 cycles with varying C-rates)
+    cfg={type:'line',data:{datasets:datasets.map((ds,i)=>{
+      const pts=ds.data.cycles.map(c=>({x:c.cycle,y:c.dchgCap})).filter(p=>p.y>0);
+      return{label:dsNames[ds.id]||ds.name,data:pts,borderColor:colors[i],borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:.1,fill:false}})},
+      options:mkOpts('Cycle Number','Discharge Capacity (mAh/g)')};
+  }else{
+    // voltage or unknown
+    cfg={type:'line',data:{datasets:datasets.map((ds,i)=>{
+      const pts=ds.data.cycles.map(c=>({x:c.cycle,y:c.dchgCap})).filter(p=>p.y>0);
+      return{label:dsNames[ds.id]||ds.name,data:pts,borderColor:colors[i],borderWidth:2,pointRadius:0,tension:.1,fill:false}})},
+      options:mkOpts('Cycle Number','Discharge Capacity (mAh/g)')};
+  }
+  const ch=new Chart(canvas,cfg);await new Promise(r=>setTimeout(r,400));
+  const img=canvas.toDataURL('image/png');ch.destroy();area.remove();return img;
+}
+
+// ── Table builder (matching reference doc: 2-row header, Dchg+Ret pairs) ──
+function rpBuildTable(datasets){
+  const bl=parseInt(document.getElementById('rpBL').value)||5;
+  const comps=document.getElementById('rpCycs').value.split(',').map(s=>parseInt(s.trim())).filter(n=>n>0);
+  const allC=[...new Set([1,bl,...comps])].sort((a,b)=>a-b);
+  const F=RP_FONT; const S=RP_SZ.table;
+  const thS=`text-align:center;padding:4px 6px;background:#d9e2f3;border:1px solid #8eaadb;font-size:${S};font-weight:bold;font-family:${F};white-space:nowrap`;
+  const tdS=`text-align:center;padding:3px 6px;border:1px solid #8eaadb;font-size:${S};font-family:${F};white-space:nowrap`;
+
+  // Header row 1: grouped columns
+  let h1=`<tr><th rowspan="2" style="${thS};text-align:left;min-width:120px">Sample</th>`;
+  h1+=`<th rowspan="2" style="${thS}">1st Dchg<br>(mAh/g)</th>`;
+  h1+=`<th rowspan="2" style="${thS}">ICE<br>(%)</th>`;
+  allC.forEach(c=>{
+    const hasDchg=true;
+    const hasRet=c!==bl;
+    const span=hasDchg&&hasRet?2:1;
+    h1+=`<th colspan="${span}" style="${thS}">${c===1?'1st':c+'th'}</th>`;
+  });
+  h1+='</tr>';
+
+  // Header row 2: sub-columns (Dchg / Ret)
+  let h2='<tr>';
+  allC.forEach(c=>{
+    h2+=`<th style="${thS}">Dchg<br>(mAh/g)</th>`;
+    if(c!==bl)h2+=`<th style="${thS}">Ret<br>(%)</th>`;
+  });
+  h2+='</tr>';
+
+  // Data rows
+  let body='';
+  datasets.forEach((ds,di)=>{
+    const cycs=ds.data?.cycles||[];const clr=dsColors[ds.id]||COLORS_ARR[di%COLORS_ARR.length];
+    const getAt=c=>{const ex=cycs.find(x=>x.cycle===c);if(ex)return ex;if(!cycs.length)return null;return cycs.reduce((p,v)=>Math.abs(v.cycle-c)<Math.abs(p.cycle-c)?v:p,cycs[0])};
+    const blD=getAt(bl);const blCap=blD?.dchgCap||1;
+    const c1=cycs[0]||{};
+    let r=`<tr><td style="${tdS};text-align:left;font-weight:bold;color:${clr}">${dsNames[ds.id]||ds.name}</td>`;
+    r+=`<td style="${tdS}">${c1.dchgCap?.toFixed(1)||'-'}</td>`;
+    r+=`<td style="${tdS}">${c1.eff?.toFixed(1)||'-'}</td>`;
+    allC.forEach(c=>{
+      const d=getAt(c);
+      r+=`<td style="${tdS}">${d?.dchgCap?.toFixed(1)||'-'}</td>`;
+      if(c!==bl){
+        const ret=d?.dchgCap&&blCap>0?((d.dchgCap/blCap*100).toFixed(1)+'%'):'-';
+        r+=`<td style="${tdS};font-weight:bold">${ret}</td>`;
+      }
+    });
+    r+='</tr>';body+=r;
+  });
+  return`<table style="width:100%;border-collapse:collapse;margin:8px 0">${h1}${h2}${body}</table>`;
+}
+
+// ── Markdown → HTML converter (for AI output) ──
+function mdToHtml(text,bStyle){
+  if(!text)return'';
+  return text.split('\n').map(line=>{
+    let l=line.trim();if(!l)return'';
+    // Remove ## headers
+    l=l.replace(/^#{1,3}\s*/,'');
+    // Bold **text** → <b>text</b>
+    l=l.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+    // Numbered list: "1. " → keep as-is but wrap
+    return`<p style="${bStyle}">${l}</p>`;
+  }).join('');
+}
+
+// ── AI conclusion ──
+async function rpGetAI(datasets){
+  const key=document.getElementById('rpAIKey').value.trim();
+  if(!key)return null;
+  localStorage.setItem('jarvis_report_api_key',key);
+  const mode=document.getElementById('rpAImode').value;
+  const custom=document.getElementById('rpAICustom')?.value||'';
+  const modeMap={general:'전반적인 배터리 성능 분석 결론',degradation:'열화 메커니즘 중심 결론',comparison:'샘플 간 성능 비교 결론',optimization:'공정 최적화 방향 제안 결론'};
+  const bl=parseInt(document.getElementById('rpBL').value)||5;
+  const summary=datasets.map(ds=>{
+    const c=ds.data?.cycles||[];const f=c[0];const blC=c.find(x=>x.cycle===bl)||c[Math.min(4,c.length-1)];const l=c[c.length-1];
+    return`- ${ds.name}: 1st Dchg ${f?.dchgCap?.toFixed(1)||'?'} mAh/g, ICE ${f?.eff?.toFixed(1)||'?'}%, ${bl}th ${blC?.dchgCap?.toFixed(1)||'?'} mAh/g, ${c.length}th ${l?.dchgCap?.toFixed(1)||'?'} mAh/g (Ret@${c.length}: ${blC?.dchgCap?(l?.dchgCap/blC.dchgCap*100).toFixed(1):'?'}%)`;
+  }).join('\n');
+
+  const sysPrompt=`당신은 리튬이온 배터리 R&D 엔지니어입니다. 실험 보고서의 "결론" 섹션을 작성합니다.
+
+작성 규칙:
+- 기술 보고서 문체로 작성 (AI 티가 나지 않게)
+- 번호 매기기로 핵심 결론을 3~5개 나열 (1. 2. 3. 형식, 마크다운 사용 금지)
+- 소제목은 볼드로 표시 (예: 1. 초기 방전 용량 및 ICE 분석)
+- 각 결론은 2~3문장, 구체적 수치를 인용
+- 한국어로 작성하되, 기술 용어는 영어 병행 (예: 용량 유지율(Capacity Retention))
+- "~것으로 판단된다", "~확인되었다", "~것으로 사료된다" 등 보고서 어미 사용
+- 마지막에 "종합 의견" 소제목 후 1문단 추가
+- 절대로 마크다운(##, **, - 등) 사용 금지. 순수 텍스트만 작성
+- 절대로 "AI", "분석 코멘트", "Claude" 등의 표현 사용 금지`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,system:sysPrompt,
+        messages:[{role:'user',content:`배터리 셀 테스트 결론 작성:\n${summary}\n셀타입: ${document.getElementById('rpCell').value}\n조건: ${document.getElementById('rpCond').value||'미기재'}\n관점: ${modeMap[mode]}\n${custom?'추가: '+custom:''}`}]})});
+    const d=await res.json();if(d.error)return`(AI 오류: ${d.error.message})`;
+    return d.content?.[0]?.text||null;
+  }catch(e){return`(AI 요청 실패: ${e.message})`}
+}
+
+// ── Generate preview ──
+async function rpGenPreview(){
+  const pv=document.getElementById('rpPreview');
+  pv.innerHTML='<p style="text-align:center;color:#999;padding:30px">⏳ 보고서 생성 중...</p>';
+  const datasets=allDS.filter(d=>selIds.has(d.id));
+  if(!datasets.length){pv.innerHTML='<p style="color:red">선택된 데이터셋이 없습니다.</p>';return}
+
+  const title=document.getElementById('rpTitle').value||'Report';
+  const author=document.getElementById('rpAuthor').value||'';
+  const dateVal=document.getElementById('rpDate').value;
+  const date=dateVal?new Date(dateVal+'T00:00:00').toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}):new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
+  const cell=document.getElementById('rpCell').value;
+  const cond=document.getElementById('rpCond').value||'-';
+  const purpose=document.getElementById('rpPurpose').value||'';
+  const equipSel=document.getElementById('rpEquip').value;
+  const equips=equipSel==='auto'?[...new Set(datasets.map(d=>d.equipment||'Unknown'))].join(', '):equipSel;
+  const layout=document.getElementById('rpChartLayout').value;
+  const is2up=layout==='2up';
+
+  const F=RP_FONT;
+  const hStyle=`font-family:${F};font-size:${RP_SZ.h1};font-weight:bold;color:#1f3864;margin:20px 0 8px;padding:4px 0;border-bottom:2px solid #4472c4`;
+  const bStyle=`font-family:${F};font-size:${RP_SZ.body};line-height:1.8;color:#222;margin:6px 0`;
+  const capStyle=`font-family:${F};font-size:${RP_SZ.caption};color:#555;text-align:center;margin:4px 0 16px`;
+
+  // Charts
+  const chartW=is2up?440:860;const chartH=is2up?300:480;
+  let chartImgs={};let chartTypes=[];
+  if(document.getElementById('rpGcyc').checked)chartTypes.push('cycle');
+  if(document.getElementById('rpGeff').checked)chartTypes.push('efficiency');
+  if(document.getElementById('rpGvol').checked)chartTypes.push('voltage');
+  if(document.getElementById('rpGrate').checked)chartTypes.push('rate');
+  for(const t of chartTypes){chartImgs[t]=await rpRenderChart(t,datasets,chartW,chartH)}
+
+  // Build chart HTML with 2-up support (odd chart gets full row in 2-up)
+  let chartsHtml='';let figN=1;
+  const capMap={cycle:'Discharge capacity vs. cycle number',efficiency:'Coulombic efficiency vs. cycle number',voltage:'Voltage profile',rate:'Rate capability'};
+  if(is2up){
+    for(let i=0;i<chartTypes.length;i+=2){
+      chartsHtml+='<div style="display:flex;gap:12px;justify-content:center;margin:10px 0">';
+      chartsHtml+=`<div style="text-align:center;flex:1"><img src="${chartImgs[chartTypes[i]]}" style="width:100%;border:1px solid #ddd"><p style="${capStyle}">Fig. ${figN++}. ${capMap[chartTypes[i]]}</p></div>`;
+      if(i+1<chartTypes.length)chartsHtml+=`<div style="text-align:center;flex:1"><img src="${chartImgs[chartTypes[i+1]]}" style="width:100%;border:1px solid #ddd"><p style="${capStyle}">Fig. ${figN++}. ${capMap[chartTypes[i+1]]}</p></div>`;
+      chartsHtml+='</div>';
+    }
+  }else{
+    chartTypes.forEach(t=>{
+      chartsHtml+=`<div style="text-align:center;margin:12px 0"><img src="${chartImgs[t]}" style="max-width:100%;border:1px solid #ddd"></div><p style="${capStyle}">Fig. ${figN++}. ${capMap[t]}</p>`;
+    });
+  }
+
+  // Table
+  const tblHtml=rpBuildTable(datasets);
+
+  // Condition table
+  const samples=datasets.map((d,i)=>`<span style="color:${dsColors[d.id]||COLORS_ARR[i%COLORS_ARR.length]};font-weight:bold">${dsNames[d.id]||d.name}</span>`).join(', ');
+  const condTbl=`<table style="width:100%;border-collapse:collapse;margin:8px 0">
+    <tr><th style="width:120px;text-align:left;padding:5px 8px;background:#d9e2f3;border:1px solid #8eaadb;font-size:${RP_SZ.table};font-weight:bold;font-family:${F}">셀 타입</th><td style="padding:5px 8px;border:1px solid #8eaadb;font-size:${RP_SZ.table};font-family:${F}">${cell}</td></tr>
+    <tr><th style="text-align:left;padding:5px 8px;background:#d9e2f3;border:1px solid #8eaadb;font-size:${RP_SZ.table};font-weight:bold;font-family:${F}">장비</th><td style="padding:5px 8px;border:1px solid #8eaadb;font-size:${RP_SZ.table};font-family:${F}">${equips}</td></tr>
+    <tr><th style="text-align:left;padding:5px 8px;background:#d9e2f3;border:1px solid #8eaadb;font-size:${RP_SZ.table};font-weight:bold;font-family:${F}">테스트 조건</th><td style="padding:5px 8px;border:1px solid #8eaadb;font-size:${RP_SZ.table};font-family:${F}">${cond}</td></tr>
+    <tr><th style="text-align:left;padding:5px 8px;background:#d9e2f3;border:1px solid #8eaadb;font-size:${RP_SZ.table};font-weight:bold;font-family:${F}">샘플</th><td style="padding:5px 8px;border:1px solid #8eaadb;font-size:${RP_SZ.table};font-family:${F}">${samples}</td></tr></table>`;
+
+  // AI conclusion
+  let conclusionHtml='';
+  if(document.getElementById('rpAI').checked){
+    pv.innerHTML='<p style="text-align:center;color:#999;padding:30px">📝 결론 작성 중 (Claude API)...</p>';
+    const aiText=await rpGetAI(datasets);
+    if(aiText){
+      // Parse markdown → HTML, handle bold, numbered lists
+      conclusionHtml=mdToHtml(aiText,bStyle);
+      window._rpAIText=aiText;
+    }else{
+      conclusionHtml=`<p style="${bStyle};color:#999">(AI 결론 생략 — API Key 확인)</p>`;
+      window._rpAIText='';
+    }
+  }else{window._rpAIText=''}
+
+  pv.innerHTML=`
+    <div style="text-align:center;margin-bottom:24px;padding-bottom:12px;border-bottom:3px solid #4472c4">
+      <p style="font-family:${F};font-size:${RP_SZ.title};font-weight:bold;color:#1f3864;margin:0">${title}</p>
+      ${author||dateVal?`<p style="font-family:${F};font-size:${RP_SZ.body};color:#555;margin:6px 0 0">${[author,date].filter(Boolean).join(' · ')}</p>`:''}
+    </div>
+    <div style="${hStyle}">1. 목적</div>
+    ${purpose?`<p style="${bStyle}">${purpose.replace(/\n/g,'<br>')}</p>`:`<p style="${bStyle};color:#999">(목적 미입력)</p>`}
+    <div style="${hStyle}">2. 실험 조건</div>
+    <p style="${capStyle}">Table 1. 실험 조건 요약</p>
+    ${condTbl}
+    <div style="${hStyle}">3. 결과</div>
+    <p style="${bStyle};font-weight:bold">3.1 Cycle Performance</p>
+    ${chartsHtml}
+    <p style="${bStyle};font-weight:bold">3.2 성능 비교 (Baseline: ${document.getElementById('rpBL').value}th cycle)</p>
+    <p style="${capStyle}">Table 2. Cycle별 방전용량 및 유지율</p>
+    ${tblHtml}
+    <div style="${hStyle}">4. 결론</div>
+    ${conclusionHtml||`<p style="${bStyle};color:#999">(결론 미작성)</p>`}
+    <div style="margin-top:30px;padding-top:8px;border-top:1px solid #ccc;text-align:right;font-family:${F};font-size:8pt;color:#aaa">JARVIS Report Builder v2.1 · ${date}</div>`;
+  window._rpChartImgs=chartImgs;window._rpChartLayout=layout;
+}
+
+// ── Print ──
+function rpPrint(){
+  const pv=document.getElementById('rpPreview');if(!pv)return;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Report</title><style>body{font-family:Arial,"Malgun Gothic","맑은 고딕",sans-serif;padding:30px 40px;color:#222;font-size:11pt;line-height:1.8}@media print{body{padding:15px 20px}img{max-width:100%!important}table{page-break-inside:avoid}}</style></head><body>${pv.innerHTML}</body></html>`);
+  w.document.close();setTimeout(()=>w.print(),500);
+}
+
+// ── DOCX export ──
+async function rpDocx(){
+  toast('Word 생성 중...','inf');
+  try{
+    if(!window.docx){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/docx@9.5.3/build/index.umd.min.js';document.head.appendChild(s);await new Promise((r,j)=>{s.onload=r;s.onerror=()=>j(new Error('docx.js 로드 실패'))})}
+    const{Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,ImageRun,AlignmentType,HeadingLevel,BorderStyle,WidthType,ShadingType,VerticalMergeType}=window.docx;
+    const tblBd={style:BorderStyle.SINGLE,size:1,color:'8EAADB'};const bs={top:tblBd,bottom:tblBd,left:tblBd,right:tblBd};
+    const cm={top:40,bottom:40,left:60,right:60};
+    const fontBody='Malgun Gothic';const fontEn='Arial';const szBody=22;
+    const children=[];
+
+    const title=document.getElementById('rpTitle').value||'Report';
+    const author=document.getElementById('rpAuthor').value||'';
+    const dateVal=document.getElementById('rpDate').value;
+    const date=dateVal||new Date().toISOString().slice(0,10);
+    const purpose=document.getElementById('rpPurpose').value||'';
+    const cell=document.getElementById('rpCell').value;
+    const equipSel=document.getElementById('rpEquip').value;
+    const datasets=allDS.filter(d=>selIds.has(d.id));
+    const equips=equipSel==='auto'?[...new Set(datasets.map(d=>d.equipment||'Unknown'))].join(', '):equipSel;
+    const cond=document.getElementById('rpCond').value||'-';
+
+    // Title
+    children.push(new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:80},children:[new TextRun({text:title,bold:true,size:32,font:fontBody})]}));
+    if(author||dateVal)children.push(new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:200},children:[new TextRun({text:[author,date].filter(Boolean).join(' · '),size:szBody,color:'555555',font:fontBody})]}));
+
+    const h1=(text)=>new Paragraph({spacing:{before:240,after:100},border:{bottom:{style:BorderStyle.SINGLE,size:3,color:'4472C4',space:4}},children:[new TextRun({text,bold:true,size:26,font:fontBody,color:'1F3864'})]});
+    const bodyP=(text)=>new Paragraph({spacing:{after:80,line:360},children:[new TextRun({text,size:szBody,font:fontBody})]});
+    // Bold text parser for Word
+    const bodyParsed=(text)=>{
+      const runs=[];const parts=text.split(/\*\*([^*]+)\*\*/g);
+      for(let i=0;i<parts.length;i++){
+        if(!parts[i])continue;
+        runs.push(new TextRun({text:parts[i],size:szBody,font:fontBody,bold:i%2===1}));
+      }
+      return new Paragraph({spacing:{after:80,line:360},children:runs});
+    };
+
+    // 1. 목적
+    children.push(h1('1. 목적'));
+    if(purpose)purpose.split('\n').forEach(p=>{if(p.trim())children.push(bodyP(p.trim()))});
+
+    // 2. 실험 조건
+    children.push(h1('2. 실험 조건'));
+    const c1w=2400,c2w=6960;
+    const mkInfoRow=(l,v)=>new TableRow({children:[
+      new TableCell({borders:bs,width:{size:c1w,type:WidthType.DXA},margins:cm,shading:{fill:'D9E2F3',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:l,bold:true,size:20,font:fontBody})]})]}),
+      new TableCell({borders:bs,width:{size:c2w,type:WidthType.DXA},margins:cm,children:[new Paragraph({children:[new TextRun({text:v,size:20,font:fontBody})]})]})]});
+    children.push(new Table({width:{size:c1w+c2w,type:WidthType.DXA},columnWidths:[c1w,c2w],
+      rows:[mkInfoRow('셀 타입',cell),mkInfoRow('장비',equips),mkInfoRow('테스트 조건',cond),mkInfoRow('샘플',datasets.map(d=>dsNames[d.id]||d.name).join(', '))]}));
+
+    // 3. 결과
+    children.push(h1('3. 결과'));
+    const imgs=window._rpChartImgs||{};const layout=window._rpChartLayout||'1up';
+    const is2up=layout==='2up';let figN=1;
+    const capMap={cycle:'Discharge capacity vs. cycle number',efficiency:'Coulombic efficiency vs. cycle number',voltage:'Voltage profile',rate:'Rate capability'};
+    const chartTypes=Object.keys(imgs);
+
+    if(is2up){
+      for(let i=0;i<chartTypes.length;i+=2){
+        const imgCells=[];
+        for(let j=i;j<Math.min(i+2,chartTypes.length);j++){
+          const t=chartTypes[j];try{const b64=imgs[t].split(',')[1];const buf=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+          imgCells.push(new TableCell({borders:{top:{style:BorderStyle.NONE},bottom:{style:BorderStyle.NONE},left:{style:BorderStyle.NONE},right:{style:BorderStyle.NONE}},
+            width:{size:4680,type:WidthType.DXA},margins:{top:40,bottom:40,left:40,right:40},
+            children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new ImageRun({data:buf,transformation:{width:280,height:190},type:'png'})]}),
+              new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:60},children:[new TextRun({text:`Fig. ${figN++}. ${capMap[t]||t}`,size:18,italics:true,color:'555555',font:fontEn})]})]}));}catch(e){console.warn(e)}}
+        if(imgCells.length===1)imgCells.push(new TableCell({borders:{top:{style:BorderStyle.NONE},bottom:{style:BorderStyle.NONE},left:{style:BorderStyle.NONE},right:{style:BorderStyle.NONE}},width:{size:4680,type:WidthType.DXA},children:[new Paragraph({})]}));
+        children.push(new Table({width:{size:9360,type:WidthType.DXA},columnWidths:[4680,4680],rows:[new TableRow({children:imgCells})]}));
+      }
+    }else{
+      for(const t of chartTypes){try{const b64=imgs[t].split(',')[1];const buf=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+        children.push(new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:120,after:40},children:[new ImageRun({data:buf,transformation:{width:500,height:280},type:'png'})]}));
+        children.push(new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:120},children:[new TextRun({text:`Fig. ${figN++}. ${capMap[t]||t}`,size:18,italics:true,color:'555555',font:fontEn})]}));
+      }catch(e){console.warn(e)}}
+    }
+
+    // Performance table (matching 2-row header from rpBuildTable)
+    children.push(new Paragraph({spacing:{before:120,after:60},children:[new TextRun({text:'Table 2. Cycle별 방전용량 및 유지율',size:18,italics:true,color:'555555',font:fontBody})]}));
+    const bl=parseInt(document.getElementById('rpBL').value)||5;
+    const comps=document.getElementById('rpCycs').value.split(',').map(s=>parseInt(s.trim())).filter(n=>n>0);
+    const allC=[...new Set([1,bl,...comps])].sort((a,b)=>a-b);
+
+    // Calculate column layout
+    const fixedCols=3; // Sample, 1st Dchg, ICE
+    let dataCols=0;allC.forEach(c=>{dataCols++;if(c!==bl)dataCols++});
+    const totalCols=fixedCols+dataCols;
+    const cw=Math.floor(9360/totalCols);
+    const mkHCell=(txt,opts={})=>new TableCell({borders:bs,width:{size:opts.width||cw,type:WidthType.DXA},margins:cm,
+      shading:{fill:'D9E2F3',type:ShadingType.CLEAR},
+      verticalMerge:opts.vmerge,
+      columnSpan:opts.colspan,
+      children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:txt,bold:true,size:16,font:fontEn})]})]});
+    const mkDCell=(txt,bold)=>new TableCell({borders:bs,width:{size:cw,type:WidthType.DXA},margins:cm,
+      children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:txt,size:18,font:fontEn,bold})]})]});
+
+    // Header row 1
+    const hr1Cells=[
+      mkHCell('Sample',{vmerge:VerticalMergeType.RESTART}),
+      mkHCell('1st Dchg\n(mAh/g)',{vmerge:VerticalMergeType.RESTART}),
+      mkHCell('ICE\n(%)',{vmerge:VerticalMergeType.RESTART})
+    ];
+    allC.forEach(c=>{const span=c!==bl?2:1;hr1Cells.push(mkHCell(c===1?'1st':c+'th',{colspan:span}))});
+
+    // Header row 2
+    const hr2Cells=[
+      mkHCell('',{vmerge:VerticalMergeType.CONTINUE}),
+      mkHCell('',{vmerge:VerticalMergeType.CONTINUE}),
+      mkHCell('',{vmerge:VerticalMergeType.CONTINUE})
+    ];
+    allC.forEach(c=>{hr2Cells.push(mkHCell('Dchg\n(mAh/g)'));if(c!==bl)hr2Cells.push(mkHCell('Ret\n(%)'))});
+
+    // Data rows
+    const dRows=datasets.map(ds=>{const cycs=ds.data?.cycles||[];
+      const getAt=c=>{const ex=cycs.find(x=>x.cycle===c);if(ex)return ex;if(!cycs.length)return null;return cycs.reduce((p,v)=>Math.abs(v.cycle-c)<Math.abs(p.cycle-c)?v:p,cycs[0])};
+      const blD=getAt(bl);const blCap=blD?.dchgCap||1;const c1=cycs[0]||{};
+      const cells=[new TableCell({borders:bs,width:{size:cw,type:WidthType.DXA},margins:cm,
+        children:[new Paragraph({children:[new TextRun({text:dsNames[ds.id]||ds.name,bold:true,size:16,font:fontBody})]})]})];
+      cells.push(mkDCell(c1.dchgCap?.toFixed(1)||'-'));
+      cells.push(mkDCell(c1.eff?.toFixed(1)||'-'));
+      allC.forEach(c=>{const d=getAt(c);
+        cells.push(mkDCell(d?.dchgCap?.toFixed(1)||'-'));
+        if(c!==bl)cells.push(mkDCell(d?.dchgCap&&blCap>0?((d.dchgCap/blCap*100).toFixed(1)+'%'):'-',true))});
+      return new TableRow({children:cells});
+    });
+    children.push(new Table({width:{size:9360,type:WidthType.DXA},columnWidths:Array(totalCols).fill(cw),
+      rows:[new TableRow({children:hr1Cells}),new TableRow({children:hr2Cells}),...dRows]}));
+
+    // 4. 결론
+    children.push(h1('4. 결론'));
+    const aiText=window._rpAIText||'';
+    if(aiText){
+      aiText.split('\n').filter(p=>p.trim()).forEach(line=>{
+        let l=line.trim().replace(/^#{1,3}\s*/,'');
+        if(l.includes('**'))children.push(bodyParsed(l));
+        else children.push(bodyP(l));
+      });
+    }
+
+    // Footer
+    children.push(new Paragraph({spacing:{before:300},border:{top:{style:BorderStyle.SINGLE,size:1,color:'CCCCCC',space:6}},alignment:AlignmentType.RIGHT,
+      children:[new TextRun({text:`JARVIS Report Builder v2.1 · ${date}`,size:16,color:'999999',font:fontEn})]}));
+
+    const doc=new Document({
+      styles:{default:{document:{run:{font:fontBody,size:szBody},paragraph:{spacing:{line:360}}}},
+        paragraphStyles:[{id:'Heading1',name:'Heading 1',basedOn:'Normal',next:'Normal',quickFormat:true,
+          run:{size:26,bold:true,font:fontBody,color:'1F3864'},paragraph:{spacing:{before:240,after:120},outlineLevel:0}}]},
+      sections:[{properties:{page:{size:{width:12240,height:15840},margin:{top:1440,right:1200,bottom:1440,left:1200}}},children}]});
+    const blob=await Packer.toBlob(doc);
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${title.replace(/[\/\\:*?"<>|]/g,'_')}_${date}.docx`;
+    a.style.display='none';document.body.appendChild(a);a.click();document.body.removeChild(a);
+    toast('Word 다운로드 완료','ok');
+  }catch(e){toast('Word 생성 실패: '+e.message,'err');console.error(e)}
+}
+
+// ===== THEME =====
+function togTheme(){const l=document.body.getAttribute('data-theme')==='light';document.body.setAttribute('data-theme',l?'':'light');localStorage.setItem('jdl_theme',l?'dark':'light');if(chart){const tc=l?'#1e293b':'#94a3b8',gc=l?'rgba(0,0,0,.08)':'rgba(148,163,184,.1)';['x','y'].forEach(a=>{chart.options.scales[a].ticks.color=tc;chart.options.scales[a].title.color=tc;chart.options.scales[a].grid.color=gc});chart.update()}}
+
+// ===== TOAST =====
+function toast(m,t='inf'){const c=document.getElementById('toastC');if(!c)return;const el=document.createElement('div');el.className=`toast ${t}`;el.innerHTML=`<span>${t==='ok'?'✓':t==='err'?'✕':'ℹ'}</span> ${m}`;c.appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(100%)';setTimeout(()=>el.remove(),300)},3000)}
+
+// ===== INIT =====
+async function init(){
+  if(localStorage.getItem('jdl_theme')==='light')document.body.setAttribute('data-theme','light');
+  try{await openDB();await loadAll();initChart()}catch(e){console.error(e);toast('Init error','err')}
+}
+init();
+</script>
+</body>
+</html>
